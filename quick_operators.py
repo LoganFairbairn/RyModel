@@ -139,7 +139,9 @@ class RyModel_AddModifier(Operator):
     type: StringProperty(default='BEVEL')
 
     def execute(self, context):
-        bpy.ops.object.modifier_add(type=self.type)
+        if context.active_object:
+            new_modifier = context.active_object.modifiers.new(str(self.type), self.type)
+            new_modifier.show_expanded = False
         return {'FINISHED'}
 
 class RyModel_CopyModifiers(Operator):
@@ -297,7 +299,7 @@ class RyModel_AddCutter(Operator):
                 bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1, calc_uvs=False)
 
             case 'CONE':
-                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=12, radius1=1, radius2=0, depth=3)
+                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=32, radius1=1, radius2=0, depth=3)
         bm.to_mesh(new_mesh)
         bm.free()
 
@@ -325,6 +327,7 @@ class RyModel_AddCutter(Operator):
 
         # Add the object to the boolean modifier.
         boolean_modifier.object = new_cutter_object
+        boolean_modifier.show_expanded = False
 
         # Display the cutter in wireframe.
         new_cutter_object.display_type = 'WIRE'
