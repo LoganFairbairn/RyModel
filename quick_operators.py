@@ -146,7 +146,56 @@ class RyModel_CopyModifiers(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        #if context.active_object and len(context.view_layer.selected_objects) > 1:
+        if context.active_object:
+            if len(context.selected_objects) == 2:
+                transfer_object = context.selected_objects[1]
+                if context.selected_objects[1] == context.active_object:
+                    transfer_object = context.selected_objects[0]
+
+                for original_modifier in transfer_object.modifiers:
+                    new_modifier = context.active_object.modifiers.new(original_modifier.name, original_modifier.type)
+                    match new_modifier.type:
+                        case 'BEVEL':
+                            new_modifier.affect = original_modifier.affect
+                            new_modifier.angle_limit = original_modifier.angle_limit
+                            new_modifier.face_strength_mode = original_modifier.face_strength_mode
+                            new_modifier.harden_normals = original_modifier.harden_normals
+                            new_modifier.invert_vertex_group = original_modifier.invert_vertex_group
+                            new_modifier.limit_method = original_modifier.limit_method
+                            new_modifier.loop_slide = original_modifier.loop_slide
+                            new_modifier.mark_seam = original_modifier.mark_seam
+                            new_modifier.material = original_modifier.material
+                            new_modifier.miter_inner = original_modifier.miter_inner
+                            new_modifier.miter_outer = original_modifier.miter_outer
+                            new_modifier.offset_type = original_modifier.offset_type
+                            new_modifier.profile = original_modifier.profile
+                            new_modifier.profile_type = original_modifier.profile_type
+                            new_modifier.segments = original_modifier.segments
+                            new_modifier.spread = original_modifier.spread
+                            new_modifier.use_clamp_overlap = original_modifier.use_clamp_overlap
+                            new_modifier.segments = original_modifier.segments
+
+                        case 'WEIGHTED_NORMAL':
+                            new_modifier.weight = original_modifier.weight
+                            new_modifier.thresh = original_modifier.thresh
+
+                        #case 'SOLIDIFY':
+
+                        #case 'ARRAY':
+
+                        #case 'RADIAL_ARRAY':
+
+                        #case 'MULTIRES'
+
+                        #case 'REMESH'
+                        
+                        #case 'SUBSURF'
+
+                        #case 'SHRINKWRAP'
+
+                        #case 'TRIANGULATE'
+
+
         return {'FINISHED'}
 
 class RyModel_HSWFModApply(Operator):

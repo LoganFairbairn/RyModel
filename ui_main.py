@@ -123,8 +123,8 @@ def draw_modifiers(layout):
     op.type = 'SOLIDIFY'
     op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text=" ")
     op.type = 'ARRAY'
-    op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
     row.operator("rymodel.radial_array", icon='SURFACE_NCIRCLE', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
     op.type = 'MULTIRES'
     op = row.operator("rymodel.add_modifier", icon='MOD_REMESH', text=" ")
     op.type = 'REMESH'
