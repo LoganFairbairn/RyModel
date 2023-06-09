@@ -10,9 +10,8 @@ def draw_mesh_tools(layout):
     '''Draws additional mesh tools'''
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.auto_sharpen", icon='SHARPCURVE')
-    row.operator("rymodel.clean_mesh", icon='MESH_DATA')
-
+    row.operator("rymodel.auto_sharpen")
+    
 def draw_mirror_options(context, layout):
     '''Draws mirror options for this add-on to the user interface.'''
 
@@ -88,26 +87,6 @@ def draw_mirror_options(context, layout):
         op = row.operator("rymodel.mirror", text="Z")
         op.axis = 'FLIP_Z'
 
-def draw_origin_options(layout):
-    split = layout.split(factor=0.15)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Origin")
-
-    row = second_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.reset_origin", text="World")
-    op.location = 'WORLD_ORIGIN'
-    op = row.operator("rymodel.reset_origin", text="Selected")
-    op.location = 'SELECTED'
-    op = row.operator("rymodel.reset_origin", text="Surface")
-    op.location = 'SURFACE'
-    op = row.operator("rymodel.reset_origin", text="Volume")
-    op.location = 'VOLUME'
-
 def draw_modifiers(layout):
     row = layout.row()
     row.scale_y = UI_Y_SCALE
@@ -168,17 +147,63 @@ def draw_cutters(layout):
     op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text=" ")
     op.shape = 'CONE'
 
-def draw_unwrapping_options(layout):
-    row = layout.row(align=True)
+def draw_origin_options(layout):
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.label(text="Unwrapping")
+    row.label(text="Origin")
+
+    row = second_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    op = row.operator("rymodel.reset_origin", text="World")
+    op.location = 'WORLD_ORIGIN'
+    op = row.operator("rymodel.reset_origin", text="Selected")
+    op.location = 'SELECTED'
+    op = row.operator("rymodel.reset_origin", text="Surface")
+    op.location = 'SURFACE'
+    op = row.operator("rymodel.reset_origin", text="Volume")
+    op.location = 'VOLUME'
+
+def draw_mesh_cleaning_operations(layout):
+    '''Draws operations for mesh cleaning to the user interface.'''
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Clean")
+    row = second_column.row(align=True)
+    row.scale_y =UI_Y_SCALE
+    row.operator("rymodel.clean_mesh", icon='MESH_DATA')
+    row.operator("rymodel.select_ngons")
+
+def draw_unwrapping_options(layout):
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Unwrap")
+    row = second_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_seam", icon='UV_EDGESEL')
     row.operator("rymodel.unwrap", icon='UV')
 
 def draw_viewport_display(layout):
-    row = layout.row(align=True)
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.label(text="Viewport Displays")
+    row.label(text="Display")
+    row = second_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
     row.prop(bpy.context.space_data.shading, "show_cavity", toggle=True)
 
@@ -215,5 +240,6 @@ class RyModel_OT_open_menu(Operator):
         draw_mirror_options(context, layout)
         draw_origin_options(layout)
         #draw_extras(layout)
+        draw_mesh_cleaning_operations(layout)
         draw_unwrapping_options(layout)
         draw_viewport_display(layout)

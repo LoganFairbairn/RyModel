@@ -116,6 +116,15 @@ class RyModel_AutoSharpen(Operator):
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
 
+class RyModel_SelectNgons(Operator):
+    bl_idname = "rymodel.select_ngons"
+    bl_label = "Select NGons"
+    bl_description = "Selects all NGons in the active object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
 class RyModel_CleanMesh(Operator):
     bl_idname = "rymodel.clean_mesh"
     bl_label = "Clean Mesh"
