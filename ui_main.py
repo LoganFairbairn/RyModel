@@ -16,35 +16,47 @@ def draw_mesh_tools(layout):
 def draw_mirror_options(context, layout):
     '''Draws mirror options for this add-on to the user interface.'''
 
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
     # Check if a mirror modifier exists on the mesh.
     no_mirror_mod = True
     if context.active_object:
         mirror_modifier = context.active_object.modifiers.get('Mirror')
         if mirror_modifier:
             no_mirror_mod = False
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
+            row = first_column.row(align=True)
             row.label(text="Mirror")
+            row.scale_y = UI_Y_SCALE
+            row = second_column.row(align=True)
+            row.scale_y = UI_Y_SCALE
             row.prop(mirror_modifier, "use_axis", index=0, text="X", toggle=True)
             row.prop(mirror_modifier, "use_axis", index=1, text="Y", toggle=True)
             row.prop(mirror_modifier, "use_axis", index=2, text="Z", toggle=True)
-            row = layout.row(align=True)
+            row = first_column.row(align=True)
             row.label(text="Bisect")
+            row.scale_y = UI_Y_SCALE
+            row = second_column.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.prop(mirror_modifier, "use_bisect_axis", index=0, text="X", toggle=True)
             row.prop(mirror_modifier, "use_bisect_axis", index=1, text="Y", toggle=True)
             row.prop(mirror_modifier, "use_bisect_axis", index=2, text="Z", toggle=True)
-            row = layout.row(align=True)
+            row = first_column.row(align=True)
             row.label(text="Flip")
+            row.scale_y = UI_Y_SCALE
+            row = second_column.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.prop(mirror_modifier, "use_bisect_flip_axis", index=0, text="X", toggle=True)
             row.prop(mirror_modifier, "use_bisect_flip_axis", index=1, text="Y", toggle=True)
             row.prop(mirror_modifier, "use_bisect_flip_axis", index=2, text="Z", toggle=True)
 
     if not context.active_object or no_mirror_mod:
-        row = layout.row(align=True)
-        row.scale_y = UI_Y_SCALE
+        row = first_column.row(align=True)
         row.label(text="Axis")
+        row.scale_y = UI_Y_SCALE
+        row = second_column.row(align=True)
+        row.scale_y = UI_Y_SCALE
         op = row.operator("rymodel.mirror", text="X")
         op.axis = 'X'
         op = row.operator("rymodel.mirror", text="Y")
@@ -52,9 +64,11 @@ def draw_mirror_options(context, layout):
         op = row.operator("rymodel.mirror", text="Z")
         op.axis = 'Z'
 
-        row = layout.row(align=True)
-        row.scale_y = UI_Y_SCALE
+        row = first_column.row(align=True)
         row.label(text="Bisect")
+        row.scale_y = UI_Y_SCALE
+        row = second_column.row(align=True)
+        row.scale_y = UI_Y_SCALE
         op = row.operator("rymodel.mirror", text="X")
         op.axis = 'BISECT_X'
         op = row.operator("rymodel.mirror", text="Y")
@@ -62,8 +76,10 @@ def draw_mirror_options(context, layout):
         op = row.operator("rymodel.mirror", text="Z")
         op.axis = 'BISECT_Z'
 
-        row = layout.row(align=True)
+        row = first_column.row(align=True)
         row.label(text="Flip")
+        row.scale_y = UI_Y_SCALE
+        row = second_column.row(align=True)
         row.scale_y = UI_Y_SCALE
         op = row.operator("rymodel.mirror", text="X")
         op.axis = 'FLIP_X'
@@ -73,8 +89,15 @@ def draw_mirror_options(context, layout):
         op.axis = 'FLIP_Z'
 
 def draw_origin_options(layout):
-    row = layout.row(align=True)
-    row.label(text="Origin:")
+    split = layout.split(factor=0.15)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Origin")
+
+    row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.reset_origin", text="World")
     op.location = 'WORLD_ORIGIN'
@@ -183,8 +206,8 @@ class MATLAYER_OT_open_rymodel_menu(Operator):
         draw_mesh_tools(layout)
         draw_cutters(layout)
         draw_modifiers(layout)
-        draw_origin_options(layout)
         draw_mirror_options(context, layout)
+        draw_origin_options(layout)
         #draw_extras(layout)
         draw_unwrapping_options(layout)
         draw_viewport_display(layout)
