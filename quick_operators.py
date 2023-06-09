@@ -140,8 +140,8 @@ class RyModel_AddModifier(Operator):
 
     def execute(self, context):
         if context.active_object:
-            new_modifier = context.active_object.modifiers.new(str(self.type), self.type)
-            new_modifier.show_expanded = False
+            if not context.active_object.modifiers.get(str(self.type)):
+                context.active_object.modifiers.new(str(self.type), self.type)
         return {'FINISHED'}
 
 class RyModel_CopyModifiers(Operator):
