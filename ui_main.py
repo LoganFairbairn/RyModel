@@ -173,7 +173,7 @@ def draw_unwrapping_options(layout):
     row.scale_y = UI_Y_SCALE
     row.label(text="Unwrapping:")
     row.operator("rymodel.auto_seam", icon='UV_EDGESEL')
-    row.operator("uvpackeroperator.packbtn", icon='UV')
+    row.operator("rymodel.unwrap", icon='UV')
 
 def draw_viewport_display(layout):
     row = layout.row(align=True)

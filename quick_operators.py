@@ -4,6 +4,7 @@ import bpy
 import bmesh
 from bpy.types import Operator
 from bpy.props import StringProperty
+import addon_utils
 import logging
 
 class RyModel_Mirror(Operator):
@@ -439,6 +440,26 @@ class RyModel_Cheshire(Operator):
 
     def execute(self, context):
 
+        return {'FINISHED'}
+
+class RyModel_Unwrap(Operator):
+    bl_idname = "rymodel.unwrap"
+    bl_label = "Unwrap"
+    bl_description = "Unwraps the selected model using the best unwrapping method available amongst all add-ons you have installed in Blender, defaults to vanilla unwrapping and packing if you have no add-ons"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        addons = context.preferences.addons
+
+        # Use UV Packer if it's installed.
+        uv_packer = addons.get("UV-Packer")
+        if uv_packer:
+            bpy.ops.uvpackeroperator.packbtn()
+
+        # User has no enabled add-ons, using vanilla packing method.
+        else:
+            bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
+            
         return {'FINISHED'}
 
 class RyModel_AutoSeam(Operator):

@@ -18,7 +18,7 @@
 import bpy
 
 # Import operators.
-from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_CleanMesh, RyModel_RadialArray, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, RyModel_AddCutter, RyModel_HideCutters, RyModel_ShowCutters, RyModel_RemoveUnusedCutters, RyModel_AutoSeam
+from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_CleanMesh, RyModel_RadialArray, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, RyModel_AddCutter, RyModel_HideCutters, RyModel_ShowCutters, RyModel_RemoveUnusedCutters, RyModel_Unwrap, RyModel_AutoSeam
 
 # Import user interface.
 from .ui_main import MATLAYER_OT_open_rymodel_menu, ADDON_VERSION_NUMBER
@@ -52,6 +52,7 @@ classes = (
     RyModel_HideCutters, 
     RyModel_ShowCutters, 
     RyModel_RemoveUnusedCutters,
+    RyModel_Unwrap,
     RyModel_AutoSeam,
 
     # User Interface
