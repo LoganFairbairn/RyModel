@@ -4,7 +4,6 @@ import bpy
 import bmesh
 from bpy.types import Operator
 from bpy.props import StringProperty
-import addon_utils
 import logging
 
 class RyModel_Mirror(Operator):
