@@ -338,12 +338,12 @@ class RyModel_AddCutter(Operator):
 class RyModel_HideCutters(Operator):
     bl_idname = "rymodel.hide_cutters"
     bl_label = "Hide Cutters"
-    bl_description = "Hides all boolean cutter objects in the scene"
+    bl_description = "Hides all boolean cutter objects excluding the activly selected one"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         for obj in bpy.data.objects:
-            if obj.name.startswith("Cutter_"):
+            if obj.name.startswith("Cutter_") and obj != context.active_object:
                 obj.hide_viewport = True
         return {'FINISHED'}
 
