@@ -240,6 +240,18 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
+        if not context.active_object:
+            self.report({'INFO'}, "No object selected to add a cutter to.")
+            return {'FINISHED'}
+
+        if context.active_object.type != 'MESH':
+            self.report({'INFO'}, "Can't add a cutter to a non-mesh object.")
+            return {'FINISHED'}
+        
+        if context.active_object.name.startswith("Cutter_"):
+            self.report({'INFO'}, "Can't add a cutter to a cutter object.")
+            return {'FINISHED'}
+
         # We'll create the new cutter object at the center of the selected object. Move the 3D cursor there for later.
         original_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
