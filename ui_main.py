@@ -169,16 +169,16 @@ def draw_cutters(layout):
     op.shape = 'CONE'
 
 def draw_unwrapping_options(layout):
-    layout.label(text="Unwrapping:")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.label(text="Unwrapping:")
     row.operator("rymodel.auto_seam", icon='UV_EDGESEL')
     row.operator("uvpackeroperator.packbtn", icon='UV')
 
 def draw_viewport_display(layout):
-    layout.label(text="Viewport Displays:")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.label(text="Viewport Displays:")
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
     row.prop(bpy.context.space_data.shading, "show_cavity", toggle=True)
 

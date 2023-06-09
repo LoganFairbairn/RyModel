@@ -122,12 +122,18 @@ class RyModel_CleanMesh(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        #if context.active_object:
-        #    if context.active_object.type == 'MESH':
+        if context.active_object:
+            if context.active_object.type == 'MESH':
 
-        # Merge double vertices.
+                # Remove non-manifold geometry.
+                bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
+                bpy.ops.mesh.select_all(action='DESELECT')
+                bpy.ops.mesh.select_non_manifold()
+                bpy.ops.mesh.delete(type='VERT')
 
-        # Clean Non-Manifold geometry.
+                # Remove doubles.
+                bpy.ops.mesh.select_all(action='SELECT')
+                bpy.ops.mesh.remove_doubles()
         return {'FINISHED'}
 
 class RyModel_AddModifier(Operator):
