@@ -103,7 +103,7 @@ def register():
     km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
     addon_keymaps.append(km)
 
-    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, update=update_boolean_operation)
+    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, default='DIFFERENCE', update=update_boolean_operation)
 
     for cls in classes:
         bpy.utils.register_class(cls)
