@@ -287,7 +287,7 @@ class RyModel_AddCutter(Operator):
                 bmesh.ops.create_cube(bm, size=1.0)
 
             case 'CYLINDER':
-                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=True, segments=12, radius1=1, radius2=1, depth=5)
+                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=True, segments=32, radius1=1, radius2=1, depth=5)
 
             case 'SPHERE':
                 bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1, calc_uvs=False)
