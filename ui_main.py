@@ -190,7 +190,7 @@ def draw_extras(layout):
     row.operator("rymodel.curve_to_rope")
     row.operator("rymodel.cheshire")
 
-class MATLAYER_OT_open_rymodel_menu(Operator):
+class RyModel_OT_open_menu(Operator):
     bl_label = "Open RyModel Menu"
     bl_idname = "rymodel.open_menu"
     bl_description = "Opens the RyModel menu"
