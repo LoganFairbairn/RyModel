@@ -409,7 +409,7 @@ class RyModel_ShowCutters(Operator):
 class RyModel_RemoveUnusedCutters(Operator):
     bl_idname = "rymodel.remove_unused_cutters"
     bl_label = "Remove Unused Cutters"
-    bl_description = "Removes all unused cutter objects and all boolean modifiers with no objects"
+    bl_description = "Removes all unused cutter objects and all boolean modifiers on all objects that have no object assigned"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
