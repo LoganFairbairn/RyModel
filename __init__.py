@@ -21,7 +21,7 @@ import bpy
 from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_CleanMesh, RyModel_RadialArray, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, RyModel_AddCutter, RyModel_HideCutters, RyModel_ShowCutters, RyModel_RemoveUnusedCutters, RyModel_Unwrap, RyModel_AutoSeam
 
 # Import user interface.
-from .ui_main import MATLAYER_OT_open_rymodel_menu, ADDON_VERSION_NUMBER
+from .ui_main import RyModel_OT_open_menu, RyModel_OT_open_radial_array_menu, ADDON_VERSION_NUMBER
 
 bl_info = {
     "name": "RyModel",
@@ -56,7 +56,8 @@ classes = (
     RyModel_AutoSeam,
 
     # User Interface
-    MATLAYER_OT_open_rymodel_menu
+    RyModel_OT_open_menu,
+    RyModel_OT_open_radial_array_menu
 )
 
 addon_keymaps = []
@@ -98,7 +99,7 @@ def register():
     # Register properties, operators and pannels.
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
-    km.keymap_items.new(MATLAYER_OT_open_rymodel_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
+    km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
     addon_keymaps.append(km)
 
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, update=update_boolean_operation)

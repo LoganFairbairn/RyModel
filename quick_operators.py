@@ -16,7 +16,16 @@ def verify_active_mesh(self, context):
         self.report({'INFO'}, "Can't add a cutter to a non-mesh object.")
         return False
     return True
-    
+
+def create_unique_collection(collection_name, color_tag):
+    '''Creates a new collection with the provided name and color if one does not already exist.'''
+    collection = bpy.data.collections.get(collection_name)
+    if not collection:
+        collection = bpy.data.collections.new(collection_name)
+        collection.color_tag = color_tag
+        bpy.context.scene.collection.children.link(collection)
+    return collection
+
 class RyModel_Mirror(Operator):
     bl_idname = "rymodel.mirror"
     bl_label = "Mirror"
@@ -26,7 +35,7 @@ class RyModel_Mirror(Operator):
     axis: StringProperty(default='X')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         bpy.ops.object.modifier_add(type='MIRROR')
@@ -107,7 +116,7 @@ class RyModel_AutoSharpen(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         original_mode = bpy.context.mode
@@ -140,7 +149,7 @@ class RyModel_CleanMesh(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         if context.active_object:
@@ -174,7 +183,7 @@ class RyModel_AddModifier(Operator):
     type: StringProperty(default='BEVEL')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if context.active_object:
@@ -189,7 +198,7 @@ class RyModel_CopyModifiers(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         if context.active_object:
@@ -251,7 +260,7 @@ class RyModel_HSWFModApply(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         if context.active_object:
@@ -267,12 +276,31 @@ class RyModel_RadialArray(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
+        # Must be in object mode for this operation.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        
+        # If a radial array modfifier already exists on the object.
+        if context.active_object.modifiers.get('RadialArray'):
+            bpy.ops.rymodel.open_radial_array_menu()
+            return {'FINISHED'}
+        
+        if not context.active_object.modifiers.get('RadialArrayDisplacement'):
+            array_modifier = context.active_object.modifiers.new('RadialArrayDisplacement', 'DISPLACE')
+
         if not context.active_object.modifiers.get('RadialArray'):
             array_modifier = context.active_object.modifiers.new('RadialArray', 'ARRAY')
         array_modifier.use_object_offset = True
+
+
+        # Add a new empty object to rotate around.
+
+        # Open the radial array menu with the settings.
+        bpy.ops.rymodel.open_radial_array_menu()
+
+
 
         return {'FINISHED'}
 
@@ -285,7 +313,7 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if context.active_object.name.startswith("Cutter_"):
@@ -473,7 +501,7 @@ class RyModel_Unwrap(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         addons = context.preferences.addons
@@ -496,7 +524,7 @@ class RyModel_AutoSeam(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         original_mode = bpy.context.mode

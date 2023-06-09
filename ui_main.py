@@ -190,7 +190,7 @@ def draw_extras(layout):
     row.operator("rymodel.curve_to_rope")
     row.operator("rymodel.cheshire")
 
-class MATLAYER_OT_open_rymodel_menu(Operator):
+class RyModel_OT_open_menu(Operator):
     bl_label = "Open RyModel Menu"
     bl_idname = "rymodel.open_menu"
     bl_description = "Opens the RyModel menu"
@@ -217,3 +217,22 @@ class MATLAYER_OT_open_rymodel_menu(Operator):
         #draw_extras(layout)
         draw_unwrapping_options(layout)
         draw_viewport_display(layout)
+
+class RyModel_OT_open_radial_array_menu(Operator):
+    bl_label = "Open Radial Array Menu"
+    bl_idname = "rymodel.open_radial_array_menu"
+    bl_description = "Opens the radial array menu"
+
+    # Runs when the add layer button in the popup is clicked.
+    def execute(self, context):
+        return {'FINISHED'}
+
+    # Opens the popup when the add layer button is clicked.
+    def invoke(self, context, event):
+        return context.window_manager.invoke_popup(self, width=300)
+
+    # Draws the properties in the popup.
+    def draw(self, context):
+        
+        layout = self.layout
+        layout.label(text="RyModel {0}.{1}.{2}".format(str(ADDON_VERSION_NUMBER[0]), str(ADDON_VERSION_NUMBER[1]), str(ADDON_VERSION_NUMBER[2])))
