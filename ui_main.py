@@ -162,7 +162,6 @@ def draw_cutters(layout):
     op.shape = 'CONE'
 
 def draw_unwrapping_options(layout):
-    layout.separator()
     layout.label(text="Unwrapping:")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
@@ -170,11 +169,11 @@ def draw_unwrapping_options(layout):
     row.operator("uvpackeroperator.packbtn", icon='UV')
 
 def draw_viewport_display(layout):
-    layout.separator()
-    layout.label(text="Viewport Displays")
-    row = layout.row()
-    row.prop(bpy.context.space_data.overlay, "show_wireframes")
-    row.prop(bpy.context.space_data.shading, "show_cavity")
+    layout.label(text="Viewport Displays:")
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
+    row.prop(bpy.context.space_data.shading, "show_cavity", toggle=True)
 
 def draw_extras(layout):
     '''Draws extra tool operations to the user interface.'''
