@@ -2,18 +2,26 @@
 
 import bpy
 import bmesh
-from bpy.types import Operator
-from bpy.props import StringProperty
+from bpy.types import Operator, PropertyGroup
+from bpy.props import StringProperty, IntProperty, FloatProperty
 from . import rylog
 import math
 
-def verify_active_mesh(self, context):
+def verify_active_mesh(self=None):
     '''Verifies the active (selected) object exists an is a mesh.'''
-    if not context.active_object:
-        self.report({'ERROR'}, "Select a mesh object to perform this operation.")
+    if not bpy.context.active_object:
+        error_message = "Select a mesh object to perform this operation."
+        if self:
+            rylog.log_status(error_message, self, 'ERROR')
+        else:
+            rylog.log(error_message)
         return False
-    if context.active_object.type != 'MESH':
-        self.report({'ERROR'}, "Active object must be a mesh to perform this operation.")
+    if bpy.context.active_object.type != 'MESH':
+        error_message = "Active object must be a mesh to perform this operation."
+        if self:
+            rylog.log_status(error_message, self, 'ERROR')
+        else:
+            rylog.log(error_message)
         return False
     return True
 
@@ -26,7 +34,7 @@ class RyModel_Mirror(Operator):
     axis: StringProperty(default='X')
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         bpy.ops.object.modifier_add(type='MIRROR')
@@ -105,7 +113,7 @@ class RyModel_AutoSharpen(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode
@@ -138,7 +146,7 @@ class RyModel_SelectNgons(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         return {'FINISHED'}
 
@@ -149,7 +157,7 @@ class RyModel_CleanMesh(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
 
         original_mode = bpy.context.mode
@@ -178,7 +186,7 @@ class RyModel_AddModifier(Operator):
     type: StringProperty(default='BEVEL')
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         if not context.active_object.modifiers.get(str(self.type)):
@@ -192,7 +200,7 @@ class RyModel_CopyModifiers(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         if len(context.selected_objects) == 2:
@@ -252,7 +260,7 @@ class RyModel_HSWFModApply(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
 
         for modifier in context.active_object.modifiers:
@@ -261,6 +269,27 @@ class RyModel_HSWFModApply(Operator):
 
         return {'FINISHED'}
 
+def update_radial_offset(self, context):
+    if not verify_active_mesh():
+        return
+
+    displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
+    if displace_modifier:
+        displace_modifier.strength = context.scene.radial_array_settings.offset
+
+def update_radial_count(self, context):
+    if not verify_active_mesh():
+        return
+    
+    array_modifier = context.active_object.modifiers.get('RadialArray')
+    array_modifier.count = context.scene.radial_array_settings.count
+    empty_object = array_modifier.offset_object
+    empty_object.rotation_euler[2] = math.radians(360 / array_modifier.count)
+
+class RadialArraySettings(PropertyGroup):
+    offset: FloatProperty(name="Offset", default=2.0, min=0.0, soft_max=5.0, update=update_radial_offset)
+    count: IntProperty(name="Count", default=10, min=0, soft_max=100, update=update_radial_count)
+
 class RyModel_RadialArray(Operator):
     bl_idname = "rymodel.radial_array"
     bl_label = "Radial Array"
@@ -268,7 +297,7 @@ class RyModel_RadialArray(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         original_object = context.active_object
@@ -286,6 +315,7 @@ class RyModel_RadialArray(Operator):
         displace_modifier.strength = 1.0
         displace_modifier.mid_level = 0.0
         displace_modifier.direction = 'X'
+        displace_modifier.show_expanded = False
 
         # Add an array modifer.
         if not array_modifier:
@@ -293,6 +323,7 @@ class RyModel_RadialArray(Operator):
         array_modifier.use_relative_offset = False
         array_modifier.use_object_offset = True
         array_modifier.count = 10
+        array_modifier.show_expanded = False
 
         # Add an empty to the array.
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
@@ -301,6 +332,33 @@ class RyModel_RadialArray(Operator):
         empty_object = context.active_object
         array_modifier.offset_object = empty_object
         empty_object.rotation_euler[2] = math.radians(360 / array_modifier.count)
+
+        # Parent the empty to the array so the objects will move together.
+        empty_object.parent = original_object
+
+        return {'FINISHED'}
+
+class RyModel_RemoveRadialArray(Operator):
+    bl_idname = "rymodel.remove_radial_array"
+    bl_label = "Remove Radial Array"
+    bl_description = "Removes a radial array setup (created with this add-on) from the active object if one exists"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_object = context.active_object
+        displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
+        array_modifier =  context.active_object.modifiers.get('RadialArray')
+
+        if displace_modifier:
+            original_object.modifiers.remove(displace_modifier)
+
+        if array_modifier:
+            original_object.modifiers.remove(array_modifier)
+
+        
 
         return {'FINISHED'}
 
@@ -313,7 +371,7 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         if context.active_object.name.startswith("Cutter_"):
@@ -491,7 +549,7 @@ class RyModel_Cheshire(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         return {'FINISHED'}
 
@@ -502,7 +560,7 @@ class RyModel_Unwrap(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         addons = context.preferences.addons
@@ -525,7 +583,7 @@ class RyModel_AutoSeam(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if not verify_active_mesh(self, context):
+        if not verify_active_mesh(self):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode

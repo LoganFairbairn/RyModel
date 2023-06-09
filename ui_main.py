@@ -102,7 +102,6 @@ def draw_modifiers(layout):
     op.type = 'SOLIDIFY'
     op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text=" ")
     op.type = 'ARRAY'
-    row.operator("rymodel.radial_array", icon='SURFACE_NCIRCLE', text=" ")
     op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
     op.type = 'MULTIRES'
     op = row.operator("rymodel.add_modifier", icon='MOD_REMESH', text=" ")
@@ -118,7 +117,14 @@ def draw_modifiers(layout):
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="HSFW Apply")
     row.operator("rymodel.copy_modifiers")
-    
+
+def draw_radial_array_options(layout):
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.radial_array", icon='SURFACE_NCIRCLE', text="")
+    row.prop(bpy.context.scene.radial_array_settings, "offset", slider=True)
+    row.prop(bpy.context.scene.radial_array_settings, "count", slider=True)
+
 def draw_cutters(layout):
     row = layout.row(align=True)
     row.label(text="Cutters")
@@ -237,6 +243,7 @@ class RyModel_OT_open_menu(Operator):
         draw_mesh_tools(layout)
         draw_cutters(layout)
         draw_modifiers(layout)
+        draw_radial_array_options(layout)
         draw_mirror_options(context, layout)
         draw_origin_options(layout)
         #draw_extras(layout)

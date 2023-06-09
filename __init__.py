@@ -18,7 +18,7 @@
 import bpy
 
 # Import operators.
-from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_CleanMesh, RyModel_SelectNgons, RyModel_RadialArray, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, RyModel_AddCutter, RyModel_HideCutters, RyModel_ShowCutters, RyModel_RemoveUnusedCutters, RyModel_Unwrap, RyModel_AutoSeam
+from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_CleanMesh, RyModel_SelectNgons, RadialArraySettings, RyModel_RadialArray, RyModel_RemoveRadialArray, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, RyModel_AddCutter, RyModel_HideCutters, RyModel_ShowCutters, RyModel_RemoveUnusedCutters, RyModel_Unwrap, RyModel_AutoSeam
 
 # Import user interface.
 from .ui_main import RyModel_OT_open_menu, ADDON_VERSION_NUMBER
@@ -45,7 +45,9 @@ classes = (
     RyModel_AutoSharpen,
     RyModel_CleanMesh,
     RyModel_SelectNgons,
+    RadialArraySettings,
     RyModel_RadialArray,
+    RyModel_RemoveRadialArray,
     RyModel_CurveToRope, 
     RyModel_Cheshire,
     RyModel_HSWFModApply,
@@ -97,16 +99,17 @@ addon_keymaps = []
 def register():
     addon_keymaps = []
 
-    # Register properties, operators and pannels.
+    # Assign keymapping for opening the add-on menu.
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
     km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
     addon_keymaps.append(km)
 
-    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, default='DIFFERENCE', update=update_boolean_operation)
-
     for cls in classes:
         bpy.utils.register_class(cls)
+
+    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, default='DIFFERENCE', update=update_boolean_operation)
+    bpy.types.Scene.radial_array_settings = bpy.props.PointerProperty(type=RadialArraySettings)
 
 def unregister():
     # Remove add-on key mapping.
