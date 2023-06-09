@@ -350,8 +350,9 @@ class RyModel_HideCutters(Operator):
 
     def execute(self, context):
         for obj in bpy.data.objects:
-            if obj.name.startswith("Cutter_") and obj != context.active_object:
-                obj.hide_viewport = True
+            if obj.name.startswith("Cutter_"):
+                if obj != context.active_object or obj.select_get() == False:
+                    obj.hide_viewport = True
         return {'FINISHED'}
 
 class RyModel_ShowCutters(Operator):
