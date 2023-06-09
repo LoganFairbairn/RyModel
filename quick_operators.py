@@ -474,6 +474,7 @@ class RyModel_AddCutter(Operator):
         # For cutters using slice, add a solidify modifier.
         if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
             solidify_modifier = new_cutter_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
+            solidify_modifier.use_even_offset = True
             solidify_modifier.thickness = 0.075
 
         # Set the location of the cutter.

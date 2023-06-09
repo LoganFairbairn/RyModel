@@ -85,6 +85,7 @@ def update_boolean_operation(self, context):
 
                             if not context.active_object.modifiers.get("SliceSolidify"):
                                 solidify_modifier = context.active_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
+                                solidify_modifier.use_even_offset = True
                                 solidify_modifier.thickness = 0.075
                         else: 
                             modifier.operation = context.scene.rymodel_boolean_mode
