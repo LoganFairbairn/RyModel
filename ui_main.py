@@ -111,7 +111,7 @@ def draw_origin_options(layout):
 def draw_modifiers(layout):
     row = layout.row()
     row.scale_y = UI_Y_SCALE
-    row.label(text="Modeling Modifiers:")
+    row.label(text="Modifiers:")
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
