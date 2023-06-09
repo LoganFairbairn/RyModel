@@ -152,6 +152,13 @@ def draw_cutters(layout):
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'INTERSECT')
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'UNION')
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'DIFFERENCE')
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE')
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.add_cutter", icon='MESH_CUBE', text=" ")
     op.shape = 'CUBE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CYLINDER', text=" ")

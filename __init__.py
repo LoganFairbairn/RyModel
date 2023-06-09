@@ -60,12 +60,34 @@ classes = (
 
 addon_keymaps = []
 
+boolean_operations = [
+    ("INTERSECT", "Intersect", "", 1),
+    ("UNION", "Union", "", 2),
+    ("DIFFERENCE", "Difference", "", 3),
+    ("SLICE", "Slice", "", 4)
+]
+
+def update_boolean_operation(self, context):
+    '''Updates the boolean operation for all objects using the selected cutter.'''
+    if not context.active_object:
+        return
+    
+    if context.active_object.name.startswith("Cutter_") and context.active_object.type == 'MESH':
+        for obj in bpy.data.objects:
+            for modifier in obj.modifiers:
+                if modifier.type == 'BOOLEAN':
+                    if modifier.object == context.active_object:
+                        modifier.operation = context.scene.rymodel_boolean_mode
+
+
 def register():
     # Register properties, operators and pannels.
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
     km.keymap_items.new(MATLAYER_OT_open_rymodel_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
     addon_keymaps.append(km)
+
+    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=boolean_operations, update=update_boolean_operation)
 
     for cls in classes:
         bpy.utils.register_class(cls)

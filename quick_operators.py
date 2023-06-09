@@ -271,6 +271,8 @@ class RyModel_AddCutter(Operator):
         # Adjust boolean settings.
         boolean_modifier.solver = 'FAST'
 
+        boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
+
         # Create a new cutter mesh with a unique name based on the provided cutter type.
         cutter_number = 1
         new_cutter_name = "CutterMesh_{0}".format(cutter_number)
