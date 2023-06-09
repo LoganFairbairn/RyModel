@@ -4,9 +4,10 @@ import bpy
 import bmesh
 from bpy.types import Operator
 from bpy.props import StringProperty
-import logging
+from . import rylog
+import math
 
-def verify_active_mesh(context, self):
+def verify_active_mesh(self, context):
     '''Verifies the active (selected) object exists an is a mesh.'''
     if not context.active_object:
         self.report({'ERROR'}, "Select a mesh object to perform this operation.")
@@ -25,7 +26,7 @@ class RyModel_Mirror(Operator):
     axis: StringProperty(default='X')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         bpy.ops.object.modifier_add(type='MIRROR')
@@ -104,7 +105,7 @@ class RyModel_AutoSharpen(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode
@@ -137,7 +138,7 @@ class RyModel_SelectNgons(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         return {'FINISHED'}
 
@@ -148,7 +149,7 @@ class RyModel_CleanMesh(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         original_mode = bpy.context.mode
@@ -177,7 +178,7 @@ class RyModel_AddModifier(Operator):
     type: StringProperty(default='BEVEL')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if not context.active_object.modifiers.get(str(self.type)):
@@ -191,7 +192,7 @@ class RyModel_CopyModifiers(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if len(context.selected_objects) == 2:
@@ -251,7 +252,7 @@ class RyModel_HSWFModApply(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
 
         for modifier in context.active_object.modifiers:
@@ -263,17 +264,43 @@ class RyModel_HSWFModApply(Operator):
 class RyModel_RadialArray(Operator):
     bl_idname = "rymodel.radial_array"
     bl_label = "Radial Array"
-    bl_description = "Applies a radial array to the select object"
+    bl_description = "Applies a radial array to the active (selected) object"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
+        original_object = context.active_object
+        displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
+        array_modifier =  context.active_object.modifiers.get('RadialArray')
+
+        # If either modifier exists, assume there is already a radial array applied to the active object.
+        if displace_modifier or array_modifier:
+            rylog.log_status("Radial array modifiers already exist on the active object, delete the existing radial array if you want a new one.", self)
             return {'FINISHED'}
 
-        if not context.active_object.modifiers.get('RadialArray'):
+        # Add a displacement modifier.
+        if not displace_modifier:
+            displace_modifier = context.active_object.modifiers.new('RadialArrayDisplacement', 'DISPLACE')
+        displace_modifier.strength = 1.0
+        displace_modifier.mid_level = 0.0
+        displace_modifier.direction = 'X'
+
+        # Add an array modifer.
+        if not array_modifier:
             array_modifier = context.active_object.modifiers.new('RadialArray', 'ARRAY')
+        array_modifier.use_relative_offset = False
         array_modifier.use_object_offset = True
-        array_modifier.use_object_offset = True
+        array_modifier.count = 10
+
+        # Add an empty to the array.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.empty_add(type='PLAIN_AXES', align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        empty_object = context.active_object
+        array_modifier.offset_object = empty_object
+        empty_object.rotation_euler[2] = math.radians(360 / array_modifier.count)
 
         return {'FINISHED'}
 
@@ -286,7 +313,7 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if context.active_object.name.startswith("Cutter_"):
@@ -464,7 +491,7 @@ class RyModel_Cheshire(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         return {'FINISHED'}
 
@@ -475,7 +502,7 @@ class RyModel_Unwrap(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         addons = context.preferences.addons
@@ -498,7 +525,7 @@ class RyModel_AutoSeam(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if verify_active_mesh(self, context):
+        if not verify_active_mesh(self, context):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode
