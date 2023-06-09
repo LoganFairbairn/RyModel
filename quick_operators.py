@@ -9,11 +9,11 @@ import logging
 def verify_active_mesh(self, context):
     '''Verifies there is an active object and the object is a mesh.'''
     if not context.active_object:
-        self.report({'INFO'}, "No object selected to add a cutter to.")
+        self.report({'ERROR'}, "No object selected.")
         return False
 
     if context.active_object.type != 'MESH':
-        self.report({'INFO'}, "Can't add a cutter to a non-mesh object.")
+        self.report({'ERROR'}, "Active object must be a mesh to run this operator.")
         return False
     return True
 

@@ -195,10 +195,6 @@ class RyModel_OT_open_menu(Operator):
     bl_idname = "rymodel.open_menu"
     bl_description = "Opens the RyModel menu"
 
-    # Runs when the add layer button in the popup is clicked.
-    def execute(self, context):
-        return {'FINISHED'}
-
     # Opens the popup when the add layer button is clicked.
     def invoke(self, context, event):
         return context.window_manager.invoke_popup(self, width=300)
