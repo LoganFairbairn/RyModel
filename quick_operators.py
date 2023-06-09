@@ -6,6 +6,16 @@ from bpy.types import Operator
 from bpy.props import StringProperty
 import logging
 
+def verify_active_mesh(context, self):
+    '''Verifies the active (selected) object exists an is a mesh.'''
+    if not context.active_object:
+        self.report({'ERROR'}, "Select a mesh object to perform this operation.")
+        return False
+    if context.active_object.type != 'MESH':
+        self.report({'ERROR'}, "Active object must be a mesh to perform this operation.")
+        return False
+    return True
+
 class RyModel_Mirror(Operator):
     bl_idname = "rymodel.mirror"
     bl_label = "Mirror"
@@ -15,6 +25,9 @@ class RyModel_Mirror(Operator):
     axis: StringProperty(default='X')
 
     def execute(self, context):
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
         bpy.ops.object.modifier_add(type='MIRROR')
         mirror_modifier = context.active_object.modifiers.get('Mirror')
         if not mirror_modifier:
@@ -60,8 +73,6 @@ class RyModel_Mirror(Operator):
                 mirror_modifier.use_axis[2] = True
                 mirror_modifier.use_axis[0] = False
                 mirror_modifier.use_bisect_flip_axis[2] = True
-
-
         return {'FINISHED'}
 
 class RyModel_ResetOrigin(Operator):
@@ -93,6 +104,9 @@ class RyModel_AutoSharpen(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
         original_mode = bpy.context.mode
 
         # Apply autosmooth.
@@ -123,6 +137,8 @@ class RyModel_SelectNgons(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
         return {'FINISHED'}
 
 class RyModel_CleanMesh(Operator):
@@ -132,26 +148,24 @@ class RyModel_CleanMesh(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if context.active_object:
-            if context.active_object.type == 'MESH':
-                original_mode = bpy.context.mode
-                bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
 
-                # Remove non-manifold geometry.
-                bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
-                bpy.ops.mesh.select_all(action='DESELECT')
-                bpy.ops.mesh.select_non_manifold()
-                bpy.ops.mesh.delete(type='VERT')
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
-                # Remove doubles.
-                bpy.ops.mesh.select_all(action='SELECT')
-                bpy.ops.mesh.remove_doubles()
+        # Remove non-manifold geometry.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_non_manifold()
+        bpy.ops.mesh.delete(type='VERT')
 
-                bpy.ops.object.mode_set(mode=original_mode, toggle=False)
-            else:
-                logging.log_status("Active object must be a mesh.")
-        else:
-            logging.log_status("No active object selected.", self)
+        # Remove doubles.
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.remove_doubles()
+
+        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+
         return {'FINISHED'}
 
 class RyModel_AddModifier(Operator):
@@ -163,9 +177,11 @@ class RyModel_AddModifier(Operator):
     type: StringProperty(default='BEVEL')
 
     def execute(self, context):
-        if context.active_object:
-            if not context.active_object.modifiers.get(str(self.type)):
-                context.active_object.modifiers.new(str(self.type), self.type)
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
+        if not context.active_object.modifiers.get(str(self.type)):
+            context.active_object.modifiers.new(str(self.type), self.type)
         return {'FINISHED'}
 
 class RyModel_CopyModifiers(Operator):
@@ -175,55 +191,56 @@ class RyModel_CopyModifiers(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if context.active_object:
-            if len(context.selected_objects) == 2:
-                transfer_object = context.selected_objects[1]
-                if context.selected_objects[1] == context.active_object:
-                    transfer_object = context.selected_objects[0]
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
+        if len(context.selected_objects) == 2:
+            transfer_object = context.selected_objects[1]
+            if context.selected_objects[1] == context.active_object:
+                transfer_object = context.selected_objects[0]
 
-                for original_modifier in transfer_object.modifiers:
-                    new_modifier = context.active_object.modifiers.new(original_modifier.name, original_modifier.type)
-                    match new_modifier.type:
-                        case 'BEVEL':
-                            new_modifier.affect = original_modifier.affect
-                            new_modifier.angle_limit = original_modifier.angle_limit
-                            new_modifier.face_strength_mode = original_modifier.face_strength_mode
-                            new_modifier.harden_normals = original_modifier.harden_normals
-                            new_modifier.invert_vertex_group = original_modifier.invert_vertex_group
-                            new_modifier.limit_method = original_modifier.limit_method
-                            new_modifier.loop_slide = original_modifier.loop_slide
-                            new_modifier.mark_seam = original_modifier.mark_seam
-                            new_modifier.material = original_modifier.material
-                            new_modifier.miter_inner = original_modifier.miter_inner
-                            new_modifier.miter_outer = original_modifier.miter_outer
-                            new_modifier.offset_type = original_modifier.offset_type
-                            new_modifier.profile = original_modifier.profile
-                            new_modifier.profile_type = original_modifier.profile_type
-                            new_modifier.segments = original_modifier.segments
-                            new_modifier.spread = original_modifier.spread
-                            new_modifier.use_clamp_overlap = original_modifier.use_clamp_overlap
-                            new_modifier.segments = original_modifier.segments
+            for original_modifier in transfer_object.modifiers:
+                new_modifier = context.active_object.modifiers.new(original_modifier.name, original_modifier.type)
+                match new_modifier.type:
+                    case 'BEVEL':
+                        new_modifier.affect = original_modifier.affect
+                        new_modifier.angle_limit = original_modifier.angle_limit
+                        new_modifier.face_strength_mode = original_modifier.face_strength_mode
+                        new_modifier.harden_normals = original_modifier.harden_normals
+                        new_modifier.invert_vertex_group = original_modifier.invert_vertex_group
+                        new_modifier.limit_method = original_modifier.limit_method
+                        new_modifier.loop_slide = original_modifier.loop_slide
+                        new_modifier.mark_seam = original_modifier.mark_seam
+                        new_modifier.material = original_modifier.material
+                        new_modifier.miter_inner = original_modifier.miter_inner
+                        new_modifier.miter_outer = original_modifier.miter_outer
+                        new_modifier.offset_type = original_modifier.offset_type
+                        new_modifier.profile = original_modifier.profile
+                        new_modifier.profile_type = original_modifier.profile_type
+                        new_modifier.segments = original_modifier.segments
+                        new_modifier.spread = original_modifier.spread
+                        new_modifier.use_clamp_overlap = original_modifier.use_clamp_overlap
+                        new_modifier.segments = original_modifier.segments
 
-                        case 'WEIGHTED_NORMAL':
-                            new_modifier.weight = original_modifier.weight
-                            new_modifier.thresh = original_modifier.thresh
+                    case 'WEIGHTED_NORMAL':
+                        new_modifier.weight = original_modifier.weight
+                        new_modifier.thresh = original_modifier.thresh
 
-                        #case 'SOLIDIFY':
+                    #case 'SOLIDIFY':
 
-                        #case 'ARRAY':
+                    #case 'ARRAY':
 
-                        #case 'RADIAL_ARRAY':
+                    #case 'RADIAL_ARRAY':
 
-                        #case 'MULTIRES'
+                    #case 'MULTIRES'
 
-                        #case 'REMESH'
-                        
-                        #case 'SUBSURF'
+                    #case 'REMESH'
+                    
+                    #case 'SUBSURF'
 
-                        #case 'SHRINKWRAP'
+                    #case 'SHRINKWRAP'
 
-                        #case 'TRIANGULATE'
-
+                    #case 'TRIANGULATE'
 
         return {'FINISHED'}
 
@@ -234,10 +251,13 @@ class RyModel_HSWFModApply(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if context.active_object:
-            for modifier in context.active_object.modifiers:
-                if modifier.type != 'BEVEL' and modifier.type != 'WEIGHTED_NORMAL':
-                    bpy.ops.object.modifier_apply(modifier=modifier.name)
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+
+        for modifier in context.active_object.modifiers:
+            if modifier.type != 'BEVEL' and modifier.type != 'WEIGHTED_NORMAL':
+                bpy.ops.object.modifier_apply(modifier=modifier.name)
+
         return {'FINISHED'}
 
 class RyModel_RadialArray(Operator):
@@ -247,11 +267,13 @@ class RyModel_RadialArray(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        if context.active_object:
-            if not context.active_object.modifiers.get('RadialArray'):
-                array_modifier = context.active_object.modifiers.new('RadialArray', 'ARRAY')
-            array_modifier.use_object_offset = True
-            array_modifier.use_object_offset = True
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+
+        if not context.active_object.modifiers.get('RadialArray'):
+            array_modifier = context.active_object.modifiers.new('RadialArray', 'ARRAY')
+        array_modifier.use_object_offset = True
+        array_modifier.use_object_offset = True
 
         return {'FINISHED'}
 
@@ -264,12 +286,7 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
-        if not context.active_object:
-            self.report({'INFO'}, "No object selected to add a cutter to.")
-            return {'FINISHED'}
-
-        if context.active_object.type != 'MESH':
-            self.report({'INFO'}, "Can't add a cutter to a non-mesh object.")
+        if verify_active_mesh(self, context):
             return {'FINISHED'}
         
         if context.active_object.name.startswith("Cutter_"):
@@ -447,7 +464,8 @@ class RyModel_Cheshire(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
         return {'FINISHED'}
 
 class RyModel_Unwrap(Operator):
@@ -457,6 +475,9 @@ class RyModel_Unwrap(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
         addons = context.preferences.addons
 
         # Use UV Packer if it's installed.
@@ -477,6 +498,9 @@ class RyModel_AutoSeam(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        if verify_active_mesh(self, context):
+            return {'FINISHED'}
+        
         original_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
         bpy.ops.mesh.select_all(action='DESELECT')
