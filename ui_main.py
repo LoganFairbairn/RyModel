@@ -111,7 +111,7 @@ def draw_origin_options(layout):
 def draw_modifiers(layout):
     row = layout.row()
     row.scale_y = UI_Y_SCALE
-    row.label(text="Modifiers:")
+    row.label(text="Modifiers")
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
@@ -142,7 +142,7 @@ def draw_modifiers(layout):
     
 def draw_cutters(layout):
     row = layout.row(align=True)
-    row.label(text="Cutters: ")
+    row.label(text="Cutters")
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
@@ -171,14 +171,14 @@ def draw_cutters(layout):
 def draw_unwrapping_options(layout):
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.label(text="Unwrapping:")
+    row.label(text="Unwrapping")
     row.operator("rymodel.auto_seam", icon='UV_EDGESEL')
     row.operator("rymodel.unwrap", icon='UV')
 
 def draw_viewport_display(layout):
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.label(text="Viewport Displays:")
+    row.label(text="Viewport Displays")
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
     row.prop(bpy.context.space_data.shading, "show_cavity", toggle=True)
 
