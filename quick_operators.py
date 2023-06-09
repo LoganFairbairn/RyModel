@@ -4,6 +4,7 @@ import bpy
 import bmesh
 from bpy.types import Operator
 from bpy.props import StringProperty
+import logging
 
 class RyModel_Mirror(Operator):
     bl_idname = "rymodel.mirror"
@@ -124,6 +125,8 @@ class RyModel_CleanMesh(Operator):
     def execute(self, context):
         if context.active_object:
             if context.active_object.type == 'MESH':
+                original_mode = bpy.context.mode
+                bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
                 # Remove non-manifold geometry.
                 bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
@@ -134,6 +137,12 @@ class RyModel_CleanMesh(Operator):
                 # Remove doubles.
                 bpy.ops.mesh.select_all(action='SELECT')
                 bpy.ops.mesh.remove_doubles()
+
+                bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+            else:
+                logging.log_status("Active object must be a mesh.")
+        else:
+            logging.log_status("No active object selected.", self)
         return {'FINISHED'}
 
 class RyModel_AddModifier(Operator):
