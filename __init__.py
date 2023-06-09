@@ -77,7 +77,20 @@ def update_boolean_operation(self, context):
             for modifier in obj.modifiers:
                 if modifier.type == 'BOOLEAN':
                     if modifier.object == context.active_object:
-                        modifier.operation = context.scene.rymodel_boolean_mode
+
+                        if context.scene.rymodel_boolean_mode == 'SLICE':
+                            modifier.operation = 'DIFFERENCE'
+
+                            if not context.active_object.modifiers.get("SliceSolidify"):
+                                solidify_modifier = context.active_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
+                                solidify_modifier.thickness = 0.075
+                        else: 
+                            modifier.operation = context.scene.rymodel_boolean_mode
+
+                            # For other boolean operations, remove the solidify modifier from the cutter if it exists.
+                            solidify_modifier = context.active_object.modifiers.get("SliceSolidify")
+                            if solidify_modifier:
+                                context.active_object.modifiers.remove(solidify_modifier)
 
 
 def register():

@@ -270,8 +270,10 @@ class RyModel_AddCutter(Operator):
 
         # Adjust boolean settings.
         boolean_modifier.solver = 'FAST'
-
-        boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
+        if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
+            boolean_modifier.operation = 'DIFFERENCE'
+        else:
+            boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
 
         # Create a new cutter mesh with a unique name based on the provided cutter type.
         cutter_number = 1
@@ -329,6 +331,11 @@ class RyModel_AddCutter(Operator):
 
         # Adjust visibility settings.
         new_cutter_object.hide_render = True
+
+        # For cutters using slice, add a solidify modifier.
+        if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
+            solidify_modifier = new_cutter_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
+            solidify_modifier.thickness = 0.075
 
         # Set the location of the cutter.
         new_cutter_object.location = bpy.context.scene.cursor.location
