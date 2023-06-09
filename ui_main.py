@@ -138,7 +138,7 @@ def draw_modifiers(layout):
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="HSFW Apply")
-    row.operator("rymodel.copy_modifiers", icon='MESH_DATA')
+    row.operator("rymodel.copy_modifiers")
     
 def draw_cutters(layout):
     row = layout.row(align=True)
