@@ -146,6 +146,12 @@ def draw_cutters(layout):
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.hide_cutters", icon='HIDE_ON', text="Hide")
+    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="Show")
+    row.operator("rymodel.remove_unused_cutters", icon='TRASH', text="")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.add_cutter", icon='MESH_CUBE', text=" ")
     op.shape = 'CUBE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CYLINDER', text=" ")
@@ -154,12 +160,6 @@ def draw_cutters(layout):
     op.shape = 'SPHERE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text=" ")
     op.shape = 'CONE'
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="Show")
-    row.operator("rymodel.hide_cutters", icon='HIDE_ON', text="Hide")
-    row.operator("rymodel.remove_unused_cutters", icon='TRASH', text="")
 
 def draw_unwrapping_options(layout):
     layout.separator()
