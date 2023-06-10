@@ -126,6 +126,26 @@ class RyModel_ExtractFace(Operator):
     def execute(self, context):
         if not verify_active_mesh(self):
             return {'FINISHED'}
+        
+        if bpy.context.mode != 'EDIT_MESH':
+            return
+        
+        if not bpy.context.scene.tool_settings.mesh_select_mode[2]:
+            return
+        
+        bpy.ops.mesh.duplicate_move(MESH_OT_duplicate={"mode":1}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
+
+        bpy.ops.mesh.separate(type='SELECTED')
+
+        new_object = context.selected_objects[1]
+        if context.selected_objects[1] == context.active_object:
+            new_object = context.selected_objects[0]
+
+        solidify_modifier = new_object.modifiers.new('Solidify', 'SOLIDIFY')
+        solidify_modifier.thickness = 0.1
+        solidify_modifier.offset = 1.0
+        solidify_modifier.use_even_offset = True
+
         return {'FINISHED'}
 
 class RyModel_ExtractCurve(Operator):
@@ -137,6 +157,27 @@ class RyModel_ExtractCurve(Operator):
     def execute(self, context):
         if not verify_active_mesh(self):
             return {'FINISHED'}
+        
+        if bpy.context.mode != 'EDIT_MESH':
+            return
+        
+        if not bpy.context.scene.tool_settings.mesh_select_mode[1]:
+            return
+
+        bpy.ops.mesh.duplicate_move(MESH_OT_duplicate={"mode":1}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
+
+        bpy.ops.mesh.separate(type='SELECTED')
+
+        new_object = context.selected_objects[1]
+        if context.selected_objects[1] == context.active_object:
+            new_object = context.selected_objects[0]
+
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.context.view_layer.objects.active = new_object
+
+        bpy.ops.object.convert(target='CURVE')
+        new_object.data.bevel_depth = 0.1
+
         return {'FINISHED'}
 
 class RyModel_SelectNgons(Operator):
