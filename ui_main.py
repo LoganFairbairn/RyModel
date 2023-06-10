@@ -59,8 +59,11 @@ def draw_mirror_tools(layout):
             row.prop(mirror_modifier, "use_axis", index=1, text="Y", toggle=True)
             row.prop(mirror_modifier, "use_axis", index=2, text="Z", toggle=True)
         
+            row = layout.row(align=True)
+            row.scale_y = UI_Y_SCALE
             row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
             row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
+            row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Insta Apply")
 
     if not bpy.context.active_object or no_mirror_mod:
         row = layout.row(align=True)
