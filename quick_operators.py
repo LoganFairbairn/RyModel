@@ -94,25 +94,25 @@ class RyModel_AutoSharpen(Operator):
         
         original_mode = bpy.context.mode
 
+        # Clear all bevel weights.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+
         # Apply autosmooth.
         bpy.context.object.data.use_auto_smooth = True
         bpy.context.object.data.auto_smooth_angle = 1.0472
 
-        # Shade smooth.
+        # Clear all bevel weights and sharpening.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.faces_shade_smooth()
-
-        # Clear all bevel weights and sharpening.
         bpy.ops.mesh.mark_sharp(clear=True)
-        bpy.ops.mesh.customdata_bevel_weight_edge_clear()
 
-        # Apply bevel weights and sharpening to all sharp angles.
+        # Mark bevel weights and sharpening for sharp angles.
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
         bpy.ops.mesh.edges_select_sharp(sharpness=0.523599)
-        bpy.ops.transform.edge_bevelweight(value=0.467186, snap=False)
         bpy.ops.mesh.mark_sharp()
+        bpy.ops.transform.edge_bevelweight(value=1.0, snap=False)
 
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
