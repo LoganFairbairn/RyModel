@@ -96,8 +96,8 @@ def register():
 
     # Assign keymapping for opening the add-on menu.
     wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
-    km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=True, shift=False)
+    km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='VIEW_3D')
+    km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=False, shift=False)
     addon_keymaps.append(km)
 
     for cls in classes:

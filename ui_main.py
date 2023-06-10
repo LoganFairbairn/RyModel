@@ -109,6 +109,8 @@ def draw_cutter_tools(layout):
     op.shape = 'SPHERE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text="")
     op.shape = 'CONE'
+    op = row.operator("rymodel.add_cutter", text="C")
+    op.shape = 'CONE'
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
@@ -118,7 +120,7 @@ def draw_cutter_tools(layout):
     row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE')
 
 def draw_origin_tools(layout):
-    split = layout.split(factor=0.15)
+    split = layout.split(factor=0.2)
     first_column = split.column()
     second_column = split.column()
 
@@ -146,7 +148,7 @@ def draw_mesh_cleaning_operations(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
-    split = layout.split(factor=0.15)
+    split = layout.split(factor=0.2)
     first_column = split.column()
     second_column = split.column()
 
@@ -166,7 +168,7 @@ def draw_unwrapping_options(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
-    split = layout.split(factor=0.15)
+    split = layout.split(factor=0.2)
     first_column = split.column()
     second_column = split.column()
 
@@ -280,6 +282,19 @@ def draw_modifiers(layout):
 
     draw_modifier_properties(layout)
 
+def draw_display_options(layout):
+    split = layout.split(factor=0.2)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Display")
+
+    row = second_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
+
 class RyModel_OT_open_menu(Operator):
     bl_label = "Open RyModel Menu"
     bl_idname = "rymodel.open_menu"
@@ -310,6 +325,7 @@ class RyModel_OT_open_menu(Operator):
         draw_origin_tools(first_column)
         draw_mesh_cleaning_operations(first_column)
         draw_unwrapping_options(first_column)
+        draw_display_options(first_column)
 
         # Modifiers
         draw_modifiers(second_column)

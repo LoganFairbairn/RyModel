@@ -406,6 +406,14 @@ class RyModel_2xSubDivision(Operator):
     def execute(self, context):
         if not verify_active_mesh(self):
             return {'FINISHED'}
+        
+        if not context.active_object.modifiers.get('2xSubDivision_1') and not context.active_object.modifiers.get('2xSubDivision_2'):
+            subdivision_modifier_1 = context.active_object.modifiers.new('2xSubDivision_1', 'SUBSURF')
+            subdivision_modifier_1.levels = 2
+            subdivision_modifier_1.subdivision_type = 'SIMPLE'
+            subdivision_modifier_2 = context.active_object.modifiers.new('2xSubDivision_2', 'SUBSURF')
+            subdivision_modifier_2.levels = 2
+
         return {'FINISHED'}
 
 #------------------------ CUTTERS ------------------------#
