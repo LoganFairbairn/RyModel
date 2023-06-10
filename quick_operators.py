@@ -58,6 +58,10 @@ class RyModel_Mirror(Operator):
             case 'Z':
                 mirror_modifier.use_axis[2] = True
                 mirror_modifier.use_axis[0] = False
+
+
+        organize_modifier_stack(context.active_object.modifiers)
+        
         return {'FINISHED'}
 
 class RyModel_ResetOrigin(Operator):
@@ -221,9 +225,31 @@ class RyModel_CleanMesh(Operator):
 
 #------------------------ MODIFIERS ------------------------#
 
-def organize_modifier_stack():
+def get_modifier(modifiers, modifier_type):
+    '''Returns the modififier of the given type if it exists in the modifiers provided.'''
+    for modifier in modifiers:
+        if modifier.type == modifier_type:
+            return modifier
+    return None
+
+def organize_modifier_stack(object_modifiers):
     '''Organizes the modifier stack order.'''
-    print("Placeholder...")
+
+    bevel_modifier = get_modifier(object_modifiers, 'BEVEL')
+    weighted_normal_modifier = get_modifier(object_modifiers, 'WEIGHTED_NORMAL')
+    mirror_modifier = get_modifier(object_modifiers, 'MIRROR')
+
+    if weighted_normal_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=len(object_modifiers) - 1)
+
+    if bevel_modifier:
+        if weighted_normal_modifier:
+            bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 2)
+        else:
+            bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 1)
+
+    if mirror_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=0)
 
 class RyModel_AddModifier(Operator):
     bl_idname = "rymodel.add_modifier"
@@ -238,7 +264,9 @@ class RyModel_AddModifier(Operator):
             return {'FINISHED'}
         
         if not context.active_object.modifiers.get(str(self.type)):
-            context.active_object.modifiers.new(str(self.type), self.type)
+            new_modifier = context.active_object.modifiers.new(str(self.type), self.type)
+
+        organize_modifier_stack(context.active_object.modifiers)
 
         return {'FINISHED'}
 
