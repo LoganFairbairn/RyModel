@@ -61,7 +61,7 @@ class RyModel_Mirror(Operator):
 
 
         organize_modifier_stack(context.active_object.modifiers)
-        
+
         return {'FINISHED'}
 
 class RyModel_ResetOrigin(Operator):
@@ -100,7 +100,9 @@ class RyModel_AutoSharpen(Operator):
 
         # Clear all bevel weights.
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+
+        if bpy.context.active_object.data.has_bevel_weight_edge:
+            bpy.ops.mesh.customdata_bevel_weight_edge_clear()
 
         # Apply autosmooth.
         bpy.context.object.data.use_auto_smooth = True
