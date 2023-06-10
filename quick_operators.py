@@ -7,6 +7,8 @@ from bpy.props import StringProperty, IntProperty, FloatProperty
 from . import rylog
 import math
 
+#------------------------ HELPERS ------------------------#
+
 def verify_active_mesh(self=None):
     '''Verifies the active (selected) object exists an is a mesh.'''
     if not bpy.context.active_object:
@@ -24,6 +26,8 @@ def verify_active_mesh(self=None):
             rylog.log(error_message)
         return False
     return True
+
+#------------------------ MODELING TOOLS ------------------------#
 
 class RyModel_Mirror(Operator):
     bl_idname = "rymodel.mirror"
@@ -54,34 +58,6 @@ class RyModel_Mirror(Operator):
             case 'Z':
                 mirror_modifier.use_axis[2] = True
                 mirror_modifier.use_axis[0] = False
-
-            case 'BISECT_X':
-                mirror_modifier.use_axis[0] = True
-                mirror_modifier.use_bisect_axis[0] = True
-
-            case 'BISECT_Y':
-                mirror_modifier.use_axis[0] = False
-                mirror_modifier.use_axis[1] = True
-                mirror_modifier.use_bisect_axis[1] = True
-
-            case 'BISECT_Z':
-                mirror_modifier.use_axis[0] = False
-                mirror_modifier.use_axis[2] = True
-                mirror_modifier.use_bisect_axis[2] = True
-
-            case 'FLIP_X':
-                mirror_modifier.use_axis[0] = True
-                mirror_modifier.use_bisect_flip_axis[0] = True
-
-            case 'FLIP_Y':
-                mirror_modifier.use_axis[1] = True
-                mirror_modifier.use_axis[0] = False
-                mirror_modifier.use_bisect_flip_axis[1] = True
-
-            case 'FLIP_Z':
-                mirror_modifier.use_axis[2] = True
-                mirror_modifier.use_axis[0] = False
-                mirror_modifier.use_bisect_flip_axis[2] = True
         return {'FINISHED'}
 
 class RyModel_ResetOrigin(Operator):
@@ -127,7 +103,11 @@ class RyModel_AutoSharpen(Operator):
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.faces_shade_smooth()
 
-        # Apply bevel weights.
+        # Clear all bevel weights and sharpening.
+        bpy.ops.mesh.mark_sharp(clear=True)
+        bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+
+        # Apply bevel weights and sharpening to all sharp angles.
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
         bpy.ops.mesh.edges_select_sharp(sharpness=0.523599)
@@ -135,6 +115,28 @@ class RyModel_AutoSharpen(Operator):
         bpy.ops.mesh.mark_sharp()
 
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        return {'FINISHED'}
+
+class RyModel_ExtractFace(Operator):
+    bl_idname = "rymodel.extract_face"
+    bl_label = "Extract Face"
+    bl_description = "Separates the selected faces from the object into a new object, and applied a solidify modifier to the new object for thickess"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        return {'FINISHED'}
+
+class RyModel_ExtractCurve(Operator):
+    bl_idname = "rymodel.extract_curve"
+    bl_label = "Extract Curve"
+    bl_description = "Separates the selected edges from the object into a new curve, and applies a default amount of bevel width to the new curve"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
         return {'FINISHED'}
 
 class RyModel_SelectNgons(Operator):
@@ -175,6 +177,13 @@ class RyModel_CleanMesh(Operator):
 
         return {'FINISHED'}
 
+
+#------------------------ MODIFIERS ------------------------#
+
+def organize_modifier_stack():
+    '''Organizes the modifier stack order.'''
+    print("Placeholder...")
+
 class RyModel_AddModifier(Operator):
     bl_idname = "rymodel.add_modifier"
     bl_label = "Add Modifier"
@@ -189,7 +198,72 @@ class RyModel_AddModifier(Operator):
         
         if not context.active_object.modifiers.get(str(self.type)):
             context.active_object.modifiers.new(str(self.type), self.type)
+
         return {'FINISHED'}
+
+class RyModel_DeleteModifier(Operator):
+    bl_idname = "rymodel.delete_modifier"
+    bl_label = "Delete Modifier"
+    bl_description = "Deletes the modifier from the active (selected) object, then re-organizes the modifier stack"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        modifier = bpy.context.active_object.modifiers.get(self.modifier_name)
+        if modifier:
+            bpy.context.active_object.modifiers.remove(modifier)
+
+        remove_unused_cutters()
+
+        return {'FINISHED'}
+
+def copy_modifiers(original_object, new_object):
+    for original_modifier in original_object.modifiers:
+        new_modifier = new_object.modifiers.new(original_modifier.name, original_modifier.type)
+        match new_modifier.type:
+            case 'BEVEL':
+                new_modifier.affect = original_modifier.affect
+                new_modifier.angle_limit = original_modifier.angle_limit
+                new_modifier.face_strength_mode = original_modifier.face_strength_mode
+                new_modifier.harden_normals = original_modifier.harden_normals
+                new_modifier.invert_vertex_group = original_modifier.invert_vertex_group
+                new_modifier.limit_method = original_modifier.limit_method
+                new_modifier.loop_slide = original_modifier.loop_slide
+                new_modifier.mark_seam = original_modifier.mark_seam
+                new_modifier.material = original_modifier.material
+                new_modifier.miter_inner = original_modifier.miter_inner
+                new_modifier.miter_outer = original_modifier.miter_outer
+                new_modifier.offset_type = original_modifier.offset_type
+                new_modifier.profile = original_modifier.profile
+                new_modifier.profile_type = original_modifier.profile_type
+                new_modifier.segments = original_modifier.segments
+                new_modifier.spread = original_modifier.spread
+                new_modifier.use_clamp_overlap = original_modifier.use_clamp_overlap
+                new_modifier.segments = original_modifier.segments
+
+            case 'WEIGHTED_NORMAL':
+                new_modifier.weight = original_modifier.weight
+                new_modifier.thresh = original_modifier.thresh
+
+            #case 'SOLIDIFY':
+
+            #case 'ARRAY':
+
+            #case 'RADIAL_ARRAY':
+
+            #case 'MULTIRES'
+
+            #case 'REMESH'
+            
+            #case 'SUBSURF'
+
+            #case 'SHRINKWRAP'
+
+            #case 'TRIANGULATE'
 
 class RyModel_CopyModifiers(Operator):
     bl_idname = "rymodel.copy_modifiers"
@@ -201,53 +275,14 @@ class RyModel_CopyModifiers(Operator):
         if not verify_active_mesh(self):
             return {'FINISHED'}
         
-        if len(context.selected_objects) == 2:
-            transfer_object = context.selected_objects[1]
+        if len(context.selected_objects) > 2:
+            original_object = context.selected_objects[1]
             if context.selected_objects[1] == context.active_object:
-                transfer_object = context.selected_objects[0]
+                original_object = context.selected_objects[0]
 
-            for original_modifier in transfer_object.modifiers:
-                new_modifier = context.active_object.modifiers.new(original_modifier.name, original_modifier.type)
-                match new_modifier.type:
-                    case 'BEVEL':
-                        new_modifier.affect = original_modifier.affect
-                        new_modifier.angle_limit = original_modifier.angle_limit
-                        new_modifier.face_strength_mode = original_modifier.face_strength_mode
-                        new_modifier.harden_normals = original_modifier.harden_normals
-                        new_modifier.invert_vertex_group = original_modifier.invert_vertex_group
-                        new_modifier.limit_method = original_modifier.limit_method
-                        new_modifier.loop_slide = original_modifier.loop_slide
-                        new_modifier.mark_seam = original_modifier.mark_seam
-                        new_modifier.material = original_modifier.material
-                        new_modifier.miter_inner = original_modifier.miter_inner
-                        new_modifier.miter_outer = original_modifier.miter_outer
-                        new_modifier.offset_type = original_modifier.offset_type
-                        new_modifier.profile = original_modifier.profile
-                        new_modifier.profile_type = original_modifier.profile_type
-                        new_modifier.segments = original_modifier.segments
-                        new_modifier.spread = original_modifier.spread
-                        new_modifier.use_clamp_overlap = original_modifier.use_clamp_overlap
-                        new_modifier.segments = original_modifier.segments
-
-                    case 'WEIGHTED_NORMAL':
-                        new_modifier.weight = original_modifier.weight
-                        new_modifier.thresh = original_modifier.thresh
-
-                    #case 'SOLIDIFY':
-
-                    #case 'ARRAY':
-
-                    #case 'RADIAL_ARRAY':
-
-                    #case 'MULTIRES'
-
-                    #case 'REMESH'
-                    
-                    #case 'SUBSURF'
-
-                    #case 'SHRINKWRAP'
-
-                    #case 'TRIANGULATE'
+            for obj in context.selected_objects:
+                if obj != original_object:
+                    copy_modifiers(original_object, obj)
 
         return {'FINISHED'}
 
@@ -360,6 +395,18 @@ class RyModel_RemoveRadialArray(Operator):
 
         return {'FINISHED'}
 
+class RyModel_2xSubDivision(Operator):
+    bl_idname = "rymodel.two_x_subdivision"
+    bl_label = "2x Subdivision"
+    bl_description = "Adds a 2x subdivision setup. Useful for a subdivision workflow where you don't want to add supporting loops for subdivided edges"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    type: StringProperty(default='BEVEL')
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        return {'FINISHED'}
 
 #------------------------ CUTTERS ------------------------#
 
@@ -369,6 +416,45 @@ CUTTER_MODE = [
     ("DIFFERENCE", "Difference", "", 3),
     ("SLICE", "Slice", "", 4)
 ]
+
+def hide_cutters():
+    if not verify_active_mesh():
+        return
+    
+    for obj in bpy.data.objects:
+        if obj.name.startswith("Cutter_"):
+            if obj != bpy.context.active_object or obj.select_get() == False:
+                obj.hide_viewport = True
+
+def show_cutters():
+    if not verify_active_mesh():
+        return
+
+    for obj in bpy.data.objects:
+        if obj.name.startswith("Cutter_"):
+                obj.hide_viewport = False
+
+def remove_unused_cutters():
+    '''Removes all unused cutter objects and all boolean modifiers on all objects that have no object assigned'''
+    used_cutter_objects = []
+    for obj in bpy.data.objects:
+        for modifier in obj.modifiers:
+            if modifier.type == 'BOOLEAN':
+                if modifier.object == None:
+                    obj.modifiers.remove(modifier)
+                else:
+                    used_cutter_objects.append(modifier.object)
+
+    for obj in bpy.data.objects:
+        if obj.name.startswith("Cutter_"):
+            if obj not in used_cutter_objects:
+                bpy.data.objects.remove(obj)
+
+def update_hide_cutters(self, context):
+    if not bpy.context.scene.rymodel_hide_cutters:
+        hide_cutters()
+    else:
+        show_cutters()
 
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
@@ -395,7 +481,7 @@ class RyModel_AddCutter(Operator):
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
 
         # Hide all existing cutters so the user can focus on the one they are adding.
-        bpy.ops.rymodel.hide_cutters()
+        hide_cutters()
 
         # Create a new cutter collection if one does not exist.
         cutter_collection = bpy.data.collections.get("Cutters")
@@ -492,53 +578,6 @@ class RyModel_AddCutter(Operator):
         
         return {'FINISHED'}
 
-class RyModel_HideCutters(Operator):
-    bl_idname = "rymodel.hide_cutters"
-    bl_label = "Hide Cutters"
-    bl_description = "Hides all boolean cutter objects excluding the activly selected one"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        for obj in bpy.data.objects:
-            if obj.name.startswith("Cutter_"):
-                if obj != context.active_object or obj.select_get() == False:
-                    obj.hide_viewport = True
-        return {'FINISHED'}
-
-class RyModel_ShowCutters(Operator):
-    bl_idname = "rymodel.show_cutters"
-    bl_label = "Show Cutters"
-    bl_description = "Shows all boolean cutter objects for the selected object"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        for obj in bpy.data.objects:
-            if obj.name.startswith("Cutter_"):
-                    obj.hide_viewport = False
-        return {'FINISHED'}
-
-class RyModel_RemoveUnusedCutters(Operator):
-    bl_idname = "rymodel.remove_unused_cutters"
-    bl_label = "Remove Unused Cutters"
-    bl_description = "Removes all unused cutter objects and all boolean modifiers on all objects that have no object assigned"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        used_cutter_objects = []
-        for obj in bpy.data.objects:
-            for modifier in obj.modifiers:
-                if modifier.type == 'BOOLEAN':
-                    if modifier.object == None:
-                        obj.modifiers.remove(modifier)
-                    else:
-                        used_cutter_objects.append(modifier.object)
-
-        for obj in bpy.data.objects:
-            if obj.name.startswith("Cutter_"):
-                if obj not in used_cutter_objects:
-                    bpy.data.objects.remove(obj)
-        return {'FINISHED'}
-
 class RyModel_CurveToRope(Operator):
     bl_idname = "rymodel.curve_to_rope"
     bl_label = "Curve To Rope"
@@ -565,7 +604,7 @@ class RyModel_Cheshire(Operator):
 class RyModel_Unwrap(Operator):
     bl_idname = "rymodel.unwrap"
     bl_label = "Unwrap"
-    bl_description = "Unwraps the selected model using the best unwrapping method available amongst all add-ons you have installed in Blender, defaults to vanilla unwrapping and packing if you have no add-ons"
+    bl_description = "Unwraps and packs the selected model using the best unwrapping method available amongst all packing / unwrapping add-ons you have installed in Blender, defaults to vanilla unwrapping and packing if you have no packing / unwrapping add-ons"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
