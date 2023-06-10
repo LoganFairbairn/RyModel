@@ -26,7 +26,7 @@ from .ui_main import RyModel_OT_open_menu, ADDON_VERSION_NUMBER
 bl_info = {
     "name": "RyModel",
     "author": "Logan Fairbairn (Ryver)",
-    "version": (ADDON_VERSION_NUMBER[0], ADDON_VERSION_NUMBER[1], ADDON_VERSION_NUMBER[2]),
+    "version": (0, 2, 0),
     "blender": (3, 5, 1),
     "location": "View3D > Sidebar > RyModel",
     "description": "Adds a quick access menu with a collection of batched and commonly used modeling operations.",
@@ -92,16 +92,16 @@ def update_boolean_operation(self, context):
 addon_keymaps = []
 
 def register():
-    addon_keymaps = []
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
     # Assign keymapping for opening the add-on menu.
     wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='VIEW_3D')
-    km.keymap_items.new(RyModel_OT_open_menu.bl_idname, 'D', 'PRESS', ctrl=False, shift=False)
-    addon_keymaps.append(km)
-
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+        kmi = km.keymap_items.new(RyModel_OT_open_menu.bl_idname, type='D', value='PRESS', ctrl=False)
+        addon_keymaps.append((km, kmi))
 
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, default='DIFFERENCE', update=update_boolean_operation)
     bpy.types.Scene.rymodel_hide_cutters = bpy.props.BoolProperty(default=False, name="Hide Cutters", update=update_hide_cutters)
@@ -112,10 +112,9 @@ def register():
 
 def unregister():
     # Remove add-on key mapping.
-    wm = bpy.context.window_manager
-    for km in addon_keymaps:
-        wm.keyconfigs.addon.keymaps.remove(km)
-    del addon_keymaps[:]
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+    addon_keymaps.clear()
 
     for cls in classes:
         bpy.utils.unregister_class(cls)
