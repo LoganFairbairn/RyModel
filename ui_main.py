@@ -246,7 +246,6 @@ class RyModel_OT_open_menu(Operator):
         draw_radial_array_options(layout)
         draw_mirror_options(context, layout)
         draw_origin_options(layout)
-        #draw_extras(layout)
         draw_mesh_cleaning_operations(layout)
         draw_unwrapping_options(layout)
         draw_viewport_display(layout)

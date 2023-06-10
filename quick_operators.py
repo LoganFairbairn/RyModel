@@ -360,6 +360,16 @@ class RyModel_RemoveRadialArray(Operator):
 
         return {'FINISHED'}
 
+
+#------------------------ CUTTERS ------------------------#
+
+CUTTER_MODE = [
+    ("INTERSECT", "Intersect", "", 1),
+    ("UNION", "Union", "", 2),
+    ("DIFFERENCE", "Difference", "", 3),
+    ("SLICE", "Slice", "", 4)
+]
+
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
     bl_label = "Add Cutter"
