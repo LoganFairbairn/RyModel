@@ -63,7 +63,7 @@ def draw_mirror_tools(layout):
             row.scale_y = UI_Y_SCALE
             row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
             row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
-            row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Insta Apply")
+            row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
 
     if not bpy.context.active_object or no_mirror_mod:
         row = layout.row(align=True)
@@ -79,7 +79,7 @@ def draw_mirror_tools(layout):
         row.scale_y = UI_Y_SCALE
         row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
         row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
-        row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Insta Apply")
+        row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
 
 def draw_cutter_tools(layout):
     if not bpy.context.active_object:
@@ -126,15 +126,7 @@ def draw_cutter_tools(layout):
     row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE')
 
 def draw_origin_tools(layout):
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Origin")
-
-    row = second_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.reset_origin", text="", icon='WORLD')
@@ -154,15 +146,7 @@ def draw_mesh_cleaning_operations(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y =UI_Y_SCALE
-    row.label(text="Clean")
-
-    row = second_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_y =UI_Y_SCALE
     row.operator("rymodel.clean_mesh")
     row.operator("rymodel.select_ngons")
@@ -174,15 +158,7 @@ def draw_unwrapping_options(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y =UI_Y_SCALE
-    row.label(text="UVs")
-
-    row = second_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_seam")
     row.operator("rymodel.unwrap")
@@ -258,7 +234,11 @@ def draw_modifier_properties(layout):
             row.separator()
 
 def draw_modifiers(layout):
-    row = layout.row(align=True)
+    split = layout.split(factor=0.75)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.add_modifier", icon='MOD_BEVEL', text=" ")
     op.type = 'BEVEL'
@@ -271,8 +251,6 @@ def draw_modifiers(layout):
     row.operator("rymodel.radial_array", icon='SURFACE_NCIRCLE', text=" ")
     op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
     op.type = 'MULTIRES'
-    op = row.operator("rymodel.add_modifier", icon='MOD_REMESH', text=" ")
-    op.type = 'REMESH'
     op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text=" ")
     op.type = 'SUBSURF'
     row.operator("rymodel.two_x_subdivision", text="2x")
@@ -281,23 +259,16 @@ def draw_modifiers(layout):
     op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text=" ")
     op.type = 'TRIANGULATE'
 
-    row = layout.row(align=True)
+    row = second_column.row(align=True)
+    row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="")
-    row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="Apply Modifiers")
+    row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="+")
 
     draw_modifier_properties(layout)
 
 def draw_display_options(layout):
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Display")
-
-    row = second_column.row()
+    row = layout.row()
     row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
 
@@ -312,7 +283,7 @@ class RyModel_OT_open_menu(Operator):
 
     # Opens the popup when the add layer button is clicked.
     def invoke(self, context, event):
-        return context.window_manager.invoke_popup(self, width=450)
+        return context.window_manager.invoke_popup(self, width=475)
 
     # Draws the properties in the popup.
     def draw(self, context):
@@ -320,7 +291,7 @@ class RyModel_OT_open_menu(Operator):
         layout = self.layout
         layout.label(text="RyModel {0}.{1}.{2}".format(str(ADDON_VERSION_NUMBER[0]), str(ADDON_VERSION_NUMBER[1]), str(ADDON_VERSION_NUMBER[2])))
 
-        split = layout.split(factor=0.5)
+        split = layout.split(factor=0.35)
         first_column = split.column()
         second_column = split.column()
 
