@@ -19,7 +19,7 @@ import bpy
 from bpy.app.handlers import persistent
 
 # Import operators.
-from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_DeleteModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_ExtractFace, RyModel_ExtractCurve, RyModel_CleanMesh, RyModel_SelectNgons, RadialArraySettings, RyModel_RadialArray, RyModel_RemoveRadialArray, RyModel_2xSubDivision, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, CUTTER_MODE, update_hide_cutters, hide_cutters, RyModel_AddCutter, RyModel_Unwrap, RyModel_AutoSeam
+from .quick_operators import RyModel_Mirror, RyModel_ResetOrigin, RyModel_AddModifier, RyModel_DeleteModifier, RyModel_CopyModifiers, RyModel_AutoSharpen, RyModel_ExtractFace, RyModel_ExtractCurve, RyModel_CleanMesh, RyModel_SelectNgons, RadialArraySettings, RyModel_RadialArray, RyModel_RemoveRadialArray, RyModel_2xSubDivision, RyModel_CurveToRope, RyModel_Cheshire, RyModel_HSWFModApply, CUTTER_MODE, hide_cutters, RyModel_AddCutter, RyModel_ShowCutters, RyModel_Unwrap, RyModel_AutoSeam
 
 # Import user interface.
 from .ui_main import RyModel_OT_open_menu, ADDON_VERSION_NUMBER
@@ -57,6 +57,7 @@ classes = (
     RyModel_Cheshire,
     RyModel_HSWFModApply,
     RyModel_AddCutter,
+    RyModel_ShowCutters,
     RyModel_Unwrap,
     RyModel_AutoSeam,
 
@@ -124,7 +125,6 @@ def register():
         addon_keymaps.append((km, kmi))
 
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, default='DIFFERENCE', update=update_boolean_operation)
-    bpy.types.Scene.rymodel_hide_cutters = bpy.props.BoolProperty(default=False, name="Hide Cutters", update=update_hide_cutters)
     bpy.types.Scene.rymodel_mirror_bisect = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_flip = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_apply = bpy.props.BoolProperty(default=True)

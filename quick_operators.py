@@ -500,12 +500,6 @@ def remove_unused_cutters():
             if obj not in used_cutter_objects:
                 bpy.data.objects.remove(obj)
 
-def update_hide_cutters(self, context):
-    if not bpy.context.scene.rymodel_hide_cutters:
-        hide_cutters()
-    else:
-        show_cutters()
-
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
     bl_label = "Add Cutter"
@@ -628,7 +622,17 @@ class RyModel_AddCutter(Operator):
 
         # Set the location of the cutter.
         new_cutter_object.location = bpy.context.scene.cursor.location
-        
+
+        return {'FINISHED'}
+
+class RyModel_ShowCutters(Operator):
+    bl_idname = "rymodel.show_cutters"
+    bl_label = "Makes all cutter objects visible in the viewport"
+    bl_description = "Show Cutters"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        show_cutters()
         return {'FINISHED'}
 
 class RyModel_CurveToRope(Operator):

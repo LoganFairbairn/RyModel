@@ -100,10 +100,7 @@ def draw_cutter_tools(layout):
     row = first_column.row(align=True)
     row.scale_x = 2
     row.scale_y = UI_Y_SCALE
-    if bpy.context.scene.rymodel_hide_cutters:
-        row.prop(bpy.context.scene, "rymodel_hide_cutters", text="", toggle=True, icon='HIDE_OFF')
-    else:
-        row.prop(bpy.context.scene, "rymodel_hide_cutters", text="", toggle=True, icon='HIDE_ON')
+    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="")
 
     row = second_column.row(align=True)
     row.scale_x = 4
