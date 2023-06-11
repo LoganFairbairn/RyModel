@@ -56,9 +56,9 @@ def draw_mirror_tools(layout):
             no_mirror_mod = False
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
-            row.prop(mirror_modifier, "use_axis", index=0, text="X", toggle=True)
-            row.prop(mirror_modifier, "use_axis", index=1, text="Y", toggle=True)
-            row.prop(mirror_modifier, "use_axis", index=2, text="Z", toggle=True)
+            row.prop(bpy.context.scene, "rymodel_mirror_x", text="X", toggle=True)
+            row.prop(bpy.context.scene, "rymodel_mirror_y", text="Y", toggle=True)
+            row.prop(bpy.context.scene, "rymodel_mirror_z", text="Z", toggle=True)
         
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE

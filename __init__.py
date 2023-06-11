@@ -125,9 +125,16 @@ def register():
         addon_keymaps.append((km, kmi))
 
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, default='DIFFERENCE', update=update_boolean_operation)
-    bpy.types.Scene.rymodel_mirror_bisect = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.rymodel_mirror_flip = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.rymodel_mirror_apply = bpy.props.BoolProperty(default=True)
+
+    # Mirror settings.
+    bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
+    bpy.types.Scene.rymodel_mirror_y = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
+    bpy.types.Scene.rymodel_mirror_z = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)
+    bpy.types.Scene.rymodel_mirror_bisect = bpy.props.BoolProperty(default=True, description="If true, the mirror will cut away geometry on all axis before mirroring", update=update_mirror_bisect)
+    bpy.types.Scene.rymodel_mirror_flip = bpy.props.BoolProperty(default=True, description="If true, mirroring on all axis will be flipped", update=update_mirror_flip)
+    bpy.types.Scene.rymodel_mirror_apply = bpy.props.BoolProperty(default=True, description="If true, the mirror modifier will be instantly applied after it's added")
+
+    # UI Toggles
     bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
     bpy.types.Scene.radial_array_settings = bpy.props.PointerProperty(type=RadialArraySettings)
 
