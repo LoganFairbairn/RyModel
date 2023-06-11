@@ -105,6 +105,7 @@ class RyModel_AutoSharpen(Operator):
             bpy.ops.mesh.customdata_bevel_weight_edge_clear()
 
         # Apply autosmooth.
+        bpy.ops.object.shade_smooth()
         bpy.context.object.data.use_auto_smooth = True
         bpy.context.object.data.auto_smooth_angle = 1.0472
 
