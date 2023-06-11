@@ -108,6 +108,7 @@ def register():
     bpy.types.Scene.rymodel_mirror_bisect = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_flip = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_apply = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
     bpy.types.Scene.radial_array_settings = bpy.props.PointerProperty(type=RadialArraySettings)
 
 def unregister():

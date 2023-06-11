@@ -227,10 +227,9 @@ def draw_modifier_properties(layout):
                 
                 # Draw commonly used properties for modifiers.
                 case _:
-                    draw_modifier_title(layout, modifier.name, modifier.name)
-
                     match modifier.type:
                         case 'BEVEL':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
                             row.prop(modifier, "segments", slider=True)
                             row = layout.row()
@@ -239,16 +238,19 @@ def draw_modifier_properties(layout):
                             row.prop(modifier, "limit_method", slider=True)
 
                         case 'WEIGHTED_NORMAL':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
                             row.prop(modifier, "weight", slider=True)
 
                         case 'SOLIDIFY':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
                             row.prop(modifier, "thickness", slider=True)
                             row = layout.row()
                             row.prop(modifier, "use_even_offset", toggle=True)
 
                         case 'ARRAY':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
                             row.prop(modifier, "count", slider=True)
                             row = layout.row()
@@ -259,11 +261,13 @@ def draw_modifier_properties(layout):
                             row.prop(modifier, "relative_offset_displace", index=2, text="")
 
                         case 'MULTIRES':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
                             row.operator("object.multires_subdivide")
                             row.operator("object.multires_higher_levels_delete")
 
                         case 'SUBSURF':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
                             row.prop(modifier, "levels")
                             row = layout.row(align=True)
@@ -271,22 +275,27 @@ def draw_modifier_properties(layout):
                             row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
 
                         case 'SHRINKWRAP':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
                             row.prop(modifier, "target")
 
                         case 'TRIANGULATE':
+                            draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
 
                         case 'BOOLEAN':
-                            row = layout.row(align=True)
-                            row.label(text="Solver ")
-                            row.prop_enum(modifier, "solver", 'FAST')
-                            row.prop_enum(modifier, "solver", 'EXACT')
+                            if bpy.context.scene.show_cutter_ui:
+                                draw_modifier_title(layout, modifier.name, modifier.name)
+                                row = layout.row(align=True)
+                                row.label(text="Solver ")
+                                row.prop_enum(modifier, "solver", 'FAST')
+                                row.prop_enum(modifier, "solver", 'EXACT')
 
-            row = layout.row()
-            row.separator()
-            row = layout.row()
-            row.separator()
+            if bpy.context.scene.show_cutter_ui and modifier.type != 'MIRROR':
+                row = layout.row()
+                row.separator()
+                row = layout.row()
+                row.separator()
 
 def draw_modifiers(layout):
     split = layout.split(factor=0.75)
