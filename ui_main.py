@@ -176,7 +176,7 @@ def draw_radial_array_properties(layout):
     array_modifier =  bpy.context.active_object.modifiers.get('RadialArray')
     if displace_modifier and array_modifier:
         row = layout.row(align=True)
-        row.label(text="Radial Array")
+        row.label(text="• Radial Array")
         op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
         op.modifier_name = "RadialArray"
 
@@ -202,7 +202,7 @@ def draw_modifier_properties(layout):
                 case _:
                     row = layout.row()
                     row.scale_y = UI_Y_SCALE
-                    row.label(text=modifier.name)
+                    row.label(text="• {0}".format(modifier.name))
                     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
                     op.modifier_name = modifier.name
 
