@@ -12,10 +12,6 @@ def draw_contextual_object_menu(layout):
     if active_object:
         match active_object.type:
             case 'MESH':
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.operator("rymodel.auto_sharpen", text="Sharpen")
-
                 if bpy.context.mode == 'EDIT_MESH':
                     if bpy.context.scene.tool_settings.mesh_select_mode[1]:
                         row = layout.row()
@@ -26,6 +22,11 @@ def draw_contextual_object_menu(layout):
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
                         row.operator("rymodel.extract_face", text="Extract Face")
+                        
+                row = layout.row()
+                row.scale_y = UI_Y_SCALE
+                row.operator("rymodel.auto_sharpen", text="Sharpen")
+
 
             case 'CURVE':
                 row = layout.row()
