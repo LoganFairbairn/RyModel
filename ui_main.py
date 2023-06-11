@@ -216,6 +216,8 @@ def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
     if active_object:
+        row = layout.row()
+        row.label(text="Modifiers")
         for modifier in active_object.modifiers:
             match modifier.name:
                 # Draw properties for custom modifiers.
