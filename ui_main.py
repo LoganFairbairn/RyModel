@@ -202,7 +202,7 @@ def draw_radial_array_properties(layout):
     displace_modifier = bpy.context.active_object.modifiers.get('RadialArrayDisplacement')
     array_modifier =  bpy.context.active_object.modifiers.get('RadialArray')
     if displace_modifier and array_modifier:
-        draw_modifier_title(layout, "Radial Array", "Radial Array")
+        draw_modifier_title(layout, "Radial Array", "RADIAL_ARRAY")
 
         row = layout.row(align=True)
         row.prop(bpy.context.scene.radial_array_settings, "offset", slider=True)

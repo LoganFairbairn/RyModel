@@ -315,6 +315,7 @@ class RyModel_AddModifier(Operator):
         
         if not context.active_object.modifiers.get(str(self.type)):
             new_modifier = context.active_object.modifiers.new(str(self.type), self.type)
+            new_modifier.show_expanded = False
 
         organize_modifier_stack(context.active_object.modifiers)
 
@@ -331,6 +332,19 @@ class RyModel_DeleteModifier(Operator):
     def execute(self, context):
         if not verify_active_mesh(self):
             return {'FINISHED'}
+        
+        # Check for custom modifiers.
+        if self.modifier_name == 'RADIAL_ARRAY':
+            radial_array_displacement_modifier = bpy.context.active_object.modifiers.get("RadialArrayDisplacement")
+            if radial_array_displacement_modifier:
+                bpy.context.active_object.modifiers.remove(radial_array_displacement_modifier)
+                
+            radial_array_modifier = bpy.context.active_object.modifiers.get("RadialArray")
+            offset_object = radial_array_modifier.offset_object
+            if offset_object:
+                bpy.data.objects.remove(radial_array_modifier.offset_object)
+            if radial_array_modifier:
+                bpy.context.active_object.modifiers.remove(radial_array_modifier)
         
         modifier = bpy.context.active_object.modifiers.get(self.modifier_name)
         if modifier:
