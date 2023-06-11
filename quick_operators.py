@@ -251,7 +251,23 @@ def organize_modifier_stack(object_modifiers):
     bevel_modifier = get_modifier_of_type(object_modifiers, 'BEVEL')
     weighted_normal_modifier = get_modifier_of_type(object_modifiers, 'WEIGHTED_NORMAL')
     mirror_modifier = get_modifier_of_type(object_modifiers, 'MIRROR')
+    solidify_modifier = get_modifier_of_type(object_modifiers, 'SOLIDIFY')
     boolean_modifiers = get_modifiers_of_type(object_modifiers, 'BOOLEAN')
+
+    modifier_index = 0
+
+    if solidify_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=solidify_modifier.name, index=modifier_index)
+        modifier_index += 1
+
+    if mirror_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
+        modifier_index += 1
+
+    if len(boolean_modifiers) > 0:
+        for boolean_modifier in boolean_modifiers:
+            bpy.ops.object.modifier_move_to_index(modifier=boolean_modifier.name, index=modifier_index)
+            modifier_index += 1
 
     if weighted_normal_modifier:
         bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=len(object_modifiers) - 1)
@@ -261,15 +277,6 @@ def organize_modifier_stack(object_modifiers):
             bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 2)
         else:
             bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 1)
-
-    if len(boolean_modifiers) > 0:
-        index = 0
-        for boolean_modifier in boolean_modifiers:
-            bpy.ops.object.modifier_move_to_index(modifier=boolean_modifier.name, index=0)
-            index += 1
-
-    if mirror_modifier:
-        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=0)
 
 class RyModel_AddModifier(Operator):
     bl_idname = "rymodel.add_modifier"
