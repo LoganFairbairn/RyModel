@@ -390,6 +390,11 @@ class RyModel_RadialArray(Operator):
         # Parent the empty to the array so the objects will move together.
         empty_object.parent = original_object
 
+        # Select the original object.
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = original_object
+
+
         return {'FINISHED'}
 
 class RyModel_RemoveRadialArray(Operator):
