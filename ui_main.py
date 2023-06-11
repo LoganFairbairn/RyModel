@@ -238,12 +238,44 @@ def draw_modifier_properties(layout):
                             row = layout.row()
                             row.prop(modifier, "limit_method", slider=True)
 
+                        case 'WEIGHTED_NORMAL':
+                            row = layout.row()
+                            row.prop(modifier, "weight", slider=True)
+
+                        case 'SOLIDIFY':
+                            row = layout.row()
+                            row.prop(modifier, "thickness", slider=True)
+                            row = layout.row()
+                            row.prop(modifier, "use_even_offset", toggle=True)
+
+                        case 'ARRAY':
+                            row = layout.row()
+                            row.prop(modifier, "count", slider=True)
+                            row = layout.row()
+                            row.label(text="Relative Offset")
+                            row = layout.row(align=True)
+                            row.prop(modifier, "relative_offset_displace", index=0, text="")
+                            row.prop(modifier, "relative_offset_displace", index=1, text="")
+                            row.prop(modifier, "relative_offset_displace", index=2, text="")
+
+                        case 'MULTIRES':
+                            row = layout.row()
+                            row.operator("object.multires_subdivide")
+                            row.operator("object.multires_higher_levels_delete")
+
                         case 'SUBSURF':
                             row = layout.row(align=True)
-                            row.prop(modifier, "levels", slider=False)
+                            row.prop(modifier, "levels")
                             row = layout.row(align=True)
                             row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
                             row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
+
+                        case 'SHRINKWRAP':
+                            row = layout.row(align=True)
+                            row.prop(modifier, "target")
+
+                        case 'TRIANGULATE':
+                            row = layout.row(align=True)
 
                         case 'BOOLEAN':
                             row = layout.row(align=True)
