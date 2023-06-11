@@ -228,19 +228,28 @@ class RyModel_CleanMesh(Operator):
 
 #------------------------ MODIFIERS ------------------------#
 
-def get_modifier(modifiers, modifier_type):
+def get_modifier_of_type(modifiers, modifier_type):
     '''Returns the modififier of the given type if it exists in the modifiers provided.'''
     for modifier in modifiers:
         if modifier.type == modifier_type:
             return modifier
     return None
 
+def get_modifiers_of_type(modifiers, modifier_type):
+    '''Returns all modifiers applied to the active (selected) object'''
+    modifiers_of_given_type = []
+    for modifier in modifiers:
+        if modifier.type == modifier_type:
+            modifiers_of_given_type.append(modifier)
+    return modifiers_of_given_type
+
 def organize_modifier_stack(object_modifiers):
     '''Organizes the modifier stack order.'''
 
-    bevel_modifier = get_modifier(object_modifiers, 'BEVEL')
-    weighted_normal_modifier = get_modifier(object_modifiers, 'WEIGHTED_NORMAL')
-    mirror_modifier = get_modifier(object_modifiers, 'MIRROR')
+    bevel_modifier = get_modifier_of_type(object_modifiers, 'BEVEL')
+    weighted_normal_modifier = get_modifier_of_type(object_modifiers, 'WEIGHTED_NORMAL')
+    mirror_modifier = get_modifier_of_type(object_modifiers, 'MIRROR')
+    boolean_modifiers = get_modifiers_of_type(object_modifiers, 'BOOLEAN')
 
     if weighted_normal_modifier:
         bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=len(object_modifiers) - 1)
@@ -250,6 +259,12 @@ def organize_modifier_stack(object_modifiers):
             bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 2)
         else:
             bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=len(object_modifiers) - 1)
+
+    if len(boolean_modifiers) > 0:
+        index = 0
+        for boolean_modifier in boolean_modifiers:
+            bpy.ops.object.modifier_move_to_index(modifier=boolean_modifier.name, index=0)
+            index += 1
 
     if mirror_modifier:
         bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=0)
@@ -543,6 +558,9 @@ class RyModel_AddCutter(Operator):
             boolean_modifier.operation = 'DIFFERENCE'
         else:
             boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
+
+        # Organize the modifier stack.
+        organize_modifier_stack(active_object.modifiers)
 
         # Create a new cutter mesh with a unique name based on the provided cutter type.
         cutter_number = 1
