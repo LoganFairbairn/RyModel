@@ -171,14 +171,35 @@ def draw_extras(layout):
     row.operator("rymodel.curve_to_rope")
     row.operator("rymodel.cheshire")
 
+def draw_modifier_title(layout, name, delete_name):
+    split = layout.split(factor=0.333)
+    first_column = split.column()
+    second_column = split.column()
+    third_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.alignment = 'LEFT'
+    row.label(text="•••••••••")
+
+    row = second_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.alignment = 'CENTER'
+    row.label(text=name)
+
+    row = third_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.alignment = 'RIGHT'
+    row.label(text="•••••••••")
+
+    op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
+    op.modifier_name = delete_name
+
 def draw_radial_array_properties(layout):
     displace_modifier = bpy.context.active_object.modifiers.get('RadialArrayDisplacement')
     array_modifier =  bpy.context.active_object.modifiers.get('RadialArray')
     if displace_modifier and array_modifier:
-        row = layout.row(align=True)
-        row.label(text="• Radial Array")
-        op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
-        op.modifier_name = "RadialArray"
+        draw_modifier_title(layout, "Radial Array", "Radial Array")
 
         row = layout.row(align=True)
         row.prop(bpy.context.scene.radial_array_settings, "offset", slider=True)
@@ -200,11 +221,7 @@ def draw_modifier_properties(layout):
                 
                 # Draw commonly used properties for modifiers.
                 case _:
-                    row = layout.row()
-                    row.scale_y = UI_Y_SCALE
-                    row.label(text="• {0}".format(modifier.name))
-                    op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
-                    op.modifier_name = modifier.name
+                    draw_modifier_title(layout, modifier.name, modifier.name)
 
                     match modifier.type:
                         case 'BEVEL':
