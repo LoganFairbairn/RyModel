@@ -153,6 +153,8 @@ class RyModel_ExtractFace(Operator):
         solidify_modifier.offset = 1.0
         solidify_modifier.use_even_offset = True
 
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
         return {'FINISHED'}
 
 class RyModel_ExtractCurve(Operator):
