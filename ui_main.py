@@ -22,7 +22,7 @@ def draw_contextual_object_menu(layout):
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
                         row.operator("rymodel.extract_face", text="Extract Face")
-                        
+
                 row = layout.row()
                 row.scale_y = UI_Y_SCALE
                 row.operator("rymodel.auto_sharpen", text="Sharpen")
@@ -127,6 +127,9 @@ def draw_cutter_tools(layout):
     row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE')
 
 def draw_origin_tools(layout):
+    row = layout.row()
+    row.label(text="Origin")
+
     row = layout.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
@@ -139,7 +142,7 @@ def draw_origin_tools(layout):
     op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
     op.location = 'VOLUME'
 
-def draw_mesh_cleaning_operations(layout):
+def draw_mesh_operators(layout):
     '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
     if not bpy.context.active_object:
         return
@@ -147,21 +150,23 @@ def draw_mesh_cleaning_operations(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
+    row = layout.row()
+    row.label(text="Mesh Tools")
+
     row = layout.row(align=True)
     row.scale_y =UI_Y_SCALE
     row.operator("rymodel.clean_mesh")
-    row.operator("rymodel.select_ngons")
 
-def draw_unwrapping_options(layout):
-    if not bpy.context.active_object:
-        return
-    
-    if bpy.context.active_object.type != 'MESH':
-        return
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.select_ngons")
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_seam")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
     row.operator("rymodel.unwrap")
 
 def draw_extras(layout):
@@ -287,6 +292,9 @@ def draw_modifiers(layout):
 
 def draw_display_options(layout):
     row = layout.row()
+    row.label(text="Display")
+
+    row = layout.row()
     row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
 
@@ -318,9 +326,8 @@ class RyModel_OT_open_menu(Operator):
         draw_cutter_tools(first_column)
         draw_mirror_tools(first_column)
         draw_origin_tools(first_column)
-        draw_mesh_cleaning_operations(first_column)
-        draw_unwrapping_options(first_column)
         draw_display_options(first_column)
+        draw_mesh_operators(first_column)
 
         # Modifiers
         draw_modifiers(second_column)
