@@ -95,8 +95,7 @@ def on_active_object_changed():
     '''Performs updates when the active object is changed.'''
     if bpy.context.active_object:
         if bpy.context.active_object.type == 'MESH':
-            if bpy.context.active_object.name.startswith("Cutter_"):
-                hide_cutters()
+            hide_cutters()
 
 
 # Mark load handlers as persistent so they are not freed when loading a new blend file.
