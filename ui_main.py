@@ -8,7 +8,6 @@ import os
 ADDON_VERSION_NUMBER = (0, 1, 0)
 UI_Y_SCALE = 1.4
 
-
 custom_icons = None
 
 def load_custom_icons():
@@ -32,42 +31,40 @@ def remove_custom_icons():
 
 def draw_contextual_object_menu(layout):
     active_object = bpy.context.active_object
-    if active_object:
-        match active_object.type:
-            case 'MESH':
-                if bpy.context.mode == 'EDIT_MESH':
-                    if bpy.context.scene.tool_settings.mesh_select_mode[1]:
-                        row = layout.row()
-                        row.scale_y = UI_Y_SCALE
-                        row.operator("rymodel.extract_curve", text="Extract Curve")
-                        
-                    if bpy.context.scene.tool_settings.mesh_select_mode[2]:
-                        row = layout.row()
-                        row.scale_y = UI_Y_SCALE
-                        row.operator("rymodel.extract_face", text="Extract Face")
+    match active_object.type:
+        case 'MESH':
+            if bpy.context.mode == 'EDIT_MESH':
+                if bpy.context.scene.tool_settings.mesh_select_mode[1]:
+                    row = layout.row()
+                    row.scale_y = UI_Y_SCALE
+                    row.operator("rymodel.extract_curve", text="Extract Curve")
+                    
+                if bpy.context.scene.tool_settings.mesh_select_mode[2]:
+                    row = layout.row()
+                    row.scale_y = UI_Y_SCALE
+                    row.operator("rymodel.extract_face", text="Extract Face")
 
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.operator("rymodel.auto_sharpen", text="Sharpen")
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.auto_sharpen", text="Sharpen")
 
 
-            case 'CURVE':
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.prop(active_object.data, "bevel_depth", slider=True)
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.prop(active_object.data, "bevel_resolution", slider=True)
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.prop(active_object.data, "extrude", slider=True)
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.prop(active_object.data, "resolution_u", slider=True)
+        case 'CURVE':
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.prop(active_object.data, "bevel_depth", slider=True)
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.prop(active_object.data, "bevel_resolution", slider=True)
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.prop(active_object.data, "extrude", slider=True)
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.prop(active_object.data, "resolution_u", slider=True)
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
-
     row = layout.row()
     row.label(text="Mirror")
 
@@ -106,9 +103,6 @@ def draw_mirror_tools(layout):
         row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
 
 def draw_cutter_tools(layout):
-    if not bpy.context.active_object:
-        return
-    
     if bpy.context.active_object.type != 'MESH':
         return
 
@@ -167,9 +161,6 @@ def draw_origin_tools(layout):
 
 def draw_mesh_operators(layout):
     '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
-    if not bpy.context.active_object:
-        return
-    
     if bpy.context.active_object.type != 'MESH':
         return
 
@@ -245,100 +236,99 @@ def draw_circular_twist_array(layout):
 def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
-    if active_object:
-        for modifier in active_object.modifiers:
-            match modifier.name:
-                # Draw properties for custom modifiers.
-                case "CircularArrayDisplacement":
-                    draw_circular_array_properties(layout)
+    for modifier in active_object.modifiers:
+        match modifier.name:
+            # Draw properties for custom modifiers.
+            case "CircularArrayDisplacement":
+                draw_circular_array_properties(layout)
 
-                case "CircularArray":
-                    continue
+            case "CircularArray":
+                continue
 
-                case "CircularTwistArray":
-                    draw_circular_twist_array(layout)
-                
-                # Draw commonly used properties for modifiers.
-                case _:
-                    match modifier.type:
-                        case 'BEVEL':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row()
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "segments", slider=True)
-                            row = layout.row()
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "width", slider=True)
-                            row = layout.row()
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "limit_method", slider=True)
+            case "CircularTwistArray":
+                draw_circular_twist_array(layout)
+            
+            # Draw commonly used properties for modifiers.
+            case _:
+                match modifier.type:
+                    case 'BEVEL':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row()
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "segments", slider=True)
+                        row = layout.row()
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "width", slider=True)
+                        row = layout.row()
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "limit_method", slider=True)
 
-                        case 'WEIGHTED_NORMAL':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row()
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "weight", slider=True)
+                    case 'WEIGHTED_NORMAL':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row()
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "weight", slider=True)
 
-                        case 'SOLIDIFY':
+                    case 'SOLIDIFY':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "thickness", slider=True)
+                        row.prop(modifier, "use_even_offset", toggle=True)
+
+                    case 'ARRAY':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row()
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "count", slider=True)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.label(text="Relative Offset")
+                        row.prop(modifier, "relative_offset_displace", index=0, text="")
+                        row.prop(modifier, "relative_offset_displace", index=1, text="")
+                        row.prop(modifier, "relative_offset_displace", index=2, text="")
+
+                    case 'MULTIRES':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row()
+                        row.operator("object.multires_subdivide")
+                        row.operator("object.multires_higher_levels_delete")
+
+                    case 'SUBSURF':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "levels")
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
+                        row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
+
+                    case 'SHRINKWRAP':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.prop(modifier, "target")
+
+                    case 'TRIANGULATE':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+
+                    case 'BOOLEAN':
+                        if bpy.context.scene.show_cutter_ui:
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
                             row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "thickness", slider=True)
-                            row.prop(modifier, "use_even_offset", toggle=True)
+                            row.label(text="Solver ")
+                            row.prop_enum(modifier, "solver", 'FAST')
+                            row.prop_enum(modifier, "solver", 'EXACT')
 
-                        case 'ARRAY':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row()
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "count", slider=True)
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-                            row.label(text="Relative Offset")
-                            row.prop(modifier, "relative_offset_displace", index=0, text="")
-                            row.prop(modifier, "relative_offset_displace", index=1, text="")
-                            row.prop(modifier, "relative_offset_displace", index=2, text="")
-
-                        case 'MULTIRES':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row()
-                            row.operator("object.multires_subdivide")
-                            row.operator("object.multires_higher_levels_delete")
-
-                        case 'SUBSURF':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "levels")
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-                            row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
-                            row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
-
-                        case 'SHRINKWRAP':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-                            row.prop(modifier, "target")
-
-                        case 'TRIANGULATE':
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-
-                        case 'BOOLEAN':
-                            if bpy.context.scene.show_cutter_ui:
-                                draw_modifier_title(layout, modifier.name, modifier.name)
-                                row = layout.row(align=True)
-                                row.scale_y = UI_Y_SCALE
-                                row.label(text="Solver ")
-                                row.prop_enum(modifier, "solver", 'FAST')
-                                row.prop_enum(modifier, "solver", 'EXACT')
-
-            if bpy.context.scene.show_cutter_ui and modifier.type != 'MIRROR':
-                row = layout.row()
-                row.separator()
-                row = layout.row()
-                row.separator()
+        if bpy.context.scene.show_cutter_ui and modifier.type != 'MIRROR':
+            row = layout.row()
+            row.separator()
+            row = layout.row()
+            row.separator()
 
 def draw_modifiers(layout):
     split = layout.split(factor=0.75)
@@ -418,13 +408,14 @@ class RyModel_OT_open_menu(Operator):
         first_column = split.column()
         second_column = split.column()
 
-        # Mesh Tools
-        draw_contextual_object_menu(first_column)
-        draw_cutter_tools(first_column)
-        draw_mirror_tools(first_column)
-        draw_origin_tools(first_column)
-        draw_display_options(first_column)
-        draw_mesh_operators(first_column)
+        if context.active_object:
+            draw_contextual_object_menu(first_column)
+            draw_cutter_tools(first_column)
+            draw_mirror_tools(first_column)
+            draw_origin_tools(first_column)
+            draw_display_options(first_column)
+            draw_mesh_operators(first_column)
+            draw_modifiers(second_column)
 
-        # Modifiers
-        draw_modifiers(second_column)
+        else:
+            layout.label(text="Select an object to edit.")
