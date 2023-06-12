@@ -238,31 +238,36 @@ def draw_modifier_properties(layout):
                         case 'BEVEL':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "segments", slider=True)
                             row = layout.row()
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "width", slider=True)
                             row = layout.row()
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "limit_method", slider=True)
 
                         case 'WEIGHTED_NORMAL':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "weight", slider=True)
 
                         case 'SOLIDIFY':
                             draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row()
+                            row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "thickness", slider=True)
-                            row = layout.row()
                             row.prop(modifier, "use_even_offset", toggle=True)
 
                         case 'ARRAY':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row()
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "count", slider=True)
-                            row = layout.row()
-                            row.label(text="Relative Offset")
                             row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
+                            row.label(text="Relative Offset")
                             row.prop(modifier, "relative_offset_displace", index=0, text="")
                             row.prop(modifier, "relative_offset_displace", index=1, text="")
                             row.prop(modifier, "relative_offset_displace", index=2, text="")
@@ -276,24 +281,29 @@ def draw_modifier_properties(layout):
                         case 'SUBSURF':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "levels")
                             row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
                             row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
                             row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
 
                         case 'SHRINKWRAP':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
                             row.prop(modifier, "target")
 
                         case 'TRIANGULATE':
                             draw_modifier_title(layout, modifier.name, modifier.name)
                             row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE
 
                         case 'BOOLEAN':
                             if bpy.context.scene.show_cutter_ui:
                                 draw_modifier_title(layout, modifier.name, modifier.name)
                                 row = layout.row(align=True)
+                                row.scale_y = UI_Y_SCALE
                                 row.label(text="Solver ")
                                 row.prop_enum(modifier, "solver", 'FAST')
                                 row.prop_enum(modifier, "solver", 'EXACT')
