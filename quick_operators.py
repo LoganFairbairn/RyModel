@@ -312,19 +312,40 @@ class RyModel_CleanMesh(Operator):
         if not verify_active_mesh(self):
             return {'FINISHED'}
 
+        # Toggle into edit mode, remember the original mode.
         original_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
-        # Remove non-manifold geometry.
+        # Remove loose faces.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='FACE')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_loose()
+        bpy.ops.mesh.delete(type='FACE')
+
+        # Remove loose edges.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_loose()
+        bpy.ops.mesh.delete(type='EDGE')
+
+        # Remove loose vertices.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_loose()
+        bpy.ops.mesh.delete(type='VERT')
+
+        # Remove vertex doubles.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.remove_doubles(threshold=0.0001)
+
+        # Fill non-manifold faces.
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_non_manifold()
-        bpy.ops.mesh.delete(type='VERT')
+        bpy.ops.mesh.fill()
 
-        # Remove doubles.
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.remove_doubles()
-
+        # Toggle back into the original mode.
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
 
         return {'FINISHED'}
