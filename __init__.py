@@ -18,11 +18,12 @@
 import bpy
 from bpy.app.handlers import persistent
 
+
 # Import operators.
 from .quick_operators import *
 
 # Import user interface.
-from .ui_main import RyModel_OT_open_menu, ADDON_VERSION_NUMBER
+from .ui_main import *
 
 bl_info = {
     "name": "RyModel",
@@ -65,33 +66,6 @@ classes = (
     RyModel_OT_open_menu
 )
 
-def update_boolean_operation(self, context):
-    '''Updates the boolean operation for all objects using the selected cutter.'''
-    if not context.active_object:
-        return
-    
-    if context.active_object.name.startswith("Cutter_") and context.active_object.type == 'MESH':
-        for obj in bpy.data.objects:
-            for modifier in obj.modifiers:
-                if modifier.type == 'BOOLEAN':
-                    if modifier.object == context.active_object:
-
-                        if context.scene.rymodel_boolean_mode == 'SLICE':
-                            modifier.operation = 'DIFFERENCE'
-
-                            if not context.active_object.modifiers.get("SliceSolidify"):
-                                solidify_modifier = context.active_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
-                                solidify_modifier.use_even_offset = True
-                                solidify_modifier.thickness = 0.075
-                        else: 
-                            modifier.operation = context.scene.rymodel_boolean_mode
-
-                            # For other boolean operations, remove the solidify modifier from the cutter if it exists.
-                            solidify_modifier = context.active_object.modifiers.get("SliceSolidify")
-                            if solidify_modifier:
-                                context.active_object.modifiers.remove(solidify_modifier)
-
-
 def on_active_object_changed():
     '''Performs updates when the active object is changed.'''
     active_object = bpy.context.active_object
@@ -103,7 +77,6 @@ def on_active_object_changed():
         circular_twist_array_mod = active_object.modifiers.get('CircularTwistArray')
         if circular_twist_array_mod:
             bpy.context.scene.circular_twist_count = circular_twist_array_mod.count
-
 
 # Mark load handlers as persistent so they are not freed when loading a new blend file.
 @persistent
@@ -119,6 +92,10 @@ bpy.app.handlers.load_post.append(load_handler)
 addon_keymaps = []
 
 def register():
+    # Import custom icons.
+    custom_icons = load_custom_icons()
+
+    # Register classes.
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -130,7 +107,14 @@ def register():
         kmi = km.keymap_items.new(RyModel_OT_open_menu.bl_idname, type='D', value='PRESS', ctrl=False)
         addon_keymaps.append((km, kmi))
 
-    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, default='DIFFERENCE', update=update_boolean_operation)
+
+    CUTTER_MODE = [
+        ("INTERSECT", "Intersect", "Cutters will cut everything from the object excluding geometry that intersects with the cutter", custom_icons["CUTTER_INTERSECT"].icon_id, 1),
+        ("UNION", "Union", "Cutters will merge with the original objects geometry", custom_icons["CUTTER_UNION"].icon_id, 2),
+        ("DIFFERENCE", "Difference", "Cutters will remove geometry that intersects with the cutter", custom_icons["CUTTER_DIFFERENCE"].icon_id, 3),
+        ("SLICE", "Slice", "Cutters will slice where the cutter and original geometry intersect", custom_icons["CUTTER_SLICE"].icon_id, 4)
+    ]
+    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
 
     # Mirror settings.
     bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
@@ -148,6 +132,9 @@ def register():
     bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
 
 def unregister():
+    # Remove custom icons.
+    remove_custom_icons()
+
     # Remove add-on key mapping.
     for km, kmi in addon_keymaps:
         km.keymap_items.remove(kmi)

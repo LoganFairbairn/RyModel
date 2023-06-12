@@ -5,6 +5,7 @@ import bmesh
 from bpy.types import Operator, PropertyGroup
 from bpy.props import StringProperty, IntProperty, FloatProperty
 from . import rylog
+from . ui_main import custom_icons
 import math
 
 #------------------------ HELPERS ------------------------#
@@ -727,12 +728,31 @@ class RyModel_CircularTwist(Operator):
 
 #------------------------ CUTTERS ------------------------#
 
-CUTTER_MODE = [
-    ("INTERSECT", "Intersect", "", 1),
-    ("UNION", "Union", "", 2),
-    ("DIFFERENCE", "Difference", "", 3),
-    ("SLICE", "Slice", "", 4)
-]
+def update_boolean_operation(self, context):
+    '''Updates the boolean operation for all objects using the selected cutter.'''
+    if not context.active_object:
+        return
+    
+    if context.active_object.name.startswith("Cutter_") and context.active_object.type == 'MESH':
+        for obj in bpy.data.objects:
+            for modifier in obj.modifiers:
+                if modifier.type == 'BOOLEAN':
+                    if modifier.object == context.active_object:
+
+                        if context.scene.rymodel_boolean_mode == 'SLICE':
+                            modifier.operation = 'DIFFERENCE'
+
+                            if not context.active_object.modifiers.get("SliceSolidify"):
+                                solidify_modifier = context.active_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
+                                solidify_modifier.use_even_offset = True
+                                solidify_modifier.thickness = 0.075
+                        else: 
+                            modifier.operation = context.scene.rymodel_boolean_mode
+
+                            # For other boolean operations, remove the solidify modifier from the cutter if it exists.
+                            solidify_modifier = context.active_object.modifiers.get("SliceSolidify")
+                            if solidify_modifier:
+                                context.active_object.modifiers.remove(solidify_modifier)
 
 def hide_cutters():
     if not verify_active_mesh():

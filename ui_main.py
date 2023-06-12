@@ -1,11 +1,34 @@
 # This module contains user interface for this add-on.
 
 import bpy
+import bpy.utils.previews                   # Imported for custom icons.
 from bpy.types import Menu, Operator
+import os
 
 ADDON_VERSION_NUMBER = (0, 1, 0)
 UI_Y_SCALE = 1.4
 
+
+custom_icons = None
+
+def load_custom_icons():
+    global custom_icons
+    custom_icons = bpy.utils.previews.new()
+    addon_path =  os.path.dirname(__file__)
+    icons_dir = os.path.join(addon_path, "icons")
+    custom_icons.load('NGON_DRAW', os.path.join(icons_dir, "ngon_draw.png"), 'IMAGE')
+    custom_icons.load('CUTTER_INTERSECT', os.path.join(icons_dir, "cutter_intersect.png"), 'IMAGE')
+    custom_icons.load('CUTTER_DIFFERENCE', os.path.join(icons_dir, "cutter_difference.png"), 'IMAGE')
+    custom_icons.load('CUTTER_SLICE', os.path.join(icons_dir, "cutter_slice.png"), 'IMAGE')
+    custom_icons.load('CUTTER_UNION', os.path.join(icons_dir, "cutter_union.png"), 'IMAGE')
+    custom_icons.load('2XSUBD', os.path.join(icons_dir, "2xsubd.png"), 'IMAGE')
+    custom_icons.load('CIRCULAR_ARRAY', os.path.join(icons_dir, "circular_array.png"), 'IMAGE')
+    custom_icons.load('CIRCULAR_TWIST', os.path.join(icons_dir, "circular_twist.png"), 'IMAGE')
+    return custom_icons
+
+def remove_custom_icons():
+    global custom_icons
+    bpy.utils.previews.remove(custom_icons)
 
 def draw_contextual_object_menu(layout):
     active_object = bpy.context.active_object
@@ -113,15 +136,18 @@ def draw_cutter_tools(layout):
     op.shape = 'SPHERE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text="")
     op.shape = 'CONE'
-    op = row.operator("rymodel.add_cutter", text="C")
+    op = row.operator("rymodel.add_cutter", icon='SELECT_SET', text="")
     op.shape = 'CONE'
+    #op = row.operator("rymodel.add_cutter", icon_value=custom_icons["NGON_DRAW"].icon_id, text="")
+    #op.shape = 'CONE'
 
     row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'INTERSECT')
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'UNION')
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'DIFFERENCE')
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE')
+    row.scale_x = 10
+    row.scale_y = 2
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'INTERSECT', text="")
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'UNION', text="")
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'DIFFERENCE', text="")
+    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE', text="")
 
 def draw_origin_tools(layout):
     row = layout.row()
@@ -330,8 +356,8 @@ def draw_modifiers(layout):
     op.type = 'SOLIDIFY'
     op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text="")
     op.type = 'ARRAY'
-    row.operator("rymodel.circular_array", icon='SURFACE_NCIRCLE', text="")
-    row.operator("rymodel.circular_twist", icon='MOD_SIMPLEDEFORM', text="C")
+    row.operator("rymodel.circular_array", text="", icon_value=custom_icons["CIRCULAR_ARRAY"].icon_id)
+    row.operator("rymodel.circular_twist", text="", icon_value=custom_icons["CIRCULAR_TWIST"].icon_id)
 
     row = layout.row(align=True)
     row.scale_x = 5
@@ -340,7 +366,7 @@ def draw_modifiers(layout):
     op.type = 'MULTIRES'
     op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text="")
     op.type = 'SUBSURF'
-    row.operator("rymodel.two_x_subdivision", text="2x")
+    row.operator("rymodel.two_x_subdivision", text="", icon_value=custom_icons["2XSUBD"].icon_id)
     op = row.operator("rymodel.add_modifier", icon='MOD_SHRINKWRAP', text="")
     op.type = 'SHRINKWRAP'
     op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text="")
