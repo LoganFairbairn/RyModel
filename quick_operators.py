@@ -294,6 +294,13 @@ class RyModel_SelectNgons(Operator):
     def execute(self, context):
         if not verify_active_mesh(self):
             return {'FINISHED'}
+        
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='FACE')
+        bpy.ops.mesh.select_face_by_sides(number=4, type='EQUAL')
+        bpy.ops.mesh.select_all(action='INVERT')
+
         return {'FINISHED'}
 
 class RyModel_CleanMesh(Operator):
