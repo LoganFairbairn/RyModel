@@ -604,6 +604,43 @@ class RyModel_2xSubDivision(Operator):
 
         return {'FINISHED'}
 
+def update_circular_twist_count(self, context):
+    '''Updates the circular array modifier twist count.'''
+    active_object = context.active_object
+
+    array_modifier =  active_object.modifiers.get('CircularTwistArray')
+    displace_modifier2 = active_object.modifiers.get('CircularTwistDisplacement2')
+
+    # Update the array modifier count.
+    array_modifier.count = context.scene.circular_twist_count
+
+
+    # Duplicate the object and apply all mods then re-center the origin to get the Y location offset to re-center the object.
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = active_object
+    active_object.select_set(True)
+    bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
+    temp_obj = bpy.context.active_object
+
+    # Remove the 2nd twist displacement.
+    twist_displacement_2 = temp_obj.modifiers.get("CircularTwistDisplacement2")
+    if twist_displacement_2:
+        temp_obj.modifiers.remove(twist_displacement_2)
+
+    for modifier in temp_obj.modifiers:
+        bpy.ops.object.modifier_apply(modifier=modifier.name, report=False)
+
+    bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+    y_offset = temp_obj.location[1]
+    bpy.ops.object.delete(use_global=False)
+
+    displace_modifier2.strength = y_offset * -1
+
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = active_object
+    active_object.select_set(True)
+
+
 class RyModel_CircularTwist(Operator):
     bl_idname = "rymodel.circular_twist"
     bl_label = "Circular Twist"
@@ -632,7 +669,7 @@ class RyModel_CircularTwist(Operator):
             return {'FINISHED'}
 
         # Add a displacement modifier.
-        displace_modifier = active_object.modifiers.new('CircularTwistDisplacement', 'DISPLACE')
+        displace_modifier = active_object.modifiers.new('CircularTwistDisplacement1', 'DISPLACE')
         displace_modifier.strength = 2.0
         displace_modifier.mid_level = 0.0
         displace_modifier.direction = 'Y'
@@ -656,7 +693,9 @@ class RyModel_CircularTwist(Operator):
         simple_deform_modifier.show_expanded = False
 
         # Duplicate the object and apply all mods then re-center the origin to get the Y location offset to re-center the object.
+        bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = active_object
+        active_object.select_set(True)
         bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
         temp_obj = bpy.context.active_object
 
@@ -683,6 +722,7 @@ class RyModel_CircularTwist(Operator):
         # Select the original object.
         bpy.ops.object.select_all(action='DESELECT')
         bpy.context.view_layer.objects.active = active_object
+        active_object.select_set(True)
 
         return {'FINISHED'}
 
@@ -847,7 +887,7 @@ class RyModel_AddCutter(Operator):
             solidify_modifier = new_cutter_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
             solidify_modifier.use_even_offset = True
             solidify_modifier.thickness = 0.075
-            
+
         # Parent the cutter to the object.
         new_cutter_object.parent = active_object
 

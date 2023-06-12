@@ -94,9 +94,15 @@ def update_boolean_operation(self, context):
 
 def on_active_object_changed():
     '''Performs updates when the active object is changed.'''
-    if bpy.context.active_object:
+    active_object = bpy.context.active_object
+    if active_object:
         if bpy.context.active_object.type == 'MESH':
             hide_cutters()
+
+        # Update circular twist count.
+        circular_twist_array_mod = active_object.modifiers.get('CircularTwistArray')
+        if circular_twist_array_mod:
+            bpy.context.scene.circular_twist_count = circular_twist_array_mod.count
 
 
 # Mark load handlers as persistent so they are not freed when loading a new blend file.
@@ -134,9 +140,12 @@ def register():
     bpy.types.Scene.rymodel_mirror_flip = bpy.props.BoolProperty(default=True, description="If true, mirroring on all axis will be flipped", update=update_mirror_flip)
     bpy.types.Scene.rymodel_mirror_apply = bpy.props.BoolProperty(default=True, description="If true, the mirror modifier will be instantly applied after it's added")
 
+    # Custom Modifier Settings
+    bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)
+    bpy.types.Scene.circular_twist_count = bpy.props.IntProperty(default=10, min=0, soft_max=30, update=update_circular_twist_count)
+
     # UI Toggles
     bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
-    bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)
 
 def unregister():
     # Remove add-on key mapping.

@@ -209,6 +209,19 @@ def draw_circular_array_properties(layout):
         row = layout.row(align=True)
         row.prop(bpy.context.scene.circular_array_settings, "count", slider=True)
 
+def draw_circular_twist_array(layout):
+    displace_modifier1 = bpy.context.active_object.modifiers.get('CircularTwistDisplacement1')
+    array_modifier =  bpy.context.active_object.modifiers.get('CircularTwistArray')
+
+    if array_modifier:
+        draw_modifier_title(layout, "Circular Twist", "CIRCULAR_TWIST")
+
+        row = layout.row(align=True)
+        row.prop(bpy.context.scene, "circular_twist_count", text="Circular Twist Count", slider=True)
+
+        row = layout.row(align=True)
+        row.prop(displace_modifier1, "strength", text="Inner Offset", slider=True)
+
 def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
@@ -221,6 +234,9 @@ def draw_modifier_properties(layout):
 
                 case "CircularArray":
                     continue
+
+                case "CircularTwistArray":
+                    draw_circular_twist_array(layout)
                 
                 # Draw commonly used properties for modifiers.
                 case _:
@@ -300,32 +316,31 @@ def draw_modifiers(layout):
     second_column = split.column()
 
     row = layout.row(align=True)
+    row.scale_x = 5
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.add_modifier", icon='MOD_BEVEL', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_BEVEL', text="")
     op.type = 'BEVEL'
-    op = row.operator("rymodel.add_modifier", icon='MOD_NORMALEDIT', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_NORMALEDIT', text="")
     op.type = 'WEIGHTED_NORMAL'
-    op = row.operator("rymodel.add_modifier", icon='MOD_SOLIDIFY', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_SOLIDIFY', text="")
     op.type = 'SOLIDIFY'
-    op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text="")
     op.type = 'ARRAY'
-    row.operator("rymodel.circular_array", icon='SURFACE_NCIRCLE', text=" ")
-    row.operator("rymodel.circular_twist", icon='MOD_MESHDEFORM', text=" ")
+    row.operator("rymodel.circular_array", icon='SURFACE_NCIRCLE', text="")
+    row.operator("rymodel.circular_twist", icon='MOD_MESHDEFORM', text="")
 
     row = layout.row(align=True)
+    row.scale_x = 5
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text="")
     op.type = 'MULTIRES'
-    op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text="")
     op.type = 'SUBSURF'
     row.operator("rymodel.two_x_subdivision", text="2x")
-    op = row.operator("rymodel.add_modifier", icon='MOD_SHRINKWRAP', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_SHRINKWRAP', text="")
     op.type = 'SHRINKWRAP'
-    op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text=" ")
+    op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text="")
     op.type = 'TRIANGULATE'
-
-
-
 
     split = layout.split(factor=0.75)
     first_column = split.column()
@@ -366,7 +381,6 @@ class RyModel_OT_open_menu(Operator):
 
     # Draws the properties in the popup.
     def draw(self, context):
-        
         layout = self.layout
         layout.label(text="RyModel {0}.{1}.{2}".format(str(ADDON_VERSION_NUMBER[0]), str(ADDON_VERSION_NUMBER[1]), str(ADDON_VERSION_NUMBER[2])))
 
