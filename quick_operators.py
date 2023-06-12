@@ -5,7 +5,6 @@ import bmesh
 from bpy.types import Operator, PropertyGroup
 from bpy.props import StringProperty, IntProperty, FloatProperty
 from . import rylog
-from . ui_main import custom_icons
 import math
 
 #------------------------ HELPERS ------------------------#
