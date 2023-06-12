@@ -327,7 +327,7 @@ def draw_modifiers(layout):
     op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text="")
     op.type = 'ARRAY'
     row.operator("rymodel.circular_array", icon='SURFACE_NCIRCLE', text="")
-    row.operator("rymodel.circular_twist", icon='MOD_MESHDEFORM', text="")
+    row.operator("rymodel.circular_twist", icon='MOD_SIMPLEDEFORM', text="C")
 
     row = layout.row(align=True)
     row.scale_x = 5

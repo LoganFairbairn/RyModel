@@ -384,12 +384,12 @@ def organize_modifier_stack(object_modifiers):
         bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if weighted_normal_modifier:
-        bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=modifier_index)
-        modifier_index += 1
-
     if bevel_modifier:
         bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=modifier_index)
+        modifier_index += 1
+
+    if weighted_normal_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=modifier_index)
         modifier_index += 1
 
     if triangulate_modifier:
