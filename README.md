@@ -9,7 +9,7 @@ Features:
 - Quick apply for modifiers based on common workflow
 - Quick access for commonly used modifiers
 - Copy modifiers operation
-- Fast radial array setup
+- Fast circular array setup
 - Fast mirroring
 - Fast object origin adjustments
 - Prioritization of the best available UV packing method among install add-ons

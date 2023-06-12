@@ -416,6 +416,40 @@ class RyModel_AddModifier(Operator):
 
         return {'FINISHED'}
 
+def remove_circular_array_setup(context):
+    circular_array_displacement_modifier = bpy.context.active_object.modifiers.get("CircularArrayDisplacement")
+    if circular_array_displacement_modifier:
+        bpy.context.active_object.modifiers.remove(circular_array_displacement_modifier)
+        
+    circular_array_modifier = bpy.context.active_object.modifiers.get("CircularArray")
+    offset_object = circular_array_modifier.offset_object
+    if offset_object:
+        bpy.data.objects.remove(circular_array_modifier.offset_object)
+    if circular_array_modifier:
+        bpy.context.active_object.modifiers.remove(circular_array_modifier)
+
+def remove_circular_twist_setup(context):
+    displace_modifier1 = context.active_object.modifiers.get('CircularTwistDisplacement1')
+    array_modifier =  context.active_object.modifiers.get('CircularTwistArray')
+    simple_deform_modifier = context.active_object.modifiers.get('CircularTwistDeform')
+    displace_modifier2 = context.active_object.modifiers.get('CircularTwistDisplacement2')
+    weld_modifier = context.active_object.modifiers.get('CircularTwistWeld')
+
+    if displace_modifier1:
+        context.active_object.modifiers.remove(displace_modifier1)
+
+    if array_modifier:
+        context.active_object.modifiers.remove(array_modifier)
+
+    if simple_deform_modifier:
+        context.active_object.modifiers.remove(simple_deform_modifier)
+
+    if displace_modifier2:
+        context.active_object.modifiers.remove(displace_modifier2)
+
+    if weld_modifier:
+        context.active_object.modifiers.remove(weld_modifier)
+
 class RyModel_DeleteModifier(Operator):
     bl_idname = "rymodel.delete_modifier"
     bl_label = "Delete Modifier"
@@ -428,22 +462,17 @@ class RyModel_DeleteModifier(Operator):
         if not verify_active_mesh(self):
             return {'FINISHED'}
         
-        # Check for custom modifiers.
-        if self.modifier_name == 'RADIAL_ARRAY':
-            radial_array_displacement_modifier = bpy.context.active_object.modifiers.get("RadialArrayDisplacement")
-            if radial_array_displacement_modifier:
-                bpy.context.active_object.modifiers.remove(radial_array_displacement_modifier)
-                
-            radial_array_modifier = bpy.context.active_object.modifiers.get("RadialArray")
-            offset_object = radial_array_modifier.offset_object
-            if offset_object:
-                bpy.data.objects.remove(radial_array_modifier.offset_object)
-            if radial_array_modifier:
-                bpy.context.active_object.modifiers.remove(radial_array_modifier)
-        
-        modifier = bpy.context.active_object.modifiers.get(self.modifier_name)
-        if modifier:
-            bpy.context.active_object.modifiers.remove(modifier)
+        match self.modifier_name:
+            case 'CIRCULAR_ARRAY':
+                remove_circular_array_setup(context)
+
+            case 'CIRCULAR_TWIST':
+                remove_circular_twist_setup(context)
+
+            case _:
+                modifier = bpy.context.active_object.modifiers.get(self.modifier_name)
+                if modifier:
+                    bpy.context.active_object.modifiers.remove(modifier)
 
         remove_unused_cutters()
 
@@ -480,31 +509,31 @@ class RyModel_HSWFModApply(Operator):
 
         return {'FINISHED'}
 
-def update_radial_offset(self, context):
+def update_circular_offset(self, context):
     if not verify_active_mesh():
         return
 
-    displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
+    displace_modifier = context.active_object.modifiers.get('CircularArrayDisplacement')
     if displace_modifier:
-        displace_modifier.strength = context.scene.radial_array_settings.offset
+        displace_modifier.strength = context.scene.circular_array_settings.offset
 
-def update_radial_count(self, context):
+def update_circular_count(self, context):
     if not verify_active_mesh():
         return
     
-    array_modifier = context.active_object.modifiers.get('RadialArray')
-    array_modifier.count = context.scene.radial_array_settings.count
+    array_modifier = context.active_object.modifiers.get('CircularArray')
+    array_modifier.count = context.scene.circular_array_settings.count
     empty_object = array_modifier.offset_object
     empty_object.rotation_euler[2] = math.radians(360 / array_modifier.count)
 
-class RadialArraySettings(PropertyGroup):
-    offset: FloatProperty(name="Offset", default=2.0, min=0.0, soft_max=5.0, update=update_radial_offset)
-    count: IntProperty(name="Count", default=10, min=0, soft_max=100, update=update_radial_count)
+class CircularArraySettings(PropertyGroup):
+    offset: FloatProperty(name="Offset", default=2.0, min=0.0, soft_max=5.0, update=update_circular_offset)
+    count: IntProperty(name="Count", default=10, min=0, soft_max=100, update=update_circular_count)
 
-class RyModel_RadialArray(Operator):
-    bl_idname = "rymodel.radial_array"
-    bl_label = "Radial Array"
-    bl_description = "Applies a radial array to the active (selected) object"
+class RyModel_CircularArray(Operator):
+    bl_idname = "rymodel.circular_array"
+    bl_label = "Circular Array"
+    bl_description = "Applies a circular array to the active (selected) object"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -512,17 +541,17 @@ class RyModel_RadialArray(Operator):
             return {'FINISHED'}
         
         original_object = context.active_object
-        displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
-        array_modifier =  context.active_object.modifiers.get('RadialArray')
+        displace_modifier = context.active_object.modifiers.get('CircularArrayDisplacement')
+        array_modifier =  context.active_object.modifiers.get('CircularArray')
 
-        # If either modifier exists, assume there is already a radial array applied to the active object.
+        # If either modifier exists, assume there is already a circular array applied to the active object.
         if displace_modifier or array_modifier:
-            rylog.log_status("Radial array modifiers already exist on the active object, delete the existing radial array if you want a new one.", self)
+            rylog.log_status("Circular array modifiers already exist on the active object, delete the existing circular array if you want a new one.", self)
             return {'FINISHED'}
 
         # Add a displacement modifier.
         if not displace_modifier:
-            displace_modifier = context.active_object.modifiers.new('RadialArrayDisplacement', 'DISPLACE')
+            displace_modifier = context.active_object.modifiers.new('CircularArrayDisplacement', 'DISPLACE')
         displace_modifier.strength = 1.0
         displace_modifier.mid_level = 0.0
         displace_modifier.direction = 'X'
@@ -530,7 +559,7 @@ class RyModel_RadialArray(Operator):
 
         # Add an array modifer.
         if not array_modifier:
-            array_modifier = context.active_object.modifiers.new('RadialArray', 'ARRAY')
+            array_modifier = context.active_object.modifiers.new('CircularArray', 'ARRAY')
         array_modifier.use_relative_offset = False
         array_modifier.use_object_offset = True
         array_modifier.count = 10
@@ -554,30 +583,6 @@ class RyModel_RadialArray(Operator):
 
         return {'FINISHED'}
 
-class RyModel_RemoveRadialArray(Operator):
-    bl_idname = "rymodel.remove_radial_array"
-    bl_label = "Remove Radial Array"
-    bl_description = "Removes a radial array setup (created with this add-on) from the active object if one exists"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        if not verify_active_mesh(self):
-            return {'FINISHED'}
-        
-        original_object = context.active_object
-        displace_modifier = context.active_object.modifiers.get('RadialArrayDisplacement')
-        array_modifier =  context.active_object.modifiers.get('RadialArray')
-
-        if displace_modifier:
-            original_object.modifiers.remove(displace_modifier)
-
-        if array_modifier:
-            original_object.modifiers.remove(array_modifier)
-
-        
-
-        return {'FINISHED'}
-
 class RyModel_2xSubDivision(Operator):
     bl_idname = "rymodel.two_x_subdivision"
     bl_label = "2x Subdivision"
@@ -596,6 +601,88 @@ class RyModel_2xSubDivision(Operator):
             subdivision_modifier_1.subdivision_type = 'SIMPLE'
             subdivision_modifier_2 = context.active_object.modifiers.new('2xSubDivision_2', 'SUBSURF')
             subdivision_modifier_2.levels = 2
+
+        return {'FINISHED'}
+
+class RyModel_CircularTwist(Operator):
+    bl_idname = "rymodel.circular_twist"
+    bl_label = "Circular Twist"
+    bl_description = "Bends the active (selected) object in a circle (applies rotation and scale to your object)"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        
+        active_object = context.active_object
+
+        # Apply rotation & scale to avoid strange results when applying this modifier.
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+
+        # If any modifier exists, assume there is already a circular twist applied to the active object.
+        displace_modifier1 = active_object.modifiers.get('CircularTwistDisplacement1')
+        array_modifier =  active_object.modifiers.get('CircularTwistArray')
+        simple_deform_modifier = active_object.modifiers.get('CircularTwistDeform')
+        displace_modifier2 = active_object.modifiers.get('CircularTwistDisplacement2')
+        weld_modifier = active_object.modifiers.get('CircularTwistWeld')
+        if displace_modifier1 or array_modifier or displace_modifier2:
+            rylog.log_status("Circular twist modifiers already exist on the active object, delete the existing circular twist modifiers before adding a new one.", self)
+            return {'FINISHED'}
+
+        # Add a displacement modifier.
+        displace_modifier = active_object.modifiers.new('CircularTwistDisplacement', 'DISPLACE')
+        displace_modifier.strength = 2.0
+        displace_modifier.mid_level = 0.0
+        displace_modifier.direction = 'Y'
+        displace_modifier.show_in_editmode = False
+        displace_modifier.show_expanded = False
+
+        # Add an array modifer.
+        array_modifier = active_object.modifiers.new('CircularTwistArray', 'ARRAY')
+        array_modifier.use_relative_offset = True
+        array_modifier.count = 10
+        array_modifier.use_merge_vertices = True
+        array_modifier.show_in_editmode = False
+        array_modifier.show_expanded = False
+
+        # Add a simple deform modifier.
+        simple_deform_modifier = active_object.modifiers.new('CircularTwistSimpleDeform', 'SIMPLE_DEFORM')
+        simple_deform_modifier.angle = 6.28319
+        simple_deform_modifier.deform_method = 'BEND'
+        simple_deform_modifier.deform_axis = 'Z'
+        simple_deform_modifier.show_in_editmode = False
+        simple_deform_modifier.show_expanded = False
+
+        # Duplicate the object and apply all mods then re-center the origin to get the Y location offset to re-center the object.
+        bpy.context.view_layer.objects.active = active_object
+        bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
+        temp_obj = bpy.context.active_object
+
+        for modifier in temp_obj.modifiers:
+            bpy.ops.object.modifier_apply(modifier=modifier.name, report=False)
+
+        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+        y_offset = temp_obj.location[1]
+        bpy.ops.object.delete(use_global=False)
+
+        # Add a second displacement modifier to re-center the objects mesh around it's origin.
+        displacement_modifier_2 = active_object.modifiers.new('CircularTwistDisplacement2', 'DISPLACE')
+        displacement_modifier_2.mid_level = 0.0
+        displacement_modifier_2.direction = 'Y'
+        displacement_modifier_2.show_in_editmode = False
+        displacement_modifier_2.show_expanded = False
+        displacement_modifier_2.strength = y_offset * -1
+
+        # Add a weld modifier.
+        weld_modifier = active_object.modifiers.new('CircularTwistWeld', 'WELD')
+        weld_modifier.show_in_editmode = False
+        weld_modifier.show_expanded = False
+
+        # Select the original object.
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = active_object
 
         return {'FINISHED'}
 

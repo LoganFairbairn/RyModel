@@ -49,9 +49,9 @@ classes = (
     RyModel_ExtractCurve,
     RyModel_CleanMesh,
     RyModel_SelectNgons,
-    RadialArraySettings,
-    RyModel_RadialArray,
-    RyModel_RemoveRadialArray,
+    CircularArraySettings,
+    RyModel_CircularArray,
+    RyModel_CircularTwist,
     RyModel_2xSubDivision,
     RyModel_CurveToRope, 
     RyModel_Cheshire,
@@ -136,7 +136,7 @@ def register():
 
     # UI Toggles
     bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
-    bpy.types.Scene.radial_array_settings = bpy.props.PointerProperty(type=RadialArraySettings)
+    bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)
 
 def unregister():
     # Remove add-on key mapping.

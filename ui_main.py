@@ -198,30 +198,28 @@ def draw_modifier_title(layout, name, delete_name):
     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
     op.modifier_name = delete_name
 
-def draw_radial_array_properties(layout):
-    displace_modifier = bpy.context.active_object.modifiers.get('RadialArrayDisplacement')
-    array_modifier =  bpy.context.active_object.modifiers.get('RadialArray')
+def draw_circular_array_properties(layout):
+    displace_modifier = bpy.context.active_object.modifiers.get('CircularArrayDisplacement')
+    array_modifier =  bpy.context.active_object.modifiers.get('CircularArray')
     if displace_modifier and array_modifier:
-        draw_modifier_title(layout, "Radial Array", "RADIAL_ARRAY")
+        draw_modifier_title(layout, "Circular Array", "CIRCULAR_ARRAY")
 
         row = layout.row(align=True)
-        row.prop(bpy.context.scene.radial_array_settings, "offset", slider=True)
+        row.prop(bpy.context.scene.circular_array_settings, "offset", slider=True)
         row = layout.row(align=True)
-        row.prop(bpy.context.scene.radial_array_settings, "count", slider=True)
+        row.prop(bpy.context.scene.circular_array_settings, "count", slider=True)
 
 def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
     if active_object:
-        row = layout.row()
-        row.label(text="Modifiers")
         for modifier in active_object.modifiers:
             match modifier.name:
                 # Draw properties for custom modifiers.
-                case "RadialArrayDisplacement":
-                    draw_radial_array_properties(layout)
+                case "CircularArrayDisplacement":
+                    draw_circular_array_properties(layout)
 
-                case "RadialArray":
+                case "CircularArray":
                     continue
                 
                 # Draw commonly used properties for modifiers.
@@ -301,7 +299,7 @@ def draw_modifiers(layout):
     first_column = split.column()
     second_column = split.column()
 
-    row = first_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.add_modifier", icon='MOD_BEVEL', text=" ")
     op.type = 'BEVEL'
@@ -311,7 +309,11 @@ def draw_modifiers(layout):
     op.type = 'SOLIDIFY'
     op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text=" ")
     op.type = 'ARRAY'
-    row.operator("rymodel.radial_array", icon='SURFACE_NCIRCLE', text=" ")
+    row.operator("rymodel.circular_array", icon='SURFACE_NCIRCLE', text=" ")
+    row.operator("rymodel.circular_twist", icon='MOD_MESHDEFORM', text=" ")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text=" ")
     op.type = 'MULTIRES'
     op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text=" ")
@@ -321,6 +323,17 @@ def draw_modifiers(layout):
     op.type = 'SHRINKWRAP'
     op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text=" ")
     op.type = 'TRIANGULATE'
+
+
+
+
+    split = layout.split(factor=0.75)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Modifiers")
 
     row = second_column.row(align=True)
     row.scale_x = 4
