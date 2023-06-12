@@ -1082,6 +1082,10 @@ class RyModel_Unwrap(Operator):
         if not verify_active_mesh(self):
             return {'FINISHED'}
         
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='SELECT')
+
         addons = context.preferences.addons
 
         # Use UV Packer if it's installed.
@@ -1093,6 +1097,9 @@ class RyModel_Unwrap(Operator):
         else:
             bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
             
+
+        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+
         return {'FINISHED'}
 
 class RyModel_AutoSeam(Operator):
