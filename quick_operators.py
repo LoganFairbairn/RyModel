@@ -847,9 +847,12 @@ class RyModel_AddCutter(Operator):
             solidify_modifier = new_cutter_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
             solidify_modifier.use_even_offset = True
             solidify_modifier.thickness = 0.075
+            
+        # Parent the cutter to the object.
+        new_cutter_object.parent = active_object
 
-        # Set the location of the cutter.
-        new_cutter_object.location = bpy.context.scene.cursor.location
+        # For not parenting - Set the location of the cutter.
+        #new_cutter_object.location = bpy.context.scene.cursor.location
 
         return {'FINISHED'}
 
