@@ -28,7 +28,7 @@ from .ui_main import *
 bl_info = {
     "name": "RyModel",
     "author": "Logan Fairbairn (Ryver)",
-    "version": (0, 2, 0),
+    "version": (1, 0, 0),
     "blender": (3, 5, 1),
     "location": "View3D > Sidebar > RyModel",
     "description": "Adds a quick access menu with a collection of batched and commonly used modeling operations.",

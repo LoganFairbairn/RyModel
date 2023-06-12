@@ -5,7 +5,6 @@ import bpy.utils.previews                   # Imported for custom icons.
 from bpy.types import Menu, Operator
 import os
 
-ADDON_VERSION_NUMBER = (0, 1, 0)
 UI_Y_SCALE = 1.4
 
 custom_icons = None
@@ -399,7 +398,7 @@ class RyModel_OT_open_menu(Operator):
     # Draws the properties in the popup.
     def draw(self, context):
         layout = self.layout
-        layout.label(text="RyModel {0}.{1}.{2}".format(str(ADDON_VERSION_NUMBER[0]), str(ADDON_VERSION_NUMBER[1]), str(ADDON_VERSION_NUMBER[2])))
+        layout.label(text="RyModel 1.0.0")
 
         split = layout.split(factor=0.35)
         first_column = split.column()
