@@ -640,7 +640,6 @@ def update_circular_twist_count(self, context):
     bpy.context.view_layer.objects.active = active_object
     active_object.select_set(True)
 
-
 class RyModel_CircularTwist(Operator):
     bl_idname = "rymodel.circular_twist"
     bl_label = "Circular Twist"
@@ -685,7 +684,7 @@ class RyModel_CircularTwist(Operator):
         array_modifier.show_expanded = False
 
         # Add a simple deform modifier.
-        simple_deform_modifier = active_object.modifiers.new('CircularTwistSimpleDeform', 'SIMPLE_DEFORM')
+        simple_deform_modifier = active_object.modifiers.new('CircularTwistDeform', 'SIMPLE_DEFORM')
         simple_deform_modifier.angle = 6.28319
         simple_deform_modifier.deform_method = 'BEND'
         simple_deform_modifier.deform_axis = 'Z'
