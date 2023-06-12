@@ -175,25 +175,19 @@ def draw_extras(layout):
     row.operator("rymodel.cheshire")
 
 def draw_modifier_title(layout, name, delete_name):
-    split = layout.split(factor=0.333)
+    split = layout.split(factor=0.4)
     first_column = split.column()
     second_column = split.column()
-    third_column = split.column()
 
     row = first_column.row()
     row.scale_y = UI_Y_SCALE
     row.alignment = 'LEFT'
-    row.label(text="•••••••••")
+    row.label(text=name)
 
     row = second_column.row()
     row.scale_y = UI_Y_SCALE
-    row.alignment = 'CENTER'
-    row.label(text=name)
-
-    row = third_column.row()
-    row.scale_y = UI_Y_SCALE
     row.alignment = 'RIGHT'
-    row.label(text="•••••••••")
+    row.label(text="••••••••••••••••••••••")
 
     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
     op.modifier_name = delete_name
