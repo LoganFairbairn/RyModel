@@ -1,6 +1,9 @@
 # This module provides operators to help speed up the modeling workflow in Blender.
 
 import bpy
+import blf
+import gpu
+from gpu_extras.batch import batch_for_shader
 import bmesh
 from bpy.types import Operator, PropertyGroup
 from bpy.props import StringProperty, IntProperty, FloatProperty
@@ -350,6 +353,106 @@ class RyModel_CleanMesh(Operator):
 
         return {'FINISHED'}
 
+def draw_callback_px(self, context):
+    # Draw number of point created.
+    font_id = 0
+    blf.position(font_id, 15, 30, 0)
+    blf.size(font_id, 20, 72)
+    blf.draw(font_id, "Points: {0}".format(len(self.verticies)))
+
+
+    render_vertices = []
+
+    if len(self.verticies) == 1:
+        render_vertices.append(self.verticies[0])
+        render_vertices.append((self.mouse_pos[0], self.mouse_pos[1]))
+        render_vertices.append((self.mouse_pos[0], self.mouse_pos[1]))
+
+    elif len(self.verticies) == 2:
+        render_vertices.append(self.verticies[0])
+        render_vertices.append(self.verticies[1])
+        render_vertices.append((self.mouse_pos[0], self.mouse_pos[1]))
+
+    else:
+        last_tri = []
+        last_tri.append((self.verticies[len(self.verticies) - 2]))
+        last_tri.append((self.verticies[len(self.verticies) - 1]))
+        last_tri.append((self.mouse_pos[0], self.mouse_pos[1]))
+
+        render_vertices = self.verticies + last_tri
+
+
+    # Draw the shape to the screen.
+    shader = gpu.shader.from_builtin('UNIFORM_COLOR')
+    gpu.state.blend_set('ALPHA')
+    gpu.state.line_width_set(2.0)
+    batch = batch_for_shader(shader, 'TRIS', {"pos": render_vertices})
+    shader.uniform_float("color", (1.0, 0.0, 0.0, 0.5))
+    batch.draw(shader)
+
+    # restore opengl defaults
+    gpu.state.blend_set('NONE')
+
+class RyModel_DrawShape(bpy.types.Operator):
+    bl_idname = "rymodel.draw_shape"
+    bl_label = "Draw Shape"
+    bl_description = "Click to create vertices of a shape, which is automatically extruded and filled. If an object is selected, the new shape will be applied as a cutter object"
+
+    def modal(self, context, event):
+        context.area.tag_redraw()
+
+        if event.type == 'MOUSEMOVE':
+            self.mouse_pos = []
+            self.mouse_pos.append(event.mouse_region_x)
+            self.mouse_pos.append(event.mouse_region_y)
+
+        if event.type == 'LEFTMOUSE':
+            if event.value == 'PRESS':
+                self.verticies.append((event.mouse_region_x, event.mouse_region_y))
+
+                # Append the last triangle.
+                if len(self.verticies) > 3:
+                    last_tri = []
+                    last_tri.append((self.verticies[len(self.verticies) - 3]))
+                    last_tri.append((self.verticies[len(self.verticies) - 2]))
+                    last_tri.append((self.mouse_pos[0], self.mouse_pos[1]))
+
+                    self.verticies += last_tri
+
+                print("-------------------------------------------")
+                print("Mouse clicks: {0}".format(str(self.verticies)))
+                print("Added mouse point: {0},{1}".format(self.mouse_pos[0], self.mouse_pos[1]))
+
+        elif event.type == 'SPACE':
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+            return {'FINISHED'}
+
+        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        if context.area.type == 'VIEW_3D':
+            # the arguments we pass the the callback
+            args = (self, context)
+            # Add the region OpenGL drawing callback
+            # draw in view space with 'POST_VIEW' and 'PRE_VIEW'
+            self._handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
+
+            self.verticies = []
+            self.mouse_pos = [0, 0]
+
+            # Add the start position.
+            self.verticies.append((event.mouse_region_x, event.mouse_region_y))
+            print("Added mouse start position.")
+
+            context.window_manager.modal_handler_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            self.report({'WARNING'}, "View3D not found, cannot run operator")
+            return {'CANCELLED'}
 
 #------------------------ MODIFIERS ------------------------#
 

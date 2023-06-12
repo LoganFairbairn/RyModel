@@ -50,6 +50,7 @@ classes = (
     RyModel_ExtractCurve,
     RyModel_CleanMesh,
     RyModel_SelectNgons,
+    RyModel_DrawShape,
     CircularArraySettings,
     RyModel_CircularArray,
     RyModel_CircularTwist,
@@ -106,6 +107,10 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
         kmi = km.keymap_items.new(RyModel_OT_open_menu.bl_idname, type='D', value='PRESS', ctrl=False)
         addon_keymaps.append((km, kmi))
+
+        #km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+        #kmi = km.keymap_items.new(RyModel_DrawShape.bl_idname, type='D', value='PRESS', ctrl=True)
+        #addon_keymaps.append((km, kmi))
 
 
     CUTTER_MODE = [

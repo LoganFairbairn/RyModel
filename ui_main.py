@@ -48,6 +48,9 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.auto_sharpen", text="Sharpen")
 
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.clean_mesh", text="Clean Mesh")
 
         case 'CURVE':
             row = layout.row()
@@ -132,8 +135,6 @@ def draw_cutter_tools(layout):
     op.shape = 'CONE'
     op = row.operator("rymodel.add_cutter", icon='SELECT_SET', text="")
     op.shape = 'CONE'
-    #op = row.operator("rymodel.add_cutter", icon_value=custom_icons["NGON_DRAW"].icon_id, text="")
-    #op.shape = 'CONE'
 
     row = layout.row(align=True)
     row.scale_x = 10
@@ -159,21 +160,17 @@ def draw_origin_tools(layout):
     op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
     op.location = 'VOLUME'
 
-def draw_mesh_operators(layout):
+def draw_unwrapping_tools(layout):
     '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
     if bpy.context.active_object.type != 'MESH':
         return
 
     row = layout.row()
-    row.label(text="Mesh Tools")
+    row.label(text="Unwrapping")
 
-    row = layout.row(align=True)
-    row.scale_y =UI_Y_SCALE
-    row.operator("rymodel.clean_mesh")
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.select_ngons")
+    #row = layout.row(align=True)
+    #row.scale_y = UI_Y_SCALE
+    #row.operator("rymodel.select_ngons")
 
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
@@ -414,7 +411,7 @@ class RyModel_OT_open_menu(Operator):
             draw_mirror_tools(first_column)
             draw_origin_tools(first_column)
             draw_display_options(first_column)
-            draw_mesh_operators(first_column)
+            draw_unwrapping_tools(first_column)
             draw_modifiers(second_column)
 
         else:
