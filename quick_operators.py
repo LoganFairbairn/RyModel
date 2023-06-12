@@ -342,12 +342,6 @@ class RyModel_CleanMesh(Operator):
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.remove_doubles(threshold=0.0001)
 
-        # Fill non-manifold faces.
-        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
-        bpy.ops.mesh.select_all(action='DESELECT')
-        bpy.ops.mesh.select_non_manifold()
-        bpy.ops.mesh.fill()
-
         # Toggle back into the original mode.
         bpy.ops.object.mode_set(mode=original_mode, toggle=False)
 
