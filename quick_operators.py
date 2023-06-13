@@ -1127,7 +1127,7 @@ class RyModel_AddCutter(Operator):
 
         if self.shape == 'SELECTED_OBJECT':
             if len(bpy.context.selected_objects) != 2:
-                self.report({'ERROR', "Select only the object you wish to use as a cutter and the object you wish to cut."})
+                self.report({'ERROR'}, "Select only the object you wish to use as a cutter and the object you wish to cut."})
                 return {'FINISHED'}
 
         # We'll create the new cutter object at the center of the selected object. Move the 3D cursor there for later.
