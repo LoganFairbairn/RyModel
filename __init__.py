@@ -48,6 +48,8 @@ classes = (
     RyModel_AutoSharpen,
     RyModel_ExtractFace,
     RyModel_ExtractCurve,
+    RyModel_MirrorByFace,
+    RyModel_3DCursorToFace,
     RyModel_CleanMesh,
     RyModel_SelectNgons,
     RyModel_DrawShape,

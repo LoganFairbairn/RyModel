@@ -3,6 +3,7 @@
 import bpy
 import blf
 import gpu
+import mathutils
 from gpu_extras.batch import batch_for_shader
 import bmesh
 from bpy.types import Operator, PropertyGroup
@@ -447,6 +448,77 @@ class RyModel_DrawShape(bpy.types.Operator):
         else:
             self.report({'WARNING'}, "View3D not found, cannot run operator")
             return {'CANCELLED'}
+
+class RyModel_MirrorByFace(Operator):
+    bl_idname = "rymodel.mirror_by_face"
+    bl_label = "Mirror By Face"
+    bl_description = "Mirrors the object based on the select"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        if original_mode != 'EDIT_MESH':
+            self.report({'ERROR'}, "Must be in edit mode to run the 3D cursor to face operator.")
+            return {'FINISHED'}
+
+        # Must be in face select mode.
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='FACE')
+        
+        original_object = bpy.context.active_object
+        
+        # Snap the cursor to the selected face.
+        bpy.ops.view3d.snap_cursor_to_selected()
+        
+        # Set the origin of the object to the face.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+
+        # Duplicate the object and flip it.
+        bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "orient_axis_ortho":'X', "orient_type":'GLOBAL', "orient_matrix":((0, 0, 0), (0, 0, 0), (0, 0, 0)), "orient_matrix_type":'GLOBAL', "constraint_axis":(False, False, False), "mirror":False, "use_proportional_edit":False, "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "use_proportional_connected":False, "use_proportional_projected":False, "snap":False, "snap_elements":{'INCREMENT'}, "use_snap_project":False, "snap_target":'CLOSEST', "use_snap_self":True, "use_snap_edit":True, "use_snap_nonedit":True, "use_snap_selectable":False, "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "cursor_transform":False, "texture_space":False, "remove_on_cancel":False, "view2d_edge_pan":False, "release_confirm":False, "use_accurate":False, "use_automerge_and_split":False})
+        bpy.ops.transform.resize(value=(-1, -1, -1), orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', mirror=False, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
+
+        # Reset both objects origins.
+        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = original_object
+        original_object.select_set(True)
+        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+
+        # Reset to the original mode.
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
+        return {'FINISHED'}
+
+class RyModel_3DCursorToFace(Operator):
+    bl_idname = "rymodel.3d_cursor_to_face"
+    bl_label = "3D Cursor To Face"
+    bl_description = "Sets the 3D cursor to the selected face and rotates it to match the face"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+    
+        cursor = bpy.context.scene.cursor
+        obj = bpy.context.active_object
+        polgyons = obj.data.polygons
+
+        # Set the 3D cursor to the center of the active face.
+        center = obj.data.polygons[polgyons.active].center
+        cursor.location = center
+
+        # Set the 3D cursor rotation to the rotation of the selected face.
+        normal = obj.data.polygons[polgyons.active].normal
+        up = normal.to_track_quat('X', 'Y')
+        cursor.rotation_euler = up.to_euler(cursor.rotation_mode)
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+        return {'FINISHED'}
 
 #------------------------ MODIFIERS ------------------------#
 
