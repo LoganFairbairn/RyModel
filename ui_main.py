@@ -321,15 +321,14 @@ def draw_modifier_properties(layout):
                         row.scale_y = UI_Y_SCALE
 
                     case 'BOOLEAN':
-                        if bpy.context.scene.show_cutter_ui:
-                            draw_modifier_title(layout, modifier.name, modifier.name)
-                            row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE
-                            row.label(text="Solver ")
-                            row.prop_enum(modifier, "solver", 'FAST')
-                            row.prop_enum(modifier, "solver", 'EXACT')
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+                        row = layout.row(align=True)
+                        row.scale_y = UI_Y_SCALE
+                        row.label(text="Solver ")
+                        row.prop_enum(modifier, "solver", 'FAST')
+                        row.prop_enum(modifier, "solver", 'EXACT')
 
-        if bpy.context.scene.show_cutter_ui and modifier.type != 'MIRROR':
+        if modifier.type != 'MIRROR':
             row = layout.row()
             row.separator()
             row = layout.row()
