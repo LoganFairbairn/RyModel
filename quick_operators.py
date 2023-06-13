@@ -1148,6 +1148,7 @@ class RyModel_AddCutter(Operator):
 
         # Adjust boolean settings.
         boolean_modifier.solver = 'FAST'
+        boolean_modifier.show_in_editmode = True
         if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
             boolean_modifier.operation = 'DIFFERENCE'
         else:
