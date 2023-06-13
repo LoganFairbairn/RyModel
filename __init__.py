@@ -60,6 +60,7 @@ classes = (
     RyModel_AddSubdivisionModifier,
     RyModel_AddShrinkWrapModifier,
     RyModel_AddTriangulateModifier,
+    RyModel_ApplyModifier,
     RyModel_DeleteModifier,
     RyModel_CopyModifiers,
     CircularArraySettings,
@@ -69,6 +70,8 @@ classes = (
     RyModel_CurveToRope, 
     RyModel_Cheshire,
     RyModel_HSWFModApply,
+
+    # Cutters
     RyModel_AddCutter,
     RyModel_ShowCutters,
 

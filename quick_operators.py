@@ -720,6 +720,20 @@ class RyModel_AddTriangulateModifier(Operator):
         update_property_range_overrides()
         return {'FINISHED'}
 
+class RyModel_ApplyModifier(Operator):
+    bl_idname = "rymodel.apply_modifier"
+    bl_label = "Apply Modifier"
+    bl_description = "Applies the modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        bpy.ops.object.modifier_apply(modifier=self.modifier_name, report=True)
+        if self.modifier_name.startswith("Cutter_"):
+            remove_unused_cutters()
+        return {'FINISHED'}
+
 #------------------------ CUSTOM MODIFIERS ------------------------#
 
 def remove_circular_array_setup(context):

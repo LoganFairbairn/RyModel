@@ -196,7 +196,7 @@ def draw_extras(layout):
     row.operator("rymodel.curve_to_rope")
     row.operator("rymodel.cheshire")
 
-def draw_modifier_title(layout, name, delete_name):
+def draw_modifier_title(layout, name, modifier_name):
     split = layout.split(factor=0.4)
     first_column = split.column()
     second_column = split.column()
@@ -206,13 +206,14 @@ def draw_modifier_title(layout, name, delete_name):
     row.alignment = 'LEFT'
     row.label(text=name)
 
-    row = second_column.row()
+    row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.alignment = 'RIGHT'
-    row.label(text="••••••••••••••••••••••")
-
+    row.label(text="••••••••••••••••••••  ")
+    op = row.operator("rymodel.apply_modifier", text="", icon='ADD')
+    op.modifier_name = modifier_name
     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
-    op.modifier_name = delete_name
+    op.modifier_name = modifier_name
 
 def draw_circular_array_properties(layout):
     displace_modifier = bpy.context.active_object.modifiers.get('CircularArrayDisplacement')
