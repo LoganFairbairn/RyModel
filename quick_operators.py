@@ -978,12 +978,12 @@ class RyModel_AddCutter(Operator):
 
         # Get a unique name for the new cutter.
         cutter_number = 1
-        new_cutter_name = "CutterMesh_{0}".format(cutter_number)
+        new_cutter_name = "Cutter_{0}".format(cutter_number)
 
         cutter = bpy.data.objects.get(new_cutter_name)
         while cutter != None:
             cutter_number += 1
-            new_cutter_name = "CutterMesh_{0}".format(cutter_number)
+            new_cutter_name = "Cutter_{0}".format(cutter_number)
             cutter = bpy.data.objects.get(new_cutter_name)
 
         # Make the selected object into a cutter.
