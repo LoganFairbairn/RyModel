@@ -47,9 +47,9 @@ def draw_contextual_object_menu(layout):
                     #row.scale_y = UI_Y_SCALE
                     #row.operator("rymodel.3d_cursor_to_face", text="3D Cursor To Face")
 
-                    #row = layout.row()
-                    #row.scale_y = UI_Y_SCALE
-                    #row.operator("rymodel.mirror_by_face", text="Mirror By Face")
+                    row = layout.row()
+                    row.scale_y = UI_Y_SCALE
+                    row.operator("rymodel.mirror_by_face", text="Mirror By Face")
 
             row = layout.row()
             row.scale_y = UI_Y_SCALE
