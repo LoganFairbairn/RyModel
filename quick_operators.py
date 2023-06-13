@@ -1196,6 +1196,7 @@ class RyModel_AddCutter(Operator):
 
             bm = bmesh.new()
             match self.shape:
+
                 case 'CUBE':
                     bmesh.ops.create_cube(bm, size=1.0)
 
@@ -1229,6 +1230,20 @@ class RyModel_AddCutter(Operator):
         bpy.context.view_layer.objects.active = new_cutter_object
         new_cutter_object.select_set(True)
 
+        # Set the dimensions of the new cutter to be slightly larger than the dimensions of the selected object.
+        match self.shape:
+            case 'CUBE':
+                new_cutter_object.dimensions = active_object.dimensions * 1.2
+
+            case _:
+                if self.shape != 'SELECTED_OBJECT':
+                    largest_dimension = active_object.dimensions[0]
+                    for i in range(1, len(active_object.dimensions)):
+                        if active_object.dimensions[i] > largest_dimension:
+                            largest_dimension = active_object.dimensions[i]
+
+                    new_cutter_object.dimensions = (largest_dimension, largest_dimension, largest_dimension)
+
         # Shade smooth.
         bpy.ops.object.shade_smooth(use_auto_smooth=False, auto_smooth_angle=1.0472)
 
@@ -1249,10 +1264,7 @@ class RyModel_AddCutter(Operator):
             solidify_modifier.thickness = 0.075
 
         # Parent the cutter to the object.
-        new_cutter_object.parent = active_object
-
-        # For not parenting - Set the location of the cutter.
-        #new_cutter_object.location = bpy.context.scene.cursor.location
+        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 
         return {'FINISHED'}
 
