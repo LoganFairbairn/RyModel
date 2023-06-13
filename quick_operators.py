@@ -920,6 +920,9 @@ class RyModel_AddCutter(Operator):
     shape: StringProperty(default='CUBE')
 
     def execute(self, context):
+        # Remove all unused cutters automatically.
+        remove_unused_cutters()
+
         if not verify_active_mesh(self):
             return {'FINISHED'}
         
