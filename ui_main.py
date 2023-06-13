@@ -358,7 +358,7 @@ def draw_modifiers(layout):
     op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text="")
     op.type = 'TRIANGULATE'
 
-    split = layout.split(factor=0.75)
+    split = layout.split(factor=0.5)
     first_column = split.column()
     second_column = split.column()
 
@@ -369,8 +369,8 @@ def draw_modifiers(layout):
     row = second_column.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="")
-    row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="+")
+    row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="Copy")
+    row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="Apply")
 
     draw_modifier_properties(layout)
 
