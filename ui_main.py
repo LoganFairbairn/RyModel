@@ -63,16 +63,16 @@ def draw_contextual_object_menu(layout):
         case 'CURVE':
             row = layout.row()
             row.scale_y = UI_Y_SCALE
-            row.prop(active_object.data, "bevel_depth", slider=True)
+            row.prop(bpy.context.scene.curve_settings, "bevel_depth", slider=True)
             row = layout.row()
             row.scale_y = UI_Y_SCALE
-            row.prop(active_object.data, "bevel_resolution", slider=True)
+            row.prop(bpy.context.scene.curve_settings, "bevel_resolution", slider=True)
             row = layout.row()
             row.scale_y = UI_Y_SCALE
-            row.prop(active_object.data, "extrude", slider=True)
+            row.prop(bpy.context.scene.curve_settings, "extrude", slider=True)
             row = layout.row()
             row.scale_y = UI_Y_SCALE
-            row.prop(active_object.data, "resolution_u", slider=True)
+            row.prop(bpy.context.scene.curve_settings, "resolution_u", slider=True)
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
@@ -260,13 +260,13 @@ def draw_modifier_properties(layout):
                         draw_modifier_title(layout, modifier.name, modifier.name)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "segments", slider=True)
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "segments", slider=True)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "width", slider=True)
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "limit_method", slider=True)
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "limit_method", slider=True)
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, modifier.name, modifier.name)
@@ -278,14 +278,14 @@ def draw_modifier_properties(layout):
                         draw_modifier_title(layout, modifier.name, modifier.name)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "thickness", slider=True)
+                        row.prop(bpy.context.scene.solidify_modifier_settings, "thickness", slider=True)
                         row.prop(modifier, "use_even_offset", toggle=True)
 
                     case 'ARRAY':
                         draw_modifier_title(layout, modifier.name, modifier.name)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "count", slider=True)
+                        row.prop(bpy.context.scene.array_modifier_settings, "count", slider=True)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.label(text="Relative Offset")

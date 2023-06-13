@@ -65,6 +65,12 @@ classes = (
     RyModel_Unwrap,
     RyModel_AutoSeam,
 
+    # Property Range Overrides
+    BevelModifierSettings,
+    SolidifyModifierSettings,
+    ArrayModifierSettings,
+    CurveSettings,
+
     # User Interface
     RyModel_OT_open_menu
 )
@@ -73,13 +79,12 @@ def on_active_object_changed():
     '''Performs updates when the active object is changed.'''
     active_object = bpy.context.active_object
     if active_object:
-        if bpy.context.active_object.type == 'MESH':
+        # Update cutter visibility.
+        if active_object.type == 'MESH':
             hide_cutters()
 
-        # Update circular twist count.
-        circular_twist_array_mod = active_object.modifiers.get('CircularTwistArray')
-        if circular_twist_array_mod:
-            bpy.context.scene.circular_twist_count = circular_twist_array_mod.count
+        update_property_range_overrides()
+
 
 # Mark load handlers as persistent so they are not freed when loading a new blend file.
 @persistent
@@ -134,6 +139,12 @@ def register():
     # Custom Modifier Settings
     bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)
     bpy.types.Scene.circular_twist_count = bpy.props.IntProperty(default=10, min=0, soft_max=30, update=update_circular_twist_count)
+
+    # Property Range Overrides
+    bpy.types.Scene.bevel_modifier_settings = bpy.props.PointerProperty(type=BevelModifierSettings)
+    bpy.types.Scene.solidify_modifier_settings = bpy.props.PointerProperty(type=SolidifyModifierSettings)
+    bpy.types.Scene.array_modifier_settings = bpy.props.PointerProperty(type=ArrayModifierSettings)
+    bpy.types.Scene.curve_settings = bpy.props.PointerProperty(type=CurveSettings)
 
     # UI Toggles
     bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
