@@ -927,6 +927,11 @@ class RyModel_AddCutter(Operator):
             self.report({'INFO'}, "Can't add a cutter to a cutter object.")
             return {'FINISHED'}
 
+        if self.shape == 'SELECTED_OBJECT':
+            if len(bpy.context.selected_objects) != 2:
+                self.report({'ERROR', "Select only the object you wish to use as a cutter and the object you wish to cut."})
+                return {'FINISHED'}
+
         # We'll create the new cutter object at the center of the selected object. Move the 3D cursor there for later.
         original_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
@@ -967,43 +972,56 @@ class RyModel_AddCutter(Operator):
         # Organize the modifier stack.
         organize_modifier_stack(active_object.modifiers)
 
-        # Create a new cutter mesh with a unique name based on the provided cutter type.
+
+        # Get a unique name for the new cutter.
         cutter_number = 1
         new_cutter_name = "CutterMesh_{0}".format(cutter_number)
-        new_mesh = bpy.data.meshes.get(new_cutter_name)
-        while new_mesh != None:
+
+        cutter = bpy.data.objects.get(new_cutter_name)
+        while cutter != None:
             cutter_number += 1
             new_cutter_name = "CutterMesh_{0}".format(cutter_number)
-            new_mesh = bpy.data.meshes.get(new_cutter_name)
-        new_mesh = bpy.data.meshes.new(new_cutter_name)
+            cutter = bpy.data.objects.get(new_cutter_name)
 
-        bm = bmesh.new()
-        match self.shape:
-            case 'CUBE':
-                bmesh.ops.create_cube(bm, size=1.0)
+        # Make the selected object into a cutter.
+        if self.shape == 'SELECTED_OBJECT':
+            new_cutter_object = context.selected_objects[0]
+            if new_cutter_object == context.active_object:
+                new_cutter_object = context.selected_objects[1]
 
-            case 'CYLINDER':
-                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=True, segments=32, radius1=1, radius2=1, depth=5)
+            new_cutter_object.name = new_cutter_name
 
-            case 'SPHERE':
-                bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1, calc_uvs=False)
+        # Create a new cutter mesh with a unique name based on the provided cutter type.
+        else:
+            new_mesh = bpy.data.meshes.new(new_cutter_name)
 
-            case 'CONE':
-                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=32, radius1=1, radius2=0, depth=3)
-        bm.to_mesh(new_mesh)
-        bm.free()
+            bm = bmesh.new()
+            match self.shape:
+                case 'CUBE':
+                    bmesh.ops.create_cube(bm, size=1.0)
 
-        # Create a new object for the cutter.
-        cutter_number = 1
-        new_cutter_object_name = "Cutter_{0}".format(cutter_number)
-        new_cutter_object = bpy.data.objects.get(new_cutter_object_name)
-        while new_cutter_object != None:
-            cutter_number += 1
+                case 'CYLINDER':
+                    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=True, segments=32, radius1=1, radius2=1, depth=5)
+
+                case 'SPHERE':
+                    bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1, calc_uvs=False)
+
+                case 'CONE':
+                    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=32, radius1=1, radius2=0, depth=3)
+            bm.to_mesh(new_mesh)
+            bm.free()
+
+            # Create a new object for the cutter.
+            cutter_number = 1
             new_cutter_object_name = "Cutter_{0}".format(cutter_number)
             new_cutter_object = bpy.data.objects.get(new_cutter_object_name)
-        new_cutter_object = bpy.data.objects.new(new_cutter_object_name, new_mesh)
+            while new_cutter_object != None:
+                cutter_number += 1
+                new_cutter_object_name = "Cutter_{0}".format(cutter_number)
+                new_cutter_object = bpy.data.objects.get(new_cutter_object_name)
+            new_cutter_object = bpy.data.objects.new(new_cutter_object_name, new_mesh)
 
-        # Add the object into the scene.
+        # Add the object into the cutter collection.
         cutter_collection.objects.link(new_cutter_object)
 
         # Select only the new cutter.

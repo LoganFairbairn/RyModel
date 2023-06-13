@@ -133,7 +133,7 @@ def draw_cutter_tools(layout):
     op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text="")
     op.shape = 'CONE'
     op = row.operator("rymodel.add_cutter", icon='SELECT_SET', text="")
-    op.shape = 'CONE'
+    op.shape = 'SELECTED_OBJECT'
 
     row = layout.row(align=True)
     row.scale_x = 10
