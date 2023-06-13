@@ -172,17 +172,28 @@ class RyModel_ResetOrigin(Operator):
     location: StringProperty(default='Y_AXIS')
 
     def execute(self, context):
+        original_mode = bpy.context.mode
+
         match self.location:
             case 'WORLD_ORIGIN':
+                bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
                 bpy.ops.view3d.snap_cursor_to_center()
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
             case 'SELECTED':
                 bpy.ops.view3d.snap_cursor_to_selected()
+                bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
             case 'SURFACE':
+                bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
                 bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS', center='MEDIAN')
             case 'VOLUME':
+                bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
                 bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='MEDIAN')
+
+        if original_mode == 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
 
 class RyModel_AutoSharpen(Operator):
