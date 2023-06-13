@@ -39,12 +39,9 @@ bl_info = {
 
 # List of classes to be registered.
 classes = (
-    # Operators
+    # Modeling
     RyModel_Mirror,
     RyModel_ResetOrigin,
-    RyModel_AddModifier,
-    RyModel_DeleteModifier,
-    RyModel_CopyModifiers,
     RyModel_AutoSharpen,
     RyModel_ExtractFace,
     RyModel_ExtractCurve,
@@ -53,6 +50,18 @@ classes = (
     RyModel_CleanMesh,
     RyModel_SelectNgons,
     RyModel_DrawShape,
+
+    # Modifiers
+    RyModel_AddBevelModifier,
+    RyModel_AddWeightedNormalModifier,
+    RyModel_AddSolidifyModifier,
+    RyModel_AddArrayModifier,
+    RyModel_AddMultiResModifier,
+    RyModel_AddSubdivisionModifier,
+    RyModel_AddShrinkWrapModifier,
+    RyModel_AddTriangulateModifier,
+    RyModel_DeleteModifier,
+    RyModel_CopyModifiers,
     CircularArraySettings,
     RyModel_CircularArray,
     RyModel_CircularTwist,
@@ -62,6 +71,8 @@ classes = (
     RyModel_HSWFModApply,
     RyModel_AddCutter,
     RyModel_ShowCutters,
+
+    # Unwrapping
     RyModel_Unwrap,
     RyModel_AutoSeam,
 

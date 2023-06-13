@@ -619,27 +619,106 @@ def organize_modifier_stack(object_modifiers):
         bpy.ops.object.modifier_move_to_index(modifier=triangulate_modifier.name, index=modifier_index)
         modifier_index += 1
 
-class RyModel_AddModifier(Operator):
-    bl_idname = "rymodel.add_modifier"
-    bl_label = "Add Modifier"
-    bl_description = "Adds a modifier of the specified type to the active object, then re-organizes the modifier stack"
+def add_modifier(modifier_type, self, context):
+    if not verify_active_mesh(self):
+        return {'FINISHED'}
+    
+    if not context.active_object.modifiers.get(str(modifier_type)):
+        new_modifier = context.active_object.modifiers.new(str(modifier_type), modifier_type)
+        new_modifier.show_expanded = False
+
+    organize_modifier_stack(context.active_object.modifiers)
+    return new_modifier
+
+class RyModel_AddBevelModifier(Operator):
+    bl_idname = "rymodel.add_bevel_modifier"
+    bl_label = "Add Bevel Modifier"
+    bl_description = "Adds a bevel modifier to the selected object"
     bl_options = {'REGISTER', 'UNDO'}
 
-    type: StringProperty(default='BEVEL')
-
     def execute(self, context):
-        if not verify_active_mesh(self):
-            return {'FINISHED'}
-        
-        if not context.active_object.modifiers.get(str(self.type)):
-            new_modifier = context.active_object.modifiers.new(str(self.type), self.type)
-            new_modifier.show_expanded = False
-
-        organize_modifier_stack(context.active_object.modifiers)
+        bevel_modifier = add_modifier('BEVEL', self, context)
+        bevel_modifier.segments = 6
         update_property_range_overrides()
         return {'FINISHED'}
 
+class RyModel_AddWeightedNormalModifier(Operator):
+    bl_idname = "rymodel.add_weighted_normal_modifier"
+    bl_label = "Add Weighted Normal Modifier"
+    bl_description = "Adds a weighted normal modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
 
+
+    def execute(self, context):
+        add_modifier('WEIGHTED_NORMAL', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddSolidifyModifier(Operator):
+    bl_idname = "rymodel.add_solidify_modifier"
+    bl_label = "Add Solidify Modifier"
+    bl_description = "Adds a solidify modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('SOLIDIFY', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddArrayModifier(Operator):
+    bl_idname = "rymodel.add_array_modifier"
+    bl_label = "Add Array Modifier"
+    bl_description = "Adds an array modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('ARRAY', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddMultiResModifier(Operator):
+    bl_idname = "rymodel.add_multires_modifier"
+    bl_label = "Add MultiRes Modifier"
+    bl_description = "Adds a multi resolution modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('MULTIRES', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddSubdivisionModifier(Operator):
+    bl_idname = "rymodel.add_subdivision_modifier"
+    bl_label = "Add Subdivision Modifier"
+    bl_description = "Adds a subdivision modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('SUBSURF', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddShrinkWrapModifier(Operator):
+    bl_idname = "rymodel.add_shrinkwrap_modifier"
+    bl_label = "Add Shrinkwrap Modifier"
+    bl_description = "Adds a shrinkwrap modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('SHRINKWRAP', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
+
+class RyModel_AddTriangulateModifier(Operator):
+    bl_idname = "rymodel.add_triangulate_modifier"
+    bl_label = "Add Triangulate Modifier"
+    bl_description = "Adds a triangulate modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('TRIANGULATE', self, context)
+        update_property_range_overrides()
+        return {'FINISHED'}
 
 #------------------------ CUSTOM MODIFIERS ------------------------#
 

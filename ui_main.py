@@ -266,7 +266,7 @@ def draw_modifier_properties(layout):
                         row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(bpy.context.scene.bevel_modifier_settings, "limit_method", slider=True)
+                        row.prop(modifier, "limit_method", slider=True)
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, modifier.name, modifier.name)
@@ -343,29 +343,21 @@ def draw_modifiers(layout):
     row = layout.row(align=True)
     row.scale_x = 5
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.add_modifier", icon='MOD_BEVEL', text="")
-    op.type = 'BEVEL'
-    op = row.operator("rymodel.add_modifier", icon='MOD_NORMALEDIT', text="")
-    op.type = 'WEIGHTED_NORMAL'
-    op = row.operator("rymodel.add_modifier", icon='MOD_SOLIDIFY', text="")
-    op.type = 'SOLIDIFY'
-    op = row.operator("rymodel.add_modifier", icon='MOD_ARRAY', text="")
-    op.type = 'ARRAY'
+    row.operator("rymodel.add_bevel_modifier", icon='MOD_BEVEL', text="")
+    row.operator("rymodel.add_weighted_normal_modifier", icon='MOD_NORMALEDIT', text="")
+    row.operator("rymodel.add_solidify_modifier", icon='MOD_SOLIDIFY', text="")
+    row.operator("rymodel.add_array_modifier", icon='MOD_ARRAY', text="")
     row.operator("rymodel.circular_array", text="", icon_value=custom_icons["CIRCULAR_ARRAY"].icon_id)
     row.operator("rymodel.circular_twist", text="", icon_value=custom_icons["CIRCULAR_TWIST"].icon_id)
 
     row = layout.row(align=True)
     row.scale_x = 5
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.add_modifier", icon='MOD_MULTIRES', text="")
-    op.type = 'MULTIRES'
-    op = row.operator("rymodel.add_modifier", icon='MOD_SUBSURF', text="")
-    op.type = 'SUBSURF'
+    row.operator("rymodel.add_multires_modifier", icon='MOD_MULTIRES', text="")
+    row.operator("rymodel.add_subdivision_modifier", icon='MOD_SUBSURF', text="")
     row.operator("rymodel.two_x_subdivision", text="", icon_value=custom_icons["2XSUBD"].icon_id)
-    op = row.operator("rymodel.add_modifier", icon='MOD_SHRINKWRAP', text="")
-    op.type = 'SHRINKWRAP'
-    op = row.operator("rymodel.add_modifier", icon='MOD_TRIANGULATE', text="")
-    op.type = 'TRIANGULATE'
+    row.operator("rymodel.add_shrinkwrap_modifier", icon='MOD_SHRINKWRAP', text="")
+    row.operator("rymodel.add_triangulate_modifier", icon='MOD_TRIANGULATE', text="")
 
     split = layout.split(factor=0.5)
     first_column = split.column()
