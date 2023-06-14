@@ -321,7 +321,7 @@ class RyModel_SelectNgons(Operator):
 class RyModel_CleanMesh(Operator):
     bl_idname = "rymodel.clean_mesh"
     bl_label = "Clean Mesh"
-    bl_description = "Removes doubles and non-manifold geometry"
+    bl_description = "Removes vertex doubles, loose geometry, and recalculates face and vertex normals to point outside"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -337,6 +337,10 @@ class RyModel_CleanMesh(Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_loose()
         bpy.ops.mesh.delete(type='FACE')
+
+        # Re-calculate outside.
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.normals_make_consistent(inside=False)
 
         # Remove loose edges.
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
