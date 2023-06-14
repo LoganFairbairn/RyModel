@@ -97,7 +97,7 @@ def draw_mirror_tools(layout):
             row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
             row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
 
-    if not bpy.context.active_object or no_mirror_mod:
+    if no_mirror_mod:
         row = layout.row(align=True)
         row.scale_y = UI_Y_SCALE
         op = row.operator("rymodel.mirror", text="X")
@@ -112,6 +112,19 @@ def draw_mirror_tools(layout):
         row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
         row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
         row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
+
+    # Delete past axis.
+    row = layout.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Delete Vertices Past Axis")
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    op = row.operator("rymodel.delete_vertices_past_axis", text="X")
+    op.axis = 'X'
+    op = row.operator("rymodel.delete_vertices_past_axis", text="Y")
+    op.axis = 'Y'
+    op = row.operator("rymodel.delete_vertices_past_axis", text="Z")
+    op.axis = 'Z'
 
 def draw_cutter_tools(layout):
     if bpy.context.active_object.type != 'MESH':

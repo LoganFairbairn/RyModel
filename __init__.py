@@ -40,16 +40,19 @@ bl_info = {
 # List of classes to be registered.
 classes = (
     # Modeling
-    RyModel_Mirror,
     RyModel_ResetOrigin,
     RyModel_AutoSharpen,
     RyModel_ExtractFace,
     RyModel_ExtractCurve,
-    RyModel_MirrorByFace,
     RyModel_3DCursorToFace,
     RyModel_CleanMesh,
     RyModel_SelectNgons,
     RyModel_DrawShape,
+
+    # Mirroring
+    RyModel_DeleteVerticesPastAxis,
+    RyModel_Mirror,
+    RyModel_MirrorByFace,
 
     # Modifiers
     RyModel_AddBevelModifier,

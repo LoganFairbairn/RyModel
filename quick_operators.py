@@ -105,6 +105,95 @@ def update_mirror_bisect(self, context):
             else:
                 mirror_modifier.use_bisect_axis[2] = False
 
+def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
+    '''Bisects the given object along the given axis, then deletes all vertices past the selected axis.'''
+
+    # Add a new mirror modifier.
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+    bpy.ops.object.modifier_add(type='MIRROR')
+    mirror_modifier = mesh_object.modifiers.get('Mirror')
+    if mirror_modifier:
+        mesh_object.modifiers.remove(mirror_modifier)
+
+    mirror_modifier = mesh_object.modifiers.new("Mirror", 'MIRROR')
+    mirror_modifier.use_clip = True
+    mirror_modifier.show_on_cage = True
+
+    # Apply mirroring settings based on the provided axis.
+    match axis:
+        case 'X':
+            mirror_modifier.use_axis[0] = True
+
+            mirror_modifier.use_bisect_axis[0] = True
+
+            if bpy.context.scene.rymodel_mirror_flip:
+                mirror_modifier.use_bisect_flip_axis[0] = True
+            
+        case 'Y':
+            mirror_modifier.use_axis[1] = True
+            mirror_modifier.use_axis[0] = False
+
+            mirror_modifier.use_bisect_axis[1] = True
+
+            if bpy.context.scene.rymodel_mirror_flip:
+                mirror_modifier.use_bisect_flip_axis[1] = True
+            
+        case 'Z':
+            mirror_modifier.use_axis[2] = True
+            mirror_modifier.use_axis[0] = False
+
+            mirror_modifier.use_bisect_axis[2] = True
+            
+            if bpy.context.scene.rymodel_mirror_flip:
+                mirror_modifier.use_bisect_flip_axis[2] = True
+
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+    bpy.ops.object.modifier_apply(modifier="Mirror")
+
+    # Delete all vertices past the provided axis.
+    bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+    me = mesh_object.data
+
+    bm = bmesh.from_edit_mesh(me)
+
+    delete_verts = []
+    axis_index = 0
+    match axis:
+        case 'X':
+            axis_index = 0
+        case 'Y':
+            axis_index = 1
+        case 'Z':
+            axis_index = 2
+        case _:
+            rylog.log("Error: Invalid axis provided to delete_past_axis.")
+
+    if flip_axis:
+        for vert in bm.verts:
+            if vert.co[axis_index] < 0.0:
+                delete_verts.append(vert)
+    else:
+        for vert in bm.verts:
+            if vert.co[axis_index] > 0.0:
+                delete_verts.append(vert)  
+
+    bmesh.ops.delete(bm, geom=delete_verts, context='VERTS') 
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+class RyModel_DeleteVerticesPastAxis(Operator):
+    bl_idname = "rymodel.delete_vertices_past_axis"
+    bl_label = "Delete Vertices Past Axis"
+    bl_description = "Deletes all vertices past the provided axis"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    axis: StringProperty(default='X')
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        delete_vertices_past_axis(context.active_object, self.axis)
+        return {'FINISHED'}
+
 class RyModel_Mirror(Operator):
     bl_idname = "rymodel.mirror"
     bl_label = "Mirror"
@@ -117,6 +206,10 @@ class RyModel_Mirror(Operator):
         if not verify_active_mesh(self):
             return {'FINISHED'}
         
+        active_object = context.active_object
+
+        # Add a mirror modifier if one doesn't exist.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
         bpy.ops.object.modifier_add(type='MIRROR')
         mirror_modifier = context.active_object.modifiers.get('Mirror')
         if not mirror_modifier:
@@ -154,7 +247,7 @@ class RyModel_Mirror(Operator):
                 if context.scene.rymodel_mirror_flip:
                     mirror_modifier.use_bisect_flip_axis[2] = True
 
-        # Instantly apply the modifier.
+        # Instantly apply the modifier if auto apply is turned on.
         if context.scene.rymodel_mirror_apply:
             bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
             bpy.ops.object.modifier_apply(modifier="Mirror")
