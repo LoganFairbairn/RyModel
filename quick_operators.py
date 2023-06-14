@@ -289,6 +289,37 @@ class RyModel_ResetOrigin(Operator):
             bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
 
+class RyModel_CenterAxis(Operator):
+    bl_idname = "rymodel.center_axis"
+    bl_label = "Center Axis"
+    bl_description = "Centers the selected object "
+    bl_options = {'REGISTER', 'UNDO'}
+
+    axis: StringProperty(default='X')
+
+    def execute(self, context):
+        if not verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        match self.axis:
+            case 'X':
+                bpy.context.active_object.location[0] = 0.0
+            case 'Y':
+                bpy.context.active_object.location[1] = 0.0
+            case 'Z':
+                bpy.context.active_object.location[2] = 0.0
+            case _:
+                rylog.log("Error: Invalid axis provided for center axis operator.")
+
+        if original_mode == 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        return {'FINISHED'}
+
 class RyModel_AutoSharpen(Operator):
     bl_idname = "rymodel.auto_sharpen"
     bl_label = "Auto Sharpen"
@@ -643,6 +674,7 @@ class RyModel_3DCursorToFace(Operator):
     def execute(self, context):
         align_cursor_to_face()
         return {'FINISHED'}
+
 
 #------------------------ MODIFIERS ------------------------#
 

@@ -181,6 +181,17 @@ def draw_origin_tools(layout):
     op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
     op.location = 'VOLUME'
 
+    row = layout.row()
+    row.label(text="Center Axis")
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    op = row.operator("rymodel.center_axis", text="X")
+    op.axis = 'X'
+    op = row.operator("rymodel.center_axis", text="Y")
+    op.axis = 'Y'
+    op = row.operator("rymodel.center_axis", text="Z")
+    op.axis = 'Z'
+
 def draw_unwrapping_tools(layout):
     '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
     if bpy.context.active_object.type != 'MESH':
