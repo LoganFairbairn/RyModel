@@ -825,9 +825,15 @@ class RyModel_HSWFModApply(Operator):
             return {'FINISHED'}
 
         for modifier in context.active_object.modifiers:
-            if modifier.type != 'BEVEL' and modifier.type != 'WEIGHTED_NORMAL':
-                bpy.ops.object.modifier_apply(modifier=modifier.name)
-
+            match modifier.type:
+                case 'BEVEL':
+                    continue
+                case 'WEIGHTED_NORMAL':
+                    continue
+                case 'MIRROR':
+                    continue
+                case _:
+                    bpy.ops.object.modifier_apply(modifier=modifier.name)
         return {'FINISHED'}
 
 def update_circular_offset(self, context):
