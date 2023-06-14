@@ -837,6 +837,8 @@ class RyModel_ApplyModifier(Operator):
         bpy.ops.object.modifier_apply(modifier=self.modifier_name, report=True)
         if self.modifier_name.startswith("Cutter_"):
             remove_unused_cutters()
+        
+        update_mirror_properties()      # Update mirror properties in case a mirror modifier was applied.
         return {'FINISHED'}
 
 #------------------------ CUSTOM MODIFIERS ------------------------#
