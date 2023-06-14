@@ -114,11 +114,9 @@ def draw_mirror_tools(layout):
         row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
 
     # Delete past axis.
-    row = layout.row()
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Delete Vertices Past Axis")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.label(text="BiDelete")
     op = row.operator("rymodel.delete_vertices_past_axis", text="X")
     op.axis = 'X'
     op = row.operator("rymodel.delete_vertices_past_axis", text="Y")
@@ -181,10 +179,9 @@ def draw_origin_tools(layout):
     op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
     op.location = 'VOLUME'
 
-    row = layout.row()
-    row.label(text="Center Axis")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
+    row.label(text="Center")
     op = row.operator("rymodel.center_axis", text="X")
     op.axis = 'X'
     op = row.operator("rymodel.center_axis", text="Y")

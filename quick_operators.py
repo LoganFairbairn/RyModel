@@ -292,7 +292,7 @@ class RyModel_ResetOrigin(Operator):
 class RyModel_CenterAxis(Operator):
     bl_idname = "rymodel.center_axis"
     bl_label = "Center Axis"
-    bl_description = "Centers the selected object "
+    bl_description = "Centers the selected object on the provided axis"
     bl_options = {'REGISTER', 'UNDO'}
 
     axis: StringProperty(default='X')
