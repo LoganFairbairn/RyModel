@@ -116,7 +116,7 @@ def draw_mirror_tools(layout):
     # Delete past axis.
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
-    row.label(text="BiDelete")
+    row.label(text="Bi-Delete")
     op = row.operator("rymodel.delete_vertices_past_axis", text="X")
     op.axis = 'X'
     op = row.operator("rymodel.delete_vertices_past_axis", text="Y")
@@ -132,18 +132,11 @@ def draw_cutter_tools(layout):
     row.scale_y = UI_Y_SCALE
     row.label(text="Cutters")
 
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_x = 2
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="")
-
-    row = second_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_x = 4
-    row.scale_y = UI_Y_SCALE
+    row.scale_y = 2
+    op = row.operator("rymodel.add_cutter", text="/")
+    op.shape = 'PLANE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CUBE', text="")
     op.shape = 'CUBE'
     op = row.operator("rymodel.add_cutter", icon='MESH_CYLINDER', text="")
@@ -155,7 +148,16 @@ def draw_cutter_tools(layout):
     op = row.operator("rymodel.add_cutter", icon='SELECT_SET', text="")
     op.shape = 'SELECTED_OBJECT'
 
-    row = layout.row(align=True)
+    split = layout.split(factor=0.2)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
+    row.scale_x = 2
+    row.scale_y = 2
+    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="")
+
+    row = second_column.row(align=True)
     row.scale_x = 10
     row.scale_y = 2
     row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'INTERSECT', text="")
@@ -419,7 +421,7 @@ class RyModel_OT_open_menu(Operator):
         layout = self.layout
         layout.label(text="RyModel 1.0.0")
 
-        split = layout.split(factor=0.35)
+        split = layout.split(factor=0.5)
         first_column = split.column()
         second_column = split.column()
 

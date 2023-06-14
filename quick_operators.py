@@ -1261,6 +1261,54 @@ def get_object_true_center(obj):
 
     return center
 
+def create_cutter_collection():
+    '''Creates a new collection for cutter objects.'''
+    cutter_collection = bpy.data.collections.get("Cutters")
+    if not cutter_collection:
+        cutter_collection = bpy.data.collections.new("Cutters")
+        cutter_collection.color_tag = 'COLOR_01'
+        bpy.context.scene.collection.children.link(cutter_collection)
+    return cutter_collection
+
+def add_cutter_boolean(obj):
+    '''Adds a boolean modifier to setup for a cutter object.'''
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+    # Add a boolean modifier with a unique name.
+    boolean_count = 1
+    boolean_mod_name = "Cutter_{0}".format(boolean_count)
+    boolean_modifier = obj.modifiers.get(boolean_mod_name)
+    while obj.modifiers.get(boolean_mod_name) != None:
+        boolean_count += 1
+        boolean_mod_name = "Cutter_{0}".format(boolean_count)
+    boolean_modifier = obj.modifiers.new(boolean_mod_name, 'BOOLEAN')
+
+    # Adjust booolean settings.
+    boolean_modifier.solver = 'FAST'
+    boolean_modifier.show_in_editmode = True
+    if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
+        boolean_modifier.operation = 'DIFFERENCE'
+    else:
+        boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
+
+    boolean_modifier.show_expanded = False
+
+    # Organize the modifier stack since we just added a new modifier.
+    organize_modifier_stack(obj.modifiers)
+
+    return boolean_modifier
+
+def get_new_cutter_name():
+    '''Returns a name for a new cutter object.'''
+    cutter_number = 1
+    new_cutter_name = "Cutter_{0}".format(cutter_number)
+    cutter = bpy.data.objects.get(new_cutter_name)
+    while cutter != None:
+        cutter_number += 1
+        new_cutter_name = "Cutter_{0}".format(cutter_number)
+        cutter = bpy.data.objects.get(new_cutter_name)
+    return new_cutter_name
+
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
     bl_label = "Add Cutter"
@@ -1285,101 +1333,55 @@ class RyModel_AddCutter(Operator):
                 self.report({'ERROR'}, "Select only the object you wish to use as a cutter and the object you wish to cut.")
                 return {'FINISHED'}
 
-        # We'll create the new cutter object at the center of the selected object. Move the 3D cursor there for later.
         original_mode = bpy.context.mode
-        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        bpy.ops.mesh.select_all(action='DESELECT')
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.view3d.snap_cursor_to_selected()
-        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
-
-        # Hide all existing cutters so the user can focus on the one they are adding.
-        hide_cutters()
-
-        # Create a new cutter collection if one does not exist.
-        cutter_collection = bpy.data.collections.get("Cutters")
-        if not cutter_collection:
-            cutter_collection = bpy.data.collections.new("Cutters")
-            cutter_collection.color_tag = 'COLOR_01'
-            bpy.context.scene.collection.children.link(cutter_collection)
-
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-
-        # Add a new boolean modifier to the selected object.
         active_object = bpy.context.active_object
-        boolean_count = 1
-        boolean_mod_name = "Cutter_{0}".format(boolean_count)
-        boolean_modifier = active_object.modifiers.get(boolean_mod_name)
-        while active_object.modifiers.get(boolean_mod_name) != None:
-            boolean_count += 1
-            boolean_mod_name = "Cutter_{0}".format(boolean_count)
-        boolean_modifier = active_object.modifiers.new(boolean_mod_name, 'BOOLEAN')
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
-        # Adjust boolean settings.
-        boolean_modifier.solver = 'FAST'
-        boolean_modifier.show_in_editmode = True
-        if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
-            boolean_modifier.operation = 'DIFFERENCE'
-        else:
-            boolean_modifier.operation = bpy.context.scene.rymodel_boolean_mode
-
-        # Organize the modifier stack.
-        organize_modifier_stack(active_object.modifiers)
-
-
-        # Get a unique name for the new cutter.
-        cutter_number = 1
-        new_cutter_name = "Cutter_{0}".format(cutter_number)
-
-        cutter = bpy.data.objects.get(new_cutter_name)
-        while cutter != None:
-            cutter_number += 1
-            new_cutter_name = "Cutter_{0}".format(cutter_number)
-            cutter = bpy.data.objects.get(new_cutter_name)
+        hide_cutters()                                          # Hide all existing cutters so the user can focus on the one they are adding.
+        cutter_collection = create_cutter_collection()          # Create a new cutter collection if one does not exist.
+        boolean_modifier = add_cutter_boolean(active_object)    # Add a new boolean modifier to the selected object.
+        new_cutter_name = get_new_cutter_name()                 # Get a unique name for the new cutter.
 
         # Make the selected object into a cutter.
         if self.shape == 'SELECTED_OBJECT':
             new_cutter_object = context.selected_objects[0]
             if new_cutter_object == context.active_object:
                 new_cutter_object = context.selected_objects[1]
-
             new_cutter_object.name = new_cutter_name
 
         # Create a new cutter mesh with a unique name based on the provided cutter type.
         else:
-            new_mesh = bpy.data.meshes.new(new_cutter_name)
+            bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 
-            bm = bmesh.new()
             match self.shape:
+                case 'PLANE':
+                    bpy.ops.mesh.primitive_plane_add(size=2, enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
 
                 case 'CUBE':
-                    bmesh.ops.create_cube(bm, size=1.0)
+                    bpy.ops.mesh.primitive_cube_add(enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
 
                 case 'CYLINDER':
-                    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=True, segments=32, radius1=1, radius2=1, depth=5)
+                    bpy.ops.mesh.primitive_cylinder_add(radius=1, depth=2, enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
 
                 case 'SPHERE':
-                    bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1, calc_uvs=False)
+                    bpy.ops.mesh.primitive_uv_sphere_add(radius=1, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
                 case 'CONE':
-                    bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=32, radius1=1, radius2=0, depth=3)
-            bm.to_mesh(new_mesh)
-            bm.free()
+                    bpy.ops.mesh.primitive_cone_add(radius1=1, radius2=0, depth=2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
 
-            # Create a new object for the cutter.
-            cutter_number = 1
-            new_cutter_object_name = "Cutter_{0}".format(cutter_number)
-            new_cutter_object = bpy.data.objects.get(new_cutter_object_name)
-            while new_cutter_object != None:
-                cutter_number += 1
-                new_cutter_object_name = "Cutter_{0}".format(cutter_number)
-                new_cutter_object = bpy.data.objects.get(new_cutter_object_name)
-            new_cutter_object = bpy.data.objects.new(new_cutter_object_name, new_mesh)
+                case _:
+                    rylog.log("Error: Incorrect shape value provided to the add cutter operator.")
 
-        # Add the object into the cutter collection.
+            new_cutter_object = bpy.context.active_object       # The active object is the new cutter object.
+            new_cutter_object.name = new_cutter_name
+
+        # Add the object into the only the cutter collection.
+        for collection in bpy.data.collections:
+            if collection.objects.get(new_cutter_object.name):
+                collection.objects.unlink(new_cutter_object)
         cutter_collection.objects.link(new_cutter_object)
 
-        # Select only the new cutter.
+        # Ensure only the new cutter object is selected.
         for obj in bpy.context.selected_objects:
             obj.select_set(False)
         bpy.context.view_layer.objects.active = new_cutter_object
@@ -1402,15 +1404,9 @@ class RyModel_AddCutter(Operator):
         # Shade smooth.
         bpy.ops.object.shade_smooth(use_auto_smooth=False, auto_smooth_angle=1.0472)
 
-        # Add the object to the boolean modifier.
-        boolean_modifier.object = new_cutter_object
-        boolean_modifier.show_expanded = False
-
-        # Display the cutter in wireframe.
-        new_cutter_object.display_type = 'WIRE'
-
-        # Adjust visibility settings.
-        new_cutter_object.hide_render = True
+        boolean_modifier.object = new_cutter_object         # Add the cutter object to the boolean modifier.
+        new_cutter_object.display_type = 'WIRE'             # Display the cutter in wireframe.
+        new_cutter_object.hide_render = True                # Ensure the cutters won't show up in renders.
 
         # For cutters using slice, add a solidify modifier.
         if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
@@ -1418,11 +1414,14 @@ class RyModel_AddCutter(Operator):
             solidify_modifier.use_even_offset = True
             solidify_modifier.thickness = 0.075
 
-        # Move the new cutter to the center of the selected object.
+        # Move the new cutter to the center of the selected object, while also accounting for mirror modifiers.
         new_cutter_object.location = get_object_true_center(active_object)
 
-        # Parent the cutter to the object.
+        # Parent the cutter to the object so the cutters will move with the object they are assigned to.
         bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        original_mode
 
         return {'FINISHED'}
 
