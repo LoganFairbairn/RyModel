@@ -4,6 +4,7 @@ import bpy
 import blf
 import gpu
 import mathutils
+from mathutils import Vector
 from gpu_extras.batch import batch_for_shader
 import bmesh
 from bpy.types import Operator, PropertyGroup
@@ -1240,6 +1241,26 @@ def remove_unused_cutters():
             if obj not in used_cutter_objects:
                 bpy.data.objects.remove(obj)
 
+def get_object_true_center(obj):
+    '''Returns the center point of the object accounting for applied mirror modifiers.'''
+
+    # Get the center of the object based on the average of vertices.
+    x, y, z = [ sum( [v.co[i] for v in obj.data.vertices] ) for i in range(3)]
+    count = float(len(obj.data.vertices))
+    center = obj.matrix_world @ (Vector( (x, y, z ) ) / count)
+
+    # Center axis values for mirror modifiers
+    mirror_modifier = get_modifier_of_type(obj.modifiers, 'MIRROR')
+    if mirror_modifier:
+        if mirror_modifier.use_axis[0]:
+            center[0] = 0
+        if mirror_modifier.use_axis[1]:
+            center[1] = 0
+        if mirror_modifier.use_axis[2]:
+            center[2] = 0
+
+    return center
+
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
     bl_label = "Add Cutter"
@@ -1396,6 +1417,9 @@ class RyModel_AddCutter(Operator):
             solidify_modifier = new_cutter_object.modifiers.new("SliceSolidify", 'SOLIDIFY')
             solidify_modifier.use_even_offset = True
             solidify_modifier.thickness = 0.075
+
+        # Move the new cutter to the center of the selected object.
+        new_cutter_object.location = get_object_true_center(active_object)
 
         # Parent the cutter to the object.
         bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
