@@ -121,8 +121,8 @@ class RyModel_Mirror(Operator):
         mirror_modifier = context.active_object.modifiers.get('Mirror')
         if not mirror_modifier:
             mirror_modifier = context.active_object.modifiers.new("Mirror", 'MIRROR')
-            mirror_modifier.use_clip = True
-            mirror_modifier.show_on_cage = True
+        mirror_modifier.use_clip = True
+        mirror_modifier.show_on_cage = True
 
         match self.axis:
             case 'X':
