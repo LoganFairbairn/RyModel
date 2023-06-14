@@ -830,8 +830,6 @@ class RyModel_HSWFModApply(Operator):
                     continue
                 case 'WEIGHTED_NORMAL':
                     continue
-                case 'MIRROR':
-                    continue
                 case _:
                     bpy.ops.object.modifier_apply(modifier=modifier.name)
         return {'FINISHED'}
