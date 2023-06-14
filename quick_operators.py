@@ -36,33 +36,21 @@ def verify_active_mesh(self=None):
 
 def update_mirror_x(self, context):
     mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+    if mirror_modifier == None:
+        add_mirror_modifier('X')
     mirror_modifier.use_axis[0] = context.scene.rymodel_mirror_x
-
-    if context.scene.rymodel_mirror_flip:
-        mirror_modifier.use_bisect_flip_axis[0] = context.scene.rymodel_mirror_x
-
-    if context.scene.rymodel_mirror_bisect:
-        mirror_modifier.use_bisect_axis[0] = context.scene.rymodel_mirror_x
 
 def update_mirror_y(self, context):
     mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+    if mirror_modifier == None:
+        add_mirror_modifier('Y')
     mirror_modifier.use_axis[1] = context.scene.rymodel_mirror_y
-
-    if context.scene.rymodel_mirror_flip:
-        mirror_modifier.use_bisect_flip_axis[1] = context.scene.rymodel_mirror_y
-
-    if context.scene.rymodel_mirror_bisect:
-        mirror_modifier.use_bisect_axis[1] = context.scene.rymodel_mirror_y
 
 def update_mirror_z(self, context):
     mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+    if mirror_modifier == None:
+        add_mirror_modifier('Z')
     mirror_modifier.use_axis[2] = context.scene.rymodel_mirror_z
-
-    if context.scene.rymodel_mirror_flip:
-        mirror_modifier.use_bisect_flip_axis[2] = context.scene.rymodel_mirror_z
-
-    if context.scene.rymodel_mirror_bisect:
-        mirror_modifier.use_bisect_axis[2] = context.scene.rymodel_mirror_z
 
 def update_mirror_flip(self, context):
     mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
@@ -124,29 +112,17 @@ def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
     match axis:
         case 'X':
             mirror_modifier.use_axis[0] = True
-
             mirror_modifier.use_bisect_axis[0] = True
-
-            if bpy.context.scene.rymodel_mirror_flip:
-                mirror_modifier.use_bisect_flip_axis[0] = True
             
         case 'Y':
             mirror_modifier.use_axis[1] = True
             mirror_modifier.use_axis[0] = False
-
             mirror_modifier.use_bisect_axis[1] = True
-
-            if bpy.context.scene.rymodel_mirror_flip:
-                mirror_modifier.use_bisect_flip_axis[1] = True
             
         case 'Z':
             mirror_modifier.use_axis[2] = True
             mirror_modifier.use_axis[0] = False
-
             mirror_modifier.use_bisect_axis[2] = True
-            
-            if bpy.context.scene.rymodel_mirror_flip:
-                mirror_modifier.use_bisect_flip_axis[2] = True
 
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
     bpy.ops.object.modifier_apply(modifier="Mirror")
@@ -195,67 +171,41 @@ class RyModel_DeleteVerticesPastAxis(Operator):
         delete_vertices_past_axis(context.active_object, self.axis)
         return {'FINISHED'}
 
-class RyModel_Mirror(Operator):
-    bl_idname = "rymodel.mirror"
-    bl_label = "Mirror"
-    bl_description = "Applies a mirror modifier to the select object based on the provided axis. Only 1 mirror modifier will be applied per object. If Symmetry is ticked, the modifier will be automatically applied."
-    bl_options = {'REGISTER', 'UNDO'}
+def update_mirror_properties():
+    active_object = bpy.context.active_object
 
-    axis: StringProperty(default='X')
+    if active_object:
+        mirror_modifier = get_modifier_of_type(active_object.modifiers, 'MIRROR')
+        if mirror_modifier:
+            bpy.context.scene.rymodel_mirror_x = mirror_modifier.use_axis[0]
+            bpy.context.scene.rymodel_mirror_y = mirror_modifier.use_axis[1]
+            bpy.context.scene.rymodel_mirror_z = mirror_modifier.use_axis[2]
 
-    def execute(self, context):
-        if not verify_active_mesh(self):
-            return {'FINISHED'}
-        
-        active_object = context.active_object
+def add_mirror_modifier(axis):
+    active_object = bpy.context.active_object
 
-        # Add a mirror modifier if one doesn't exist.
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        bpy.ops.object.modifier_add(type='MIRROR')
-        mirror_modifier = context.active_object.modifiers.get('Mirror')
-        if not mirror_modifier:
-            mirror_modifier = context.active_object.modifiers.new("Mirror", 'MIRROR')
-        mirror_modifier.use_clip = True
-        mirror_modifier.show_on_cage = True
+    # Add a mirror modifier if one doesn't exist.
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+    bpy.ops.object.modifier_add(type='MIRROR')
+    mirror_modifier = active_object.modifiers.get('Mirror')
+    if not mirror_modifier:
+        mirror_modifier = active_object.modifiers.new("Mirror", 'MIRROR')
+    mirror_modifier.use_clip = True
+    mirror_modifier.show_on_cage = True
 
-        match self.axis:
-            case 'X':
-                mirror_modifier.use_axis[0] = True
+    match axis:
+        case 'X':
+            mirror_modifier.use_axis[0] = True
+            
+        case 'Y':
+            mirror_modifier.use_axis[1] = True
+            mirror_modifier.use_axis[0] = False
+            
+        case 'Z':
+            mirror_modifier.use_axis[2] = True
+            mirror_modifier.use_axis[0] = False
 
-                if context.scene.rymodel_mirror_bisect:
-                    mirror_modifier.use_bisect_axis[0] = True
-
-                if context.scene.rymodel_mirror_flip:
-                    mirror_modifier.use_bisect_flip_axis[0] = True
-                
-            case 'Y':
-                mirror_modifier.use_axis[1] = True
-                mirror_modifier.use_axis[0] = False
-
-                if context.scene.rymodel_mirror_bisect:
-                    mirror_modifier.use_bisect_axis[1] = True
-
-                if context.scene.rymodel_mirror_flip:
-                    mirror_modifier.use_bisect_flip_axis[1] = True
-                
-            case 'Z':
-                mirror_modifier.use_axis[2] = True
-                mirror_modifier.use_axis[0] = False
-
-                if context.scene.rymodel_mirror_bisect:
-                    mirror_modifier.use_bisect_axis[2] = True
-                
-                if context.scene.rymodel_mirror_flip:
-                    mirror_modifier.use_bisect_flip_axis[2] = True
-
-        # Instantly apply the modifier if auto apply is turned on.
-        if context.scene.rymodel_mirror_apply:
-            bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-            bpy.ops.object.modifier_apply(modifier="Mirror")
-
-        organize_modifier_stack(context.active_object.modifiers)
-
-        return {'FINISHED'}
+    organize_modifier_stack(active_object.modifiers)
 
 class RyModel_ResetOrigin(Operator):
     bl_idname = "rymodel.reset_origin"

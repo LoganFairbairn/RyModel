@@ -76,47 +76,32 @@ def draw_contextual_object_menu(layout):
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
-    row = layout.row()
-    row.label(text="Mirror")
-
-    # Check if a mirror modifier exists on the mesh.
-    no_mirror_mod = True
     if bpy.context.active_object:
-        mirror_modifier = bpy.context.active_object.modifiers.get('Mirror')
-        if mirror_modifier:
-            no_mirror_mod = False
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.prop(bpy.context.scene, "rymodel_mirror_x", text="X", toggle=True)
-            row.prop(bpy.context.scene, "rymodel_mirror_y", text="Y", toggle=True)
-            row.prop(bpy.context.scene, "rymodel_mirror_z", text="Z", toggle=True)
-        
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
-            row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
-            row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
+        split = layout.split(factor=0.25)
+        first_column = split.column()
+        second_column = split.column()
 
-    if no_mirror_mod:
-        row = layout.row(align=True)
+        row = first_column.row(align=True)
         row.scale_y = UI_Y_SCALE
-        op = row.operator("rymodel.mirror", text="X")
-        op.axis = 'X'
-        op = row.operator("rymodel.mirror", text="Y")
-        op.axis = 'Y'
-        op = row.operator("rymodel.mirror", text="Z")
-        op.axis = 'Z'
+        row.label(text="Mirror")
 
-        row = layout.row(align=True)
+        row = second_column.row(align=True)
         row.scale_y = UI_Y_SCALE
-        row.prop(bpy.context.scene, "rymodel_mirror_bisect", toggle=True, text="Bisect")
-        row.prop(bpy.context.scene, "rymodel_mirror_flip", toggle=True, text="Flip")
-        row.prop(bpy.context.scene, "rymodel_mirror_apply", toggle=True, text="Apply")
+        row.prop(bpy.context.scene, "rymodel_mirror_x", text="X", toggle=True)
+        row.prop(bpy.context.scene, "rymodel_mirror_y", text="Y", toggle=True)
+        row.prop(bpy.context.scene, "rymodel_mirror_z", text="Z", toggle=True)
 
-    # Delete past axis.
-    row = layout.row(align=True)
+    # Bi-Delete
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.label(text="Bi-Delete")
+
+    row = second_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.delete_vertices_past_axis", text="X")
     op.axis = 'X'
     op = row.operator("rymodel.delete_vertices_past_axis", text="Y")
@@ -166,10 +151,15 @@ def draw_cutter_tools(layout):
     row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE', text="")
 
 def draw_origin_tools(layout):
-    row = layout.row()
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
     row.label(text="Origin")
 
-    row = layout.row(align=True)
+    row = second_column.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.reset_origin", text="", icon='WORLD')
@@ -181,9 +171,12 @@ def draw_origin_tools(layout):
     op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
     op.location = 'VOLUME'
 
-    row = layout.row(align=True)
+    row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.label(text="Center")
+
+    row = second_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
     op = row.operator("rymodel.center_axis", text="X")
     op.axis = 'X'
     op = row.operator("rymodel.center_axis", text="Y")
@@ -196,14 +189,15 @@ def draw_unwrapping_tools(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
-    row = layout.row()
-    row.label(text="Unwrapping")
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
 
-    #row = layout.row(align=True)
-    #row.scale_y = UI_Y_SCALE
-    #row.operator("rymodel.select_ngons")
+    row = first_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.label(text="UVs")
 
-    row = layout.row(align=True)
+    row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_seam")
     row.operator("rymodel.unwrap")
@@ -224,12 +218,11 @@ def draw_modifier_title(layout, name, modifier_name):
     row = first_column.row()
     row.scale_y = UI_Y_SCALE
     row.alignment = 'LEFT'
-    row.label(text=name)
+    row.label(text="• {0}".format(name))
 
     row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.alignment = 'RIGHT'
-    row.label(text="••••••••••••••••••••  ")
     op = row.operator("rymodel.apply_modifier", text="", icon='ADD')
     op.modifier_name = modifier_name
     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
@@ -349,11 +342,13 @@ def draw_modifier_properties(layout):
                         #row.prop_enum(modifier, "solver", 'FAST')
                         #row.prop_enum(modifier, "solver", 'EXACT')
 
-        if modifier.type != 'MIRROR':
-            row = layout.row()
-            row.separator()
-            row = layout.row()
-            row.separator()
+                    case 'MIRROR':
+                        draw_modifier_title(layout, modifier.name, modifier.name)
+
+        row = layout.row()
+        row.separator()
+        row = layout.row()
+        row.separator()
 
 def draw_modifiers(layout):
     split = layout.split(factor=0.75)
@@ -396,10 +391,15 @@ def draw_modifiers(layout):
     draw_modifier_properties(layout)
 
 def draw_display_options(layout):
-    row = layout.row()
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
     row.label(text="Display")
 
-    row = layout.row()
+    row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
 
