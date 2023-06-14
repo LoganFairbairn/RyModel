@@ -78,6 +78,7 @@ classes = (
 
     # Cutters
     RyModel_AddCutter,
+    RyModel_SelectCutter,
     RyModel_ShowCutters,
 
     # Unwrapping
@@ -103,7 +104,8 @@ def on_active_object_changed():
             hide_cutters()
 
         update_property_range_overrides()
-        update_mirror_properties()
+
+    update_mirror_properties()
 
 # Mark load handlers as persistent so they are not freed when loading a new blend file.
 @persistent
@@ -148,6 +150,7 @@ def register():
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
 
     # Mirror settings.
+    bpy.types.Scene.rymodel_update_mirroring = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
     bpy.types.Scene.rymodel_mirror_y = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
     bpy.types.Scene.rymodel_mirror_z = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)

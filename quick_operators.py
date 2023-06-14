@@ -35,22 +35,49 @@ def verify_active_mesh(self=None):
 #------------------------ MODELING TOOLS ------------------------#
 
 def update_mirror_x(self, context):
-    mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
-    if mirror_modifier == None:
-        add_mirror_modifier('X')
-    mirror_modifier.use_axis[0] = context.scene.rymodel_mirror_x
+    if bpy.context.scene.rymodel_update_mirroring:
+        if context.scene.rymodel_mirror_x:
+            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+            if mirror_modifier == None:
+                add_mirror_modifier('X')
+            mirror_modifier.use_axis[0] = context.scene.rymodel_mirror_x
 
 def update_mirror_y(self, context):
-    mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
-    if mirror_modifier == None:
-        add_mirror_modifier('Y')
-    mirror_modifier.use_axis[1] = context.scene.rymodel_mirror_y
+    if bpy.context.scene.rymodel_update_mirroring:
+        if context.scene.rymodel_mirror_y:
+            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+            if mirror_modifier == None:
+                add_mirror_modifier('Y')
+            mirror_modifier.use_axis[1] = context.scene.rymodel_mirror_y
 
 def update_mirror_z(self, context):
-    mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
-    if mirror_modifier == None:
-        add_mirror_modifier('Z')
-    mirror_modifier.use_axis[2] = context.scene.rymodel_mirror_z
+    if bpy.context.scene.rymodel_update_mirroring:
+        if context.scene.rymodel_mirror_z:
+            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
+            if mirror_modifier == None:
+                add_mirror_modifier('Z')
+            mirror_modifier.use_axis[2] = context.scene.rymodel_mirror_z
+
+def update_mirror_properties():
+    bpy.context.scene.rymodel_update_mirroring = False
+    active_object = bpy.context.active_object
+    if active_object:
+        mirror_modifier = get_modifier_of_type(active_object.modifiers, 'MIRROR')
+        if mirror_modifier:
+            bpy.context.scene.rymodel_mirror_x = mirror_modifier.use_axis[0]
+            bpy.context.scene.rymodel_mirror_y = mirror_modifier.use_axis[1]
+            bpy.context.scene.rymodel_mirror_z = mirror_modifier.use_axis[2]
+
+        else:
+            bpy.context.scene.rymodel_mirror_x = 0
+            bpy.context.scene.rymodel_mirror_y = 0
+            bpy.context.scene.rymodel_mirror_z = 0
+
+    else:
+        bpy.context.scene.rymodel_mirror_x = 0
+        bpy.context.scene.rymodel_mirror_y = 0
+        bpy.context.scene.rymodel_mirror_z = 0
+    bpy.context.scene.rymodel_update_mirroring = True
 
 def update_mirror_flip(self, context):
     mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
@@ -170,16 +197,6 @@ class RyModel_DeleteVerticesPastAxis(Operator):
             return {'FINISHED'}
         delete_vertices_past_axis(context.active_object, self.axis)
         return {'FINISHED'}
-
-def update_mirror_properties():
-    active_object = bpy.context.active_object
-
-    if active_object:
-        mirror_modifier = get_modifier_of_type(active_object.modifiers, 'MIRROR')
-        if mirror_modifier:
-            bpy.context.scene.rymodel_mirror_x = mirror_modifier.use_axis[0]
-            bpy.context.scene.rymodel_mirror_y = mirror_modifier.use_axis[1]
-            bpy.context.scene.rymodel_mirror_z = mirror_modifier.use_axis[2]
 
 def add_mirror_modifier(axis):
     active_object = bpy.context.active_object
@@ -1373,6 +1390,38 @@ class RyModel_AddCutter(Operator):
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
         original_mode
 
+        return {'FINISHED'}
+
+class RyModel_SelectCutter(Operator):
+    bl_idname = "rymodel.select_cutter"
+    bl_label = "Select Cutter"
+    bl_description = "Selects the specified cutter"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    boolean_modifier_name: StringProperty(name="")
+
+    def execute(self, context):
+        if not verify_active_mesh():
+            return
+    
+        original_mode = bpy.context.mode
+        active_object = bpy.context.active_object
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        boolean_modifier = active_object.modifiers.get(self.boolean_modifier_name)
+        if boolean_modifier:
+            cutter_object = boolean_modifier.object
+            if cutter_object:
+                show_cutters()
+                bpy.ops.object.select_all(action='DESELECT')
+                bpy.context.view_layer.objects.active = cutter_object
+                cutter_object.select_set(True)
+                hide_cutters()
+
+        if original_mode == 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
 
 class RyModel_ShowCutters(Operator):
