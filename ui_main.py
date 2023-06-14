@@ -183,9 +183,6 @@ def draw_unwrapping_tools(layout):
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_seam")
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
     row.operator("rymodel.unwrap")
 
 def draw_extras(layout):
