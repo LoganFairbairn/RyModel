@@ -344,11 +344,11 @@ def draw_modifier_properties(layout):
 
                     case 'BOOLEAN':
                         draw_modifier_title(layout, modifier.name, modifier.name)
-                        row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
-                        row.label(text="Solver ")
-                        row.prop_enum(modifier, "solver", 'FAST')
-                        row.prop_enum(modifier, "solver", 'EXACT')
+                        #row = layout.row(align=True)
+                        #row.scale_y = UI_Y_SCALE
+                        #row.label(text="Solver ")
+                        #row.prop_enum(modifier, "solver", 'FAST')
+                        #row.prop_enum(modifier, "solver", 'EXACT')
 
         if modifier.type != 'MIRROR':
             row = layout.row()
