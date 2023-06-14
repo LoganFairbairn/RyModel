@@ -929,6 +929,10 @@ class RyModel_HSWFModApply(Operator):
                     continue
                 case _:
                     bpy.ops.object.modifier_apply(modifier=modifier.name)
+
+        # Update mirror properties.
+        update_mirror_properties()
+        
         return {'FINISHED'}
 
 def update_circular_offset(self, context):
