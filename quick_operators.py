@@ -1388,7 +1388,7 @@ class RyModel_AddCutter(Operator):
         # Set the dimensions of the new cutter to be slightly larger than the dimensions of the selected object.
         match self.shape:
             case 'CUBE':
-                new_cutter_object.dimensions = active_object.dimensions * 1.2
+                new_cutter_object.dimensions = active_object.dimensions * 1.35
 
             case _:
                 if self.shape != 'SELECTED_OBJECT':
