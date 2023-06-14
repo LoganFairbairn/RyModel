@@ -254,9 +254,10 @@ class RyModel_ExtractFace(Operator):
 
         bpy.ops.mesh.separate(type='SELECTED')
 
-        new_object = context.selected_objects[1]
-        if context.selected_objects[1] == context.active_object:
-            new_object = context.selected_objects[0]
+        new_object = context.selected_objects[0]
+        if len(context.selected_objects) > 1:
+            if context.selected_objects[0] == new_object:
+                new_object = context.selected_objects[1]
 
         solidify_modifier = new_object.modifiers.new('Solidify', 'SOLIDIFY')
         solidify_modifier.thickness = 0.1
