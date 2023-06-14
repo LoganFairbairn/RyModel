@@ -36,27 +36,27 @@ def verify_active_mesh(self=None):
 
 def update_mirror_x(self, context):
     if bpy.context.scene.rymodel_update_mirroring:
+        mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
         if context.scene.rymodel_mirror_x:
-            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
             if mirror_modifier == None:
-                add_mirror_modifier('X')
-            mirror_modifier.use_axis[0] = context.scene.rymodel_mirror_x
+                mirror_modifier = add_mirror_modifier('X')
+        mirror_modifier.use_axis[0] = context.scene.rymodel_mirror_x
 
 def update_mirror_y(self, context):
     if bpy.context.scene.rymodel_update_mirroring:
+        mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
         if context.scene.rymodel_mirror_y:
-            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
             if mirror_modifier == None:
-                add_mirror_modifier('Y')
-            mirror_modifier.use_axis[1] = context.scene.rymodel_mirror_y
+                mirror_modifier = add_mirror_modifier('Y')
+        mirror_modifier.use_axis[1] = context.scene.rymodel_mirror_y
 
 def update_mirror_z(self, context):
     if bpy.context.scene.rymodel_update_mirroring:
+        mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
         if context.scene.rymodel_mirror_z:
-            mirror_modifier = get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
             if mirror_modifier == None:
-                add_mirror_modifier('Z')
-            mirror_modifier.use_axis[2] = context.scene.rymodel_mirror_z
+                mirror_modifier = add_mirror_modifier('Z')
+        mirror_modifier.use_axis[2] = context.scene.rymodel_mirror_z
 
 def update_mirror_properties():
     bpy.context.scene.rymodel_update_mirroring = False
@@ -126,14 +126,16 @@ def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
 
     # Add a new mirror modifier.
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-    bpy.ops.object.modifier_add(type='MIRROR')
     mirror_modifier = mesh_object.modifiers.get('Mirror')
     if mirror_modifier:
-        mesh_object.modifiers.remove(mirror_modifier)
+        bpy.ops.object.modifier_apply(modifier=mirror_modifier.name, report=True)
 
     mirror_modifier = mesh_object.modifiers.new("Mirror", 'MIRROR')
     mirror_modifier.use_clip = True
     mirror_modifier.show_on_cage = True
+    mirror_modifier.use_bisect_flip_axis[0] = True
+    mirror_modifier.use_bisect_flip_axis[1] = True
+    mirror_modifier.use_bisect_flip_axis[2] = True
 
     # Apply mirroring settings based on the provided axis.
     match axis:
@@ -179,10 +181,13 @@ def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
     else:
         for vert in bm.verts:
             if vert.co[axis_index] > 0.0:
-                delete_verts.append(vert)  
+                delete_verts.append(vert)
 
     bmesh.ops.delete(bm, geom=delete_verts, context='VERTS') 
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+    # Make sure to update ui mirror properties.
+    update_mirror_properties()
 
 class RyModel_DeleteVerticesPastAxis(Operator):
     bl_idname = "rymodel.delete_vertices_past_axis"
@@ -204,7 +209,7 @@ def add_mirror_modifier(axis):
     # Add a mirror modifier if one doesn't exist.
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
     bpy.ops.object.modifier_add(type='MIRROR')
-    mirror_modifier = active_object.modifiers.get('Mirror')
+    mirror_modifier = get_modifier_of_type(active_object.modifiers, 'MIRROR')
     if not mirror_modifier:
         mirror_modifier = active_object.modifiers.new("Mirror", 'MIRROR')
     mirror_modifier.use_clip = True
@@ -223,6 +228,8 @@ def add_mirror_modifier(axis):
             mirror_modifier.use_axis[0] = False
 
     organize_modifier_stack(active_object.modifiers)
+
+    return mirror_modifier
 
 class RyModel_ResetOrigin(Operator):
     bl_idname = "rymodel.reset_origin"

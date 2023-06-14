@@ -115,6 +115,14 @@ def load_handler(dummy):
     bpy.types.Scene.matlayer_object_selection_updater = object()
     bpy.msgbus.subscribe_rna(key=subscribe_to, owner=bpy.types.Scene.matlayer_object_selection_updater, args=(), notify=on_active_object_changed)
 
+    # Update ui properties when a new blend file is loaded.
+    update_mirror_properties()
+    active_object = bpy.context.active_object
+    if active_object:
+        if active_object.type == 'MESH':
+            hide_cutters()
+        update_property_range_overrides()
+
 # Run startup functions when a new blend file is loaded.
 bpy.app.handlers.load_post.append(load_handler)
 
