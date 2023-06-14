@@ -580,6 +580,10 @@ def organize_modifier_stack(object_modifiers):
 
     modifier_index = 0
 
+    if mirror_modifier:
+        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
+        modifier_index += 1
+
     if shrinkwrap_modifier:
         bpy.ops.object.modifier_move_to_index(modifier=shrinkwrap_modifier.name, index=modifier_index)
         modifier_index += 1
@@ -602,10 +606,6 @@ def organize_modifier_stack(object_modifiers):
 
     for boolean_modifier in boolean_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=boolean_modifier.name, index=modifier_index)
-        modifier_index += 1
-
-    if mirror_modifier:
-        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
         modifier_index += 1
 
     if bevel_modifier:
