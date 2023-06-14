@@ -211,7 +211,7 @@ def draw_extras(layout):
     row.operator("rymodel.cheshire")
 
 def draw_modifier_title(layout, name, modifier_name):
-    split = layout.split(factor=0.4)
+    split = layout.split(factor=0.75)
     first_column = split.column()
     second_column = split.column()
 
@@ -344,11 +344,6 @@ def draw_modifier_properties(layout):
 
                     case 'MIRROR':
                         draw_modifier_title(layout, modifier.name, modifier.name)
-
-        row = layout.row()
-        row.separator()
-        row = layout.row()
-        row.separator()
 
 def draw_modifiers(layout):
     split = layout.split(factor=0.75)
