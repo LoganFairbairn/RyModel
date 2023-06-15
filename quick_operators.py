@@ -1266,7 +1266,7 @@ def add_cutter_boolean(obj):
     boolean_modifier = obj.modifiers.new(boolean_mod_name, 'BOOLEAN')
 
     # Adjust booolean settings.
-    boolean_modifier.solver = 'EXACT'
+    boolean_modifier.solver = 'FAST'
     boolean_modifier.show_in_editmode = True
     if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
         boolean_modifier.operation = 'DIFFERENCE'
