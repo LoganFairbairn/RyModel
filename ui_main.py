@@ -236,7 +236,7 @@ def draw_circular_array_properties(layout):
     displace_modifier = bpy.context.active_object.modifiers.get('CircularArrayDisplacement')
     array_modifier =  bpy.context.active_object.modifiers.get('CircularArray')
     if displace_modifier and array_modifier:
-        draw_modifier_title(layout, "Circular Array", "CIRCULAR_ARRAY")
+        draw_modifier_title(layout, "Circular Array", "CIRCULAR_ARRAY", array_modifier.type)
 
         row = layout.row(align=True)
         row.prop(bpy.context.scene.circular_array_settings, "offset", slider=True)
@@ -248,7 +248,7 @@ def draw_circular_twist_array(layout):
     array_modifier =  bpy.context.active_object.modifiers.get('CircularTwistArray')
 
     if array_modifier:
-        draw_modifier_title(layout, "Circular Twist", "CIRCULAR_TWIST")
+        draw_modifier_title(layout, "Circular Twist", "CIRCULAR_TWIST", array_modifier.type)
 
         row = layout.row(align=True)
         row.prop(bpy.context.scene, "circular_twist_count", text="Circular Twist Count", slider=True)
