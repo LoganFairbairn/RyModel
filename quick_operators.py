@@ -1460,7 +1460,7 @@ class RyModel_AddCutter(Operator):
             bm.verts[3].select = True
 
         # Finish in xray mode so users can quickly grab vertices through the mesh.
-        bpy.context.space_data.shading.show_xray = True
+        #bpy.context.space_data.shading.show_xray = True
         bpy.context.scene.tool_settings.snap_elements = {'VERTEX'}
 
         # Always finish add cutter in edit mode...
