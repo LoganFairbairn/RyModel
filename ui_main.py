@@ -210,8 +210,8 @@ def draw_extras(layout):
     row.operator("rymodel.curve_to_rope")
     row.operator("rymodel.cheshire")
 
-def draw_modifier_title(layout, name, modifier_name, modifier_type):
-    split = layout.split(factor=0.75)
+def draw_modifier_title(layout, name, modifier):
+    split = layout.split(factor=0.6)
     first_column = split.column()
     second_column = split.column()
 
@@ -224,20 +224,21 @@ def draw_modifier_title(layout, name, modifier_name, modifier_type):
     row.scale_y = UI_Y_SCALE
     row.alignment = 'RIGHT'
 
-    if modifier_type == 'BOOLEAN':
+    if modifier.type == 'BOOLEAN':
         op = row.operator("rymodel.select_cutter", text="", icon='SELECT_SET')
-        op.boolean_modifier_name = modifier_name
+        op.boolean_modifier_name = modifier.name
+
+    op = row.prop(modifier, "show_viewport", text="", icon='RESTRICT_VIEW_ON')
     op = row.operator("rymodel.apply_modifier", text="", icon='ADD')
-    op.modifier_name = modifier_name
+    op.modifier_name = modifier.name
     op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
-    op.modifier_name = modifier_name
+    op.modifier_name = modifier.name
 
 def draw_circular_array_properties(layout):
     displace_modifier = bpy.context.active_object.modifiers.get('CircularArrayDisplacement')
     array_modifier =  bpy.context.active_object.modifiers.get('CircularArray')
     if displace_modifier and array_modifier:
-        draw_modifier_title(layout, "Circular Array", "CIRCULAR_ARRAY", array_modifier.type)
-
+        draw_modifier_title(layout, "Circular Array", array_modifier)
         row = layout.row(align=True)
         row.prop(bpy.context.scene.circular_array_settings, "offset", slider=True)
         row = layout.row(align=True)
@@ -248,7 +249,7 @@ def draw_circular_twist_array(layout):
     array_modifier =  bpy.context.active_object.modifiers.get('CircularTwistArray')
 
     if array_modifier:
-        draw_modifier_title(layout, "Circular Twist", "CIRCULAR_TWIST", array_modifier.type)
+        draw_modifier_title(layout, "Circular Twist", array_modifier)
 
         row = layout.row(align=True)
         row.prop(bpy.context.scene, "circular_twist_count", text="Circular Twist Count", slider=True)
@@ -260,14 +261,15 @@ def draw_cutter_properties(layout, active_object):
     '''Draws cutter proprerties.'''
     row = layout.row()
     row.separator()
-    
+
     row = layout.row()
     row.scale_y = UI_Y_SCALE
+    row.alignment = 'CENTER'
     row.label(text="Cutters")
 
     for modifier in active_object.modifiers:
         if modifier.type == 'BOOLEAN':
-            draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+            draw_modifier_title(layout, modifier.name, modifier)
             #row = layout.row(align=True)
             #row.scale_y = UI_Y_SCALE
             #row.label(text="Solver ")
@@ -293,7 +295,7 @@ def draw_modifier_properties(layout):
             case _:
                 match modifier.type:
                     case 'BEVEL':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Bevel', modifier)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.bevel_modifier_settings, "segments", slider=True)
@@ -305,20 +307,20 @@ def draw_modifier_properties(layout):
                         row.prop(modifier, "limit_method", slider=True)
 
                     case 'WEIGHTED_NORMAL':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Weighted Normal', modifier)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "weight", slider=True)
 
                     case 'SOLIDIFY':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Solidify', modifier)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.solidify_modifier_settings, "thickness", slider=True)
                         row.prop(modifier, "use_even_offset", toggle=True)
 
                     case 'ARRAY':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Array', modifier)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.array_modifier_settings, "count", slider=True)
@@ -330,13 +332,13 @@ def draw_modifier_properties(layout):
                         row.prop(modifier, "relative_offset_displace", index=2, text="")
 
                     case 'MULTIRES':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Multi-resolution', modifier)
                         row = layout.row()
                         row.operator("object.multires_subdivide")
                         row.operator("object.multires_higher_levels_delete")
 
                     case 'SUBSURF':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Subsurface', modifier)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "levels")
@@ -346,13 +348,13 @@ def draw_modifier_properties(layout):
                         row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
 
                     case 'SHRINKWRAP':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Shrinkwrap', modifier)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "target")
 
                     case 'TRIANGULATE':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Triangulate', modifier)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
 
@@ -360,7 +362,7 @@ def draw_modifier_properties(layout):
                         continue
 
                     case 'MIRROR':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+                        draw_modifier_title(layout, 'Mirror', modifier)
 
     draw_cutter_properties(layout, active_object)
 
@@ -388,19 +390,16 @@ def draw_modifiers(layout):
     row.operator("rymodel.add_shrinkwrap_modifier", icon='MOD_SHRINKWRAP', text="")
     row.operator("rymodel.add_triangulate_modifier", icon='MOD_TRIANGULATE', text="")
 
-    split = layout.split(factor=0.5)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row()
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Modifiers")
-
-    row = second_column.row(align=True)
+    row = layout.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="Copy")
     row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="Apply")
+
+    row = layout.row()
+    row.alignment = 'CENTER'
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Modifiers")
 
     draw_modifier_properties(layout)
 
