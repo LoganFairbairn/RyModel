@@ -728,8 +728,10 @@ def add_modifier(modifier_type, self, context):
     if not verify_active_mesh(self):
         return {'FINISHED'}
     
-    if not context.active_object.modifiers.get(str(modifier_type)):
-        new_modifier = context.active_object.modifiers.new(str(modifier_type), modifier_type)
+    modifier_name = modifier_type.replace('_', ' ')
+    new_modifier = context.active_object.modifiers.get(modifier_name)
+    if not new_modifier:
+        new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
         new_modifier.show_expanded = False
 
     organize_modifier_stack(context.active_object.modifiers)
@@ -938,7 +940,7 @@ class RyModel_HSWFModApply(Operator):
                     continue
                 case _:
                     bpy.ops.object.modifier_apply(modifier=modifier.name)
-                    
+
         update_mirror_properties()      # Update mirror properties in case mirror properties were applied.
         remove_unused_cutters()         # Remove unused cutters in case cutter modifiers were applied.
         
