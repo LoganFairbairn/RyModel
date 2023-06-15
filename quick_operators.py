@@ -1369,6 +1369,9 @@ class RyModel_AddCutter(Operator):
 
         # Set the dimensions of the new cutter to be slightly larger than the dimensions of the selected object.
         match self.shape:
+            case 'PLANE':
+                new_cutter_object.dimensions = active_object.dimensions * 1.25
+
             case 'CUBE':
                 new_cutter_object.dimensions = active_object.dimensions * 1.25
 
@@ -1402,9 +1405,18 @@ class RyModel_AddCutter(Operator):
 
         # For plane cutters, select two vertices so users can instantly start extruding the plane to make a custom shape.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
         if self.shape == 'PLANE':
             me = new_cutter_object.data
             bm = bmesh.from_edit_mesh(me)
+            for f in bm.faces:
+                f.select = False
+
+            for edge in bm.edges:
+                edge.select = False
+            bm.edges.ensure_lookup_table()
+            bm.edges[2].select = True
+
             for v in bm.verts:
                 v.select = False
             bm.verts.ensure_lookup_table()
