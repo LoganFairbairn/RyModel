@@ -256,6 +256,24 @@ def draw_circular_twist_array(layout):
         row = layout.row(align=True)
         row.prop(displace_modifier1, "strength", text="Inner Offset", slider=True)
 
+def draw_cutter_properties(layout, active_object):
+    '''Draws cutter proprerties.'''
+    row = layout.row()
+    row.separator()
+    
+    row = layout.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Cutters")
+
+    for modifier in active_object.modifiers:
+        if modifier.type == 'BOOLEAN':
+            draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+            #row = layout.row(align=True)
+            #row.scale_y = UI_Y_SCALE
+            #row.label(text="Solver ")
+            #row.prop_enum(modifier, "solver", 'FAST')
+            #row.prop_enum(modifier, "solver", 'EXACT')
+
 def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
@@ -339,15 +357,12 @@ def draw_modifier_properties(layout):
                         row.scale_y = UI_Y_SCALE
 
                     case 'BOOLEAN':
-                        draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
-                        #row = layout.row(align=True)
-                        #row.scale_y = UI_Y_SCALE
-                        #row.label(text="Solver ")
-                        #row.prop_enum(modifier, "solver", 'FAST')
-                        #row.prop_enum(modifier, "solver", 'EXACT')
+                        continue
 
                     case 'MIRROR':
                         draw_modifier_title(layout, modifier.name, modifier.name, modifier.type)
+
+    draw_cutter_properties(layout, active_object)
 
 def draw_modifiers(layout):
     split = layout.split(factor=0.75)
