@@ -1405,7 +1405,7 @@ class RyModel_AddCutter(Operator):
 
         # For plane cutters, select two vertices so users can instantly start extruding the plane to make a custom shape.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')       # Finishing in vertex mode allows users to quickly grab vertices to re-adjust for the new cutter.
         if self.shape == 'PLANE':
             me = new_cutter_object.data
             bm = bmesh.from_edit_mesh(me)
@@ -1422,6 +1422,9 @@ class RyModel_AddCutter(Operator):
             bm.verts.ensure_lookup_table()
             bm.verts[1].select = True
             bm.verts[3].select = True
+
+        # Finish in xray mode so users can quickly grab vertices through the mesh.
+        bpy.context.space_data.shading.show_xray = True
 
         # Always finish add cutter in edit mode...
 
