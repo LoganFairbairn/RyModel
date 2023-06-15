@@ -938,9 +938,9 @@ class RyModel_HSWFModApply(Operator):
                     continue
                 case _:
                     bpy.ops.object.modifier_apply(modifier=modifier.name)
-
-        # Update mirror properties.
-        update_mirror_properties()
+                    
+        update_mirror_properties()      # Update mirror properties in case mirror properties were applied.
+        remove_unused_cutters()         # Remove unused cutters in case cutter modifiers were applied.
         
         return {'FINISHED'}
 
