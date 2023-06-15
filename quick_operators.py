@@ -1400,8 +1400,18 @@ class RyModel_AddCutter(Operator):
         # Parent the cutter to the object so the cutters will move with the object they are assigned to.
         bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        original_mode
+        # For plane cutters, select two vertices so users can instantly start extruding the plane to make a custom shape.
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        if self.shape == 'PLANE':
+            me = new_cutter_object.data
+            bm = bmesh.from_edit_mesh(me)
+            for v in bm.verts:
+                v.select = False
+            bm.verts.ensure_lookup_table()
+            bm.verts[1].select = True
+            bm.verts[3].select = True
+
+        # Always finish add cutter in edit mode...
 
         return {'FINISHED'}
 
