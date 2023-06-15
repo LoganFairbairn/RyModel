@@ -1631,7 +1631,7 @@ def update_bevel_modifier_width(self, context):
 
 class BevelModifierSettings(PropertyGroup):
     segments: IntProperty(name="Segments", default=6, min=0, soft_max=10, update=update_bevel_modifier_segments)
-    width: FloatProperty(name="Width", default=1, min=0, soft_max=10, update=update_bevel_modifier_width)
+    width: FloatProperty(name="Width", default=1, min=0, soft_max=1, update=update_bevel_modifier_width)
 
 def update_solidify_thickness(self, context):
     if context.active_object:
