@@ -1264,7 +1264,7 @@ def add_cutter_boolean(obj):
     boolean_modifier = obj.modifiers.new(boolean_mod_name, 'BOOLEAN')
 
     # Adjust booolean settings.
-    boolean_modifier.solver = 'FAST'
+    boolean_modifier.solver = 'EXACT'
     boolean_modifier.show_in_editmode = True
     if bpy.context.scene.rymodel_boolean_mode == 'SLICE':
         boolean_modifier.operation = 'DIFFERENCE'
@@ -1288,6 +1288,36 @@ def get_new_cutter_name():
         new_cutter_name = "Cutter_{0}".format(cutter_number)
         cutter = bpy.data.objects.get(new_cutter_name)
     return new_cutter_name
+
+def rotate_plane_cutter_to_view(plane_cutter):
+    '''Rotates the provided plane cutter to match the obj rotation of the viewport.'''
+    # Assumes that there is only 1 3D view.
+    for area in bpy.context.screen.areas:
+        if area.type == 'VIEW_3D':
+            r3d = area.spaces.active.region_3d # fine for right-upper quadview view
+            view_matrix = r3d.view_matrix
+            r = lambda x: round(x, 2)
+            view_rot = view_matrix.to_euler()
+            orientation_dict = {(0.0, 0.0, 0.0) : 'TOP',
+                                (r(math.pi), 0.0, 0.0) : 'BOTTOM',
+                                (r(-math.pi/2), 0.0, 0.0) : 'FRONT',
+                                (r(math.pi/2), 0.0, r(-math.pi)) : 'BACK',
+                                (r(-math.pi/2), r(math.pi/2), 0.0) : 'LEFT',
+                                (r(-math.pi/2), r(-math.pi/2), 0.0) : 'RIGHT'}
+            orientation = orientation_dict.get(tuple(map(r, view_rot)), 'USER')
+
+            match orientation:
+                case 'TOP':
+                    plane_cutter.rotation_euler[0] = math.radians(-90)
+                case 'BOTTOM':
+                    plane_cutter.rotation_euler[0] = math.radians(90)
+                case 'LEFT':
+                    plane_cutter.rotation_euler[2] = math.radians(-90)
+                case 'RIGHT':
+                    plane_cutter.rotation_euler[2] = math.radians(90)
+                case 'BACK':
+                    plane_cutter.rotation_euler[2] = math.radians(180)
+            break
 
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
@@ -1399,6 +1429,11 @@ class RyModel_AddCutter(Operator):
 
         # Move the new cutter to the center of the selected object, while also accounting for mirror modifiers.
         new_cutter_object.location = get_object_true_center(active_object)
+
+        # Rotate the new cutter object to match the viewport rotation.
+        if self.shape == 'PLANE':
+            rotate_plane_cutter_to_view(new_cutter_object)
+            bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
         # Parent the cutter to the object so the cutters will move with the object they are assigned to.
         bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
