@@ -1294,7 +1294,7 @@ def rotate_plane_cutter_to_view(plane_cutter):
     # Assumes that there is only 1 3D view.
     for area in bpy.context.screen.areas:
         if area.type == 'VIEW_3D':
-            r3d = area.spaces.active.region_3d # fine for right-upper quadview view
+            r3d = area.spaces.active.region_3d
             view_matrix = r3d.view_matrix
             r = lambda x: round(x, 2)
             view_rot = view_matrix.to_euler()
@@ -1322,7 +1322,7 @@ def rotate_plane_cutter_to_view(plane_cutter):
 class RyModel_AddCutter(Operator):
     bl_idname = "rymodel.add_cutter"
     bl_label = "Add Cutter"
-    bl_description = "Adds a boolean modifier and a new object of the selected sharp to the selected object"
+    bl_description = "Adds a boolean modifier to the selected object. Toggles to edit mode. Toggles vertex snapping on. Toggles xray mode on"
     bl_options = {'REGISTER', 'UNDO'}
 
     shape: StringProperty(default='CUBE')
@@ -1434,6 +1434,7 @@ class RyModel_AddCutter(Operator):
         if self.shape == 'PLANE':
             rotate_plane_cutter_to_view(new_cutter_object)
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+            
 
         # Parent the cutter to the object so the cutters will move with the object they are assigned to.
         bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
@@ -1460,6 +1461,7 @@ class RyModel_AddCutter(Operator):
 
         # Finish in xray mode so users can quickly grab vertices through the mesh.
         bpy.context.space_data.shading.show_xray = True
+        bpy.context.scene.tool_settings.snap_elements = {'VERTEX'}
 
         # Always finish add cutter in edit mode...
 
