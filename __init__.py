@@ -101,7 +101,8 @@ def on_active_object_changed():
     if active_object:
         # Update cutter visibility.
         if active_object.type == 'MESH':
-            hide_cutters()
+            if len(bpy.context.selected_objects) <= 1:
+                hide_cutters()
 
         update_property_range_overrides()
 

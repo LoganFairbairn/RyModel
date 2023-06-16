@@ -1344,10 +1344,16 @@ class RyModel_AddCutter(Operator):
             if len(bpy.context.selected_objects) != 2:
                 self.report({'ERROR'}, "Select only the object you wish to use as a cutter and the object you wish to cut.")
                 return {'FINISHED'}
-
-        original_mode = bpy.context.mode
+            
         active_object = bpy.context.active_object
-        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
+        if self.shape == 'SELECTED_OBJECT':
+            new_cutter_object = context.selected_objects[0]
+            if len(context.selected_objects) >= 2:
+                if new_cutter_object == context.active_object:
+                    new_cutter_object = context.selected_objects[1]
+
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 
         hide_cutters()                                          # Hide all existing cutters so the user can focus on the one they are adding.
         cutter_collection = create_cutter_collection()          # Create a new cutter collection if one does not exist.
@@ -1356,9 +1362,11 @@ class RyModel_AddCutter(Operator):
 
         # Make the selected object into a cutter.
         if self.shape == 'SELECTED_OBJECT':
-            new_cutter_object = context.selected_objects[0]
-            if new_cutter_object == context.active_object:
-                new_cutter_object = context.selected_objects[1]
+
+            # If the selected object is already a cutter, just add the cutter to the boolean modifier.
+            if new_cutter_object.name.startswith("Cutter_"):
+                boolean_modifier.object = new_cutter_object
+                return {'FINISHED'}
             new_cutter_object.name = new_cutter_name
 
         # Create a new cutter mesh with a unique name based on the provided cutter type.
