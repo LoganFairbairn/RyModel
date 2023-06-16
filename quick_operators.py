@@ -1399,6 +1399,10 @@ class RyModel_AddCutter(Operator):
         bpy.context.view_layer.objects.active = new_cutter_object
         new_cutter_object.select_set(True)
 
+        # Parent the cutter to the object so the cutters will move with the object they are assigned to.
+        if new_cutter_object.parent != active_object:
+            bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
         # Set the dimensions of the new cutter to be slightly larger than the dimensions of the selected object.
         match self.shape:
             case 'PLANE':
@@ -1430,16 +1434,13 @@ class RyModel_AddCutter(Operator):
             solidify_modifier.thickness = 0.075
 
         # Move the new cutter to the center of the selected object, while also accounting for mirror modifiers.
-        new_cutter_object.location = get_object_true_center(active_object)
+        if self.shape != 'SELECTED_OBJECT':
+            new_cutter_object.location = get_object_true_center(active_object)
 
         # Rotate the new cutter object to match the viewport rotation.
         if self.shape == 'PLANE':
             rotate_plane_cutter_to_view(new_cutter_object)
             bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
-            
-
-        # Parent the cutter to the object so the cutters will move with the object they are assigned to.
-        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
 
         # For plane cutters, select two vertices so users can instantly start extruding the plane to make a custom shape.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
