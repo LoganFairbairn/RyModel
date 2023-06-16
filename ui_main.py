@@ -367,10 +367,6 @@ def draw_modifier_properties(layout):
     draw_cutter_properties(layout, active_object)
 
 def draw_modifiers(layout):
-    split = layout.split(factor=0.75)
-    first_column = split.column()
-    second_column = split.column()
-
     row = layout.row(align=True)
     row.scale_x = 5
     row.scale_y = UI_Y_SCALE
