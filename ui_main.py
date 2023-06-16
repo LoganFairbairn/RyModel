@@ -166,10 +166,8 @@ def draw_origin_tools(layout):
     op.location = 'WORLD_ORIGIN'
     op = row.operator("rymodel.reset_origin", text="", icon='SELECT_INTERSECT')
     op.location = 'SELECTED'
-    op = row.operator("rymodel.reset_origin", text="", icon='SURFACE_NCYLINDER')
-    op.location = 'SURFACE'
-    op = row.operator("rymodel.reset_origin", text="", icon='VOLUME_DATA')
-    op.location = 'VOLUME'
+    op = row.operator("rymodel.reset_origin", text="", icon='ANCHOR_CENTER')
+    op.location = 'TRUE_CENTER'
 
     row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE
