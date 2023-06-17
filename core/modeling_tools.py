@@ -398,7 +398,7 @@ class RyModel_SelectNgons(Operator):
 class RyModel_CleanMesh(Operator):
     bl_idname = "rymodel.clean_mesh"
     bl_label = "Clean Mesh"
-    bl_description = "Removes vertex doubles, loose geometry, and recalculates face and vertex normals to point outside"
+    bl_description = "Applies rotation and scale, removes vertex doubles, loose geometry, and recalculates face and vertex normals to point outside"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -407,6 +407,11 @@ class RyModel_CleanMesh(Operator):
 
         # Toggle into edit mode, remember the original mode.
         original_mode = bpy.context.mode
+
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+
+
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
         # Remove loose faces.
