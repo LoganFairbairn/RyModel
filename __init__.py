@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Logan Fairbairn
+# Copyright (c) 2023 Logan Fairbairn
 # logan-fairbairn@outlook.com
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
 import bpy
 from bpy.app.handlers import persistent
 
-
-# Import operators.
-from .quick_operators import *
+# Import core functionality.
+from .core.internal_utils import *
+from .core.cutters import *
+from .core.modeling_tools import *
+from .core.modifiers import *
+from .core.property_range_overrides import *
 
 # Import user interface.
-from .ui_main import *
+from .ui.ui_main import *
 
 bl_info = {
     "name": "RyModel",

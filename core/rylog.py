@@ -1,3 +1,5 @@
+# This module contains functions for logging debug information and displaying warning and info messages.
+
 import bpy
 import datetime
 

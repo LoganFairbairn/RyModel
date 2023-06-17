@@ -2,7 +2,10 @@
 
 import bpy
 import bpy.utils.previews                   # Imported for custom icons.
-from bpy.types import Menu, Operator
+from bpy.utils import resource_path
+from bpy.types import Operator
+from .. import preferences
+from pathlib import Path
 import os
 
 UI_Y_SCALE = 1.4
@@ -12,8 +15,9 @@ custom_icons = None
 def load_custom_icons():
     global custom_icons
     custom_icons = bpy.utils.previews.new()
-    addon_path =  os.path.dirname(__file__)
-    icons_dir = os.path.join(addon_path, "icons")
+
+    USER = Path(resource_path('USER'))
+    icons_dir =  str(USER / "scripts/addons" / preferences.ADDON_NAME / "icons")
     custom_icons.load('NGON_DRAW', os.path.join(icons_dir, "ngon_draw.png"), 'IMAGE')
     custom_icons.load('CUTTER_INTERSECT', os.path.join(icons_dir, "cutter_intersect.png"), 'IMAGE')
     custom_icons.load('CUTTER_DIFFERENCE', os.path.join(icons_dir, "cutter_difference.png"), 'IMAGE')
