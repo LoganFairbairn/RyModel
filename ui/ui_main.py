@@ -4,6 +4,7 @@ import bpy
 import bpy.utils.previews                   # Imported for custom icons.
 from bpy.utils import resource_path
 from bpy.types import Operator
+from ..core import modifiers
 from .. import preferences
 from pathlib import Path
 import os
@@ -19,10 +20,10 @@ def load_custom_icons():
     USER = Path(resource_path('USER'))
     icons_dir =  str(USER / "scripts/addons" / preferences.ADDON_NAME / "icons")
     custom_icons.load('NGON_DRAW', os.path.join(icons_dir, "ngon_draw.png"), 'IMAGE')
-    custom_icons.load('CUTTER_INTERSECT', os.path.join(icons_dir, "cutter_intersect.png"), 'IMAGE')
-    custom_icons.load('CUTTER_DIFFERENCE', os.path.join(icons_dir, "cutter_difference.png"), 'IMAGE')
-    custom_icons.load('CUTTER_SLICE', os.path.join(icons_dir, "cutter_slice.png"), 'IMAGE')
-    custom_icons.load('CUTTER_UNION', os.path.join(icons_dir, "cutter_union.png"), 'IMAGE')
+    custom_icons.load('CUTTER_INTERSECT', os.path.join(icons_dir, "boolean_intersect.png"), 'IMAGE')
+    custom_icons.load('CUTTER_DIFFERENCE', os.path.join(icons_dir, "boolean_difference.png"), 'IMAGE')
+    custom_icons.load('CUTTER_SLICE', os.path.join(icons_dir, "boolean_slice.png"), 'IMAGE')
+    custom_icons.load('CUTTER_UNION', os.path.join(icons_dir, "boolean_union.png"), 'IMAGE')
     custom_icons.load('2XSUBD', os.path.join(icons_dir, "2xsubd.png"), 'IMAGE')
     custom_icons.load('CIRCULAR_ARRAY', os.path.join(icons_dir, "circular_array.png"), 'IMAGE')
     custom_icons.load('CIRCULAR_TWIST', os.path.join(icons_dir, "circular_twist.png"), 'IMAGE')
@@ -63,6 +64,11 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.clean_mesh", text="Clean Mesh")
 
+            boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
+            if boolean_mod:
+                row = layout.row()
+                row.scale_y = UI_Y_SCALE
+                row.operator("rymodel.make_booleans_unique", text="Unique Bools")
 
         case 'CURVE':
             row = layout.row()
@@ -113,29 +119,23 @@ def draw_mirror_tools(layout):
     op = row.operator("rymodel.delete_vertices_past_axis", text="Z")
     op.axis = 'Z'
 
-def draw_cutter_tools(layout):
+def draw_boolean_tools(layout):
     if bpy.context.active_object.type != 'MESH':
         return
 
     row = layout.row()
     row.scale_y = UI_Y_SCALE
-    row.label(text="Cutters")
+    row.label(text="Booleans")
 
     row = layout.row(align=True)
     row.scale_x = 4
     row.scale_y = 2
-    op = row.operator("rymodel.add_cutter", text="/")
-    op.shape = 'PLANE'
-    op = row.operator("rymodel.add_cutter", icon='MESH_CUBE', text="")
-    op.shape = 'CUBE'
-    op = row.operator("rymodel.add_cutter", icon='MESH_CYLINDER', text="")
-    op.shape = 'CYLINDER'
-    op = row.operator("rymodel.add_cutter", icon='SPHERE', text="")
-    op.shape = 'SPHERE'
-    op = row.operator("rymodel.add_cutter", icon='MESH_CONE', text="")
-    op.shape = 'CONE'
-    op = row.operator("rymodel.add_cutter", icon='SELECT_SET', text="")
-    op.shape = 'SELECTED_OBJECT'
+    row.operator("rymodel.add_plane_boolean", text="/")
+    row.operator("rymodel.add_cube_boolean", icon='MESH_CUBE', text="")
+    row.operator("rymodel.add_cylinder_boolean", icon='MESH_CYLINDER', text="")
+    row.operator("rymodel.add_sphere_boolean", icon='SPHERE', text="")
+    row.operator("rymodel.add_cone_boolean", icon='MESH_CONE', text="")
+    row.operator("rymodel.selected_object_to_boolean", icon='SELECT_SET', text="")
 
     split = layout.split(factor=0.2)
     first_column = split.column()
@@ -144,7 +144,7 @@ def draw_cutter_tools(layout):
     row = first_column.row(align=True)
     row.scale_x = 2
     row.scale_y = 2
-    row.operator("rymodel.show_cutters", icon='HIDE_OFF', text="")
+    row.operator("rymodel.show_boolean_objects", icon='HIDE_OFF', text="")
 
     row = second_column.row(align=True)
     row.scale_x = 10
@@ -227,7 +227,7 @@ def draw_modifier_title(layout, name, modifier):
     row.alignment = 'RIGHT'
 
     if modifier.type == 'BOOLEAN':
-        op = row.operator("rymodel.select_cutter", text="", icon='SELECT_SET')
+        op = row.operator("rymodel.select_boolean", text="", icon='SELECT_SET')
         op.boolean_modifier_name = modifier.name
 
     op = row.prop(modifier, "show_viewport", text="", icon='RESTRICT_VIEW_ON')
@@ -259,15 +259,15 @@ def draw_circular_twist_array(layout):
         row = layout.row(align=True)
         row.prop(displace_modifier1, "strength", text="Inner Offset", slider=True)
 
-def draw_cutter_properties(layout, active_object):
-    '''Draws cutter proprerties.'''
+def draw_boolean_properties(layout, active_object):
+    '''Draws boolean proprerties.'''
     row = layout.row()
     row.separator()
 
     row = layout.row()
     row.scale_y = UI_Y_SCALE
     row.alignment = 'CENTER'
-    row.label(text="Cutters")
+    row.label(text="Booleans")
 
     for modifier in active_object.modifiers:
         if modifier.type == 'BOOLEAN':
@@ -366,7 +366,7 @@ def draw_modifier_properties(layout):
                     case 'MIRROR':
                         draw_modifier_title(layout, 'Mirror', modifier)
 
-    draw_cutter_properties(layout, active_object)
+    draw_boolean_properties(layout, active_object)
 
 def draw_modifiers(layout):
     row = layout.row(align=True)
@@ -438,12 +438,14 @@ class RyModel_OT_open_menu(Operator):
 
         if context.active_object:
             draw_contextual_object_menu(first_column)
-            draw_cutter_tools(first_column)
+            draw_boolean_tools(first_column)
             draw_mirror_tools(first_column)
             draw_origin_tools(first_column)
             draw_display_options(first_column)
             draw_unwrapping_tools(first_column)
+            row = first_column.row()
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.make_backup_object", text="Backup Object")
             draw_modifiers(second_column)
-
         else:
             layout.label(text="Select an object to edit.")

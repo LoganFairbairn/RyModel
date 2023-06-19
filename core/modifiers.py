@@ -2,7 +2,7 @@ import bpy
 from bpy.types import PropertyGroup, Operator
 from bpy.props import IntProperty, FloatProperty, StringProperty
 from ..core import property_range_overrides
-from ..core import cutters
+from . import booleans
 from ..core import modeling_tools
 from ..core import internal_utils
 from ..core import rylog
@@ -192,8 +192,8 @@ class RyModel_ApplyModifier(Operator):
 
     def execute(self, context):
         bpy.ops.object.modifier_apply(modifier=self.modifier_name, report=True)
-        if self.modifier_name.startswith("Cutter_"):
-            cutters.remove_unused_cutters()
+        if self.modifier_name.startswith("BoolObj_"):
+            booleans.remove_unused_booleans()
         
         property_range_overrides.update_mirror_properties()      # Update mirror properties in case a mirror modifier was applied.
         return {'FINISHED'}
@@ -256,7 +256,7 @@ class RyModel_DeleteModifier(Operator):
                 if modifier:
                     bpy.context.active_object.modifiers.remove(modifier)
 
-        cutters.remove_unused_cutters()
+        booleans.remove_unused_booleans()
 
         return {'FINISHED'}
 
@@ -294,8 +294,8 @@ class RyModel_HSWFModApply(Operator):
                 case _:
                     bpy.ops.object.modifier_apply(modifier=modifier.name)
 
-        modeling_tools.update_mirror_properties()       # Update mirror properties in case mirror properties were applied.
-        cutters.remove_unused_cutters()                 # Remove unused cutters in case cutter modifiers were applied.
+        modeling_tools.update_mirror_properties()
+        booleans.remove_unused_booleans()
         
         return {'FINISHED'}
 

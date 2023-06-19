@@ -20,7 +20,7 @@ from bpy.app.handlers import persistent
 
 # Import core functionality.
 from .core.internal_utils import *
-from .core.cutters import *
+from .core.booleans import *
 from .core.modeling_tools import *
 from .core.modifiers import *
 from .core.property_range_overrides import *
@@ -79,10 +79,17 @@ classes = (
     RyModel_Cheshire,
     RyModel_HSWFModApply,
 
-    # Cutters
-    RyModel_AddCutter,
-    RyModel_SelectCutter,
-    RyModel_ShowCutters,
+    # Booleans
+    RyModel_AddPlaneBoolean,
+    RyModel_AddCubeBoolean,
+    RyModel_AddCylinderBoolean,
+    RyModel_AddSphereBoolean,
+    RyModel_AddConeBoolean,
+    RyModel_SelectedObjectToBoolean,
+    RyModel_MakeBackupObject,
+    RyModel_MakeBooleansUnique,
+    RyModel_SelectBoolObject,
+    RyModel_ShowBooleanObjects,
 
     # Unwrapping
     RyModel_Unwrap,
@@ -102,10 +109,10 @@ def on_active_object_changed():
     '''Performs updates when the active object is changed.'''
     active_object = bpy.context.active_object
     if active_object:
-        # Update cutter visibility.
+        # Update boolean visibility.
         if active_object.type == 'MESH':
             if len(bpy.context.selected_objects) <= 1:
-                hide_cutters()
+                hide_booleans()
 
         update_property_range_overrides()
 
@@ -124,7 +131,7 @@ def load_handler(dummy):
     active_object = bpy.context.active_object
     if active_object:
         if active_object.type == 'MESH':
-            hide_cutters()
+            hide_booleans()
         update_property_range_overrides()
 
 # Run startup functions when a new blend file is loaded.
@@ -154,10 +161,10 @@ def register():
 
 
     CUTTER_MODE = [
-        ("INTERSECT", "Intersect", "Cutters will cut everything from the object excluding geometry that intersects with the cutter", custom_icons["CUTTER_INTERSECT"].icon_id, 1),
+        ("INTERSECT", "Intersect", "Cutters will cut everything from the object excluding geometry that intersects with the add_boolean_mod", custom_icons["CUTTER_INTERSECT"].icon_id, 1),
         ("UNION", "Union", "Cutters will merge with the original objects geometry", custom_icons["CUTTER_UNION"].icon_id, 2),
-        ("DIFFERENCE", "Difference", "Cutters will remove geometry that intersects with the cutter", custom_icons["CUTTER_DIFFERENCE"].icon_id, 3),
-        ("SLICE", "Slice", "Cutters will slice where the cutter and original geometry intersect", custom_icons["CUTTER_SLICE"].icon_id, 4)
+        ("DIFFERENCE", "Difference", "Cutters will remove geometry that intersects with the add_boolean_mod", custom_icons["CUTTER_DIFFERENCE"].icon_id, 3),
+        ("SLICE", "Slice", "Cutters will slice where the boolean and original geometry intersect", custom_icons["CUTTER_SLICE"].icon_id, 4)
     ]
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
 
@@ -178,7 +185,7 @@ def register():
     bpy.types.Scene.curve_settings = bpy.props.PointerProperty(type=CurveSettings)
 
     # UI Toggles
-    bpy.types.Scene.show_cutter_ui = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.show_add_boolean_mod_ui = bpy.props.BoolProperty(default=False)
 
 def unregister():
     # Remove custom icons.

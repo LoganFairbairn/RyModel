@@ -489,7 +489,7 @@ def draw_callback_px(self, context):
 class RyModel_DrawShape(bpy.types.Operator):
     bl_idname = "rymodel.draw_shape"
     bl_label = "Draw Shape"
-    bl_description = "Click to create vertices of a shape, which is automatically extruded and filled. If an object is selected, the new shape will be applied as a cutter object"
+    bl_description = "Click to create vertices of a shape, which is automatically extruded and filled. If an object is selected, the new shape will be applied as a boolean object"
 
     def modal(self, context, event):
         context.area.tag_redraw()
@@ -631,4 +631,75 @@ class RyModel_3DCursorToFace(Operator):
 
     def execute(self, context):
         align_cursor_to_face()
+        return {'FINISHED'}
+
+class RyModel_CurveToRope(Operator):
+    bl_idname = "rymodel.curve_to_rope"
+    bl_label = "Curve To Rope"
+    bl_description = "Converts the selected curve to a rope"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    type: StringProperty(default='BEVEL')
+
+    def execute(self, context):
+
+        return {'FINISHED'}
+
+class RyModel_Cheshire(Operator):
+    bl_idname = "rymodel.cheshire"
+    bl_label = "Cheshire"
+    bl_description = "Cheshire"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        return {'FINISHED'}
+
+class RyModel_Unwrap(Operator):
+    bl_idname = "rymodel.unwrap"
+    bl_label = "Unwrap"
+    bl_description = "Unwraps and packs the selected model using the best unwrapping method available amongst all packing / unwrapping add-ons you have installed in Blender, defaults to vanilla unwrapping and packing if you have no packing / unwrapping add-ons"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='SELECT')
+
+        addons = context.preferences.addons
+
+        # Use UV Packer if it's installed.
+        uv_packer = addons.get("UV-Packer")
+        if uv_packer:
+            bpy.ops.uvpackeroperator.packbtn()
+
+        # User has no enabled add-ons, using vanilla packing method.
+        else:
+            bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
+            
+
+        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+
+        return {'FINISHED'}
+
+class RyModel_AutoSeam(Operator):
+    bl_idname = "rymodel.auto_seam"
+    bl_label = "Auto Seam"
+    bl_description = "Marks seams for uv unwrapping for the selected object based on the angle geometry"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.edges_select_sharp()
+        bpy.ops.mesh.mark_seam(clear=False)
+        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
         return {'FINISHED'}
