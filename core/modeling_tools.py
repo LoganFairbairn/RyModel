@@ -446,6 +446,30 @@ class RyModel_CleanMesh(Operator):
 
         return {'FINISHED'}
 
+class RyModel_FillNonManifold(Operator):
+    bl_idname = "rymodel.fill_non_manifold"
+    bl_label = "Fill Non-Manifold"
+    bl_description = "Fills non-manifold geometry"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
+        bpy.ops.mesh.select_non_manifold()
+        bpy.ops.mesh.edge_face_add()
+
+        if original_mode == 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+            
+        return {'FINISHED'}
+
 def draw_callback_px(self, context):
     # Draw number of point created.
     font_id = 0

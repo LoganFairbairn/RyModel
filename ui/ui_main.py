@@ -64,6 +64,10 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.clean_mesh", text="Clean Mesh")
 
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.fill_non_manifold", text="Fill Non-Manifold")
+
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
                 row = layout.row()

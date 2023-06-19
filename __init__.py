@@ -50,6 +50,7 @@ classes = (
     RyModel_CleanMesh,
     RyModel_SelectNgons,
     RyModel_DrawShape,
+    RyModel_FillNonManifold,
 
     # Origin Adjustments / Centering
     RyModel_ResetOrigin,
