@@ -350,6 +350,12 @@ class RyModel_SelectedObjectToBoolean(Operator):
 
         # If the selected object is already a boolean, add it to the boolean modifier.
         if new_boolean_object.name.startswith("Boolean_"):
+            boolean_modifiers = []
+            for obj in context.selected_objects:
+                if obj != new_boolean_object:
+                    new_bool_mod = add_boolean_mod(obj)
+                    boolean_modifiers.append(new_bool_mod)
+                    
             for boolean_modifier in boolean_modifiers:
                 boolean_modifier.object = new_boolean_object
             return {'FINISHED'}
