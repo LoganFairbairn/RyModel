@@ -187,8 +187,8 @@ def register():
     bpy.types.Scene.array_modifier_settings = bpy.props.PointerProperty(type=ArrayModifierSettings)
     bpy.types.Scene.curve_settings = bpy.props.PointerProperty(type=CurveSettings)
 
-    # UI Toggles
-    bpy.types.Scene.show_add_boolean_mod_ui = bpy.props.BoolProperty(default=False)
+    # General Settings
+    bpy.types.Scene.auto_sharpen_angle = bpy.props.FloatProperty(name="Auto Sharpen Angle", description="Angle in which to apply auto sharpening. Default = 30 degrees", default=0.523599, min=0, max=3.14159, unit='ROTATION')
 
 def unregister():
     # Remove custom icons.

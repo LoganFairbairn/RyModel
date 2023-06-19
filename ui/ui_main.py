@@ -56,9 +56,10 @@ def draw_contextual_object_menu(layout):
                     row.scale_y = UI_Y_SCALE
                     row.operator("rymodel.mirror_by_face", text="Mirror By Face")
 
-            row = layout.row()
+            row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.auto_sharpen", text="Sharpen")
+            row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=True)
 
             row = layout.row()
             row.scale_y = UI_Y_SCALE

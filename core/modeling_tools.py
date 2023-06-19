@@ -325,7 +325,7 @@ class RyModel_AutoSharpen(Operator):
         # Mark bevel weights and sharpening for sharp angles.
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
-        bpy.ops.mesh.edges_select_sharp(sharpness=0.523599)
+        bpy.ops.mesh.edges_select_sharp(sharpness=context.scene.auto_sharpen_angle)
         bpy.ops.mesh.mark_sharp()
         bpy.ops.transform.edge_bevelweight(value=1.0, snap=False)
 
