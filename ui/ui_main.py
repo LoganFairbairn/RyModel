@@ -170,12 +170,9 @@ def draw_origin_tools(layout):
     row = second_column.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.reset_origin", text="", icon='WORLD')
-    op.location = 'WORLD_ORIGIN'
-    op = row.operator("rymodel.reset_origin", text="", icon='SELECT_INTERSECT')
-    op.location = 'SELECTED'
-    op = row.operator("rymodel.reset_origin", text="", icon='ANCHOR_CENTER')
-    op.location = 'TRUE_CENTER'
+    op = row.operator("rymodel.set_origin_world_center", text="", icon='WORLD')
+    op = row.operator("rymodel.set_origin_selected", text="", icon='SELECT_INTERSECT')
+    op = row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
 
     row = first_column.row(align=True)
     row.scale_y = UI_Y_SCALE

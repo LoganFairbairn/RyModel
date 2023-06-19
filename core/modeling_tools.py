@@ -206,40 +206,61 @@ def add_mirror_modifier(axis):
 
     return mirror_modifier
 
-class RyModel_ResetOrigin(Operator):
-    bl_idname = "rymodel.reset_origin"
-    bl_label = "Reset Origin"
-    bl_description = "Resets the objects origin to the specified location"
+def set_object_origin(location, self):
+    original_mode = bpy.context.mode
+
+    active_object = bpy.context.active_object
+    if active_object:
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        match self.location:
+            case 'WORLD_ORIGIN':
+                bpy.ops.view3d.snap_cursor_to_center()
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+
+            case 'SELECTED':
+                bpy.ops.view3d.snap_cursor_to_selected()
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+
+            case 'TRUE_CENTER':
+                center = internal_utils.get_object_true_center(active_object)
+                bpy.context.scene.cursor.location = center
+                bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+
+        if original_mode == 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        else:
+            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+    else:
+        self.report({'ERROR'}, "No active object, select an object to reset it's origin.")
+
+class RyModel_SetOriginWorld(Operator):
+    bl_idname = "rymodel.set_origin_world_center"
+    bl_label = "Set Origin World Center"
+    bl_description = "Sets the selected objects origin to the world center"
     bl_options = {'REGISTER', 'UNDO'}
 
-    location: StringProperty(default='Y_AXIS')
+    def execute(self, context):
+        set_object_origin('WORLD_ORIGIN', self)
+        return {'FINISHED'}
+
+class RyModel_SetOriginSelected(Operator):
+    bl_idname = "rymodel.set_origin_selected"
+    bl_label = "Set Origin Selected"
+    bl_description = "Sets the selected objects origin to the selected element"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        original_mode = bpy.context.mode
+        set_object_origin('SELECTED', self)
+        return {'FINISHED'}
 
-        active_object = bpy.context.active_object
-        if active_object:
-            bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-            match self.location:
-                case 'WORLD_ORIGIN':
-                    bpy.ops.view3d.snap_cursor_to_center()
-                    bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+class RyModel_SetOriginCenter(Operator):
+    bl_idname = "rymodel.set_origin_center"
+    bl_label = "Set Origin Center"
+    bl_description = "Sets the selected objects origin to the center"
+    bl_options = {'REGISTER', 'UNDO'}
 
-                case 'SELECTED':
-                    bpy.ops.view3d.snap_cursor_to_selected()
-                    bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
-
-                case 'TRUE_CENTER':
-                    center = internal_utils.get_object_true_center(active_object)
-                    bpy.context.scene.cursor.location = center
-                    bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
-
-            if original_mode == 'EDIT_MESH':
-                bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-            else:
-                bpy.ops.object.mode_set(mode=original_mode, toggle=False)
-        else:
-            self.report({'ERROR'}, "No active object, select an object to reset it's origin.")
+    def execute(self, context):
+        set_object_origin('TRUE_CENTER', self)
         return {'FINISHED'}
 
 class RyModel_CenterAxis(Operator):
@@ -467,7 +488,7 @@ class RyModel_FillNonManifold(Operator):
             bpy.ops.object.mode_set(mode='EDIT', toggle=False)
         else:
             bpy.ops.object.mode_set(mode=original_mode, toggle=False)
-            
+
         return {'FINISHED'}
 
 def draw_callback_px(self, context):

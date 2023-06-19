@@ -53,7 +53,9 @@ classes = (
     RyModel_FillNonManifold,
 
     # Origin Adjustments / Centering
-    RyModel_ResetOrigin,
+    RyModel_SetOriginWorld,
+    RyModel_SetOriginSelected,
+    RyModel_SetOriginCenter,
     RyModel_CenterAxis,
 
     # Mirroring
