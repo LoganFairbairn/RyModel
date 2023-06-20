@@ -194,8 +194,8 @@ class RyModel_ApplyModifier(Operator):
         bpy.ops.object.modifier_apply(modifier=self.modifier_name, report=True)
         if self.modifier_name.startswith("BoolObj_"):
             booleans.remove_unused_booleans()
-        
-        property_range_overrides.update_mirror_properties()      # Update mirror properties in case a mirror modifier was applied.
+    
+        modeling_tools.update_mirror_properties()   # Update mirror properties in case a mirror modifier was applied.
         return {'FINISHED'}
 
 def remove_circular_array_setup(context):
