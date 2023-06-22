@@ -176,6 +176,7 @@ def register():
     bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
     bpy.types.Scene.rymodel_mirror_y = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
     bpy.types.Scene.rymodel_mirror_z = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)
+    bpy.types.Scene.rymodel_flip_bidelete = bpy.props.BoolProperty(default=True, description="Flips the axis used for bi-delete.")
 
     # Custom Modifier Settings
     bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)

@@ -99,34 +99,19 @@ def update_mirror_bisect(self, context):
 def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
     '''Bisects the given object along the given axis, then deletes all vertices past the selected axis.'''
 
-    # Add a new mirror modifier.
-    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-    mirror_modifier = mesh_object.modifiers.get('Mirror')
-    if mirror_modifier:
-        bpy.ops.object.modifier_apply(modifier=mirror_modifier.name, report=True)
-
-    mirror_modifier = mesh_object.modifiers.new("Mirror", 'MIRROR')
-    mirror_modifier.use_clip = True
-    mirror_modifier.show_on_cage = True
-    mirror_modifier.use_bisect_flip_axis[0] = True
-    mirror_modifier.use_bisect_flip_axis[1] = True
-    mirror_modifier.use_bisect_flip_axis[2] = True
-
-    # Apply mirroring settings based on the provided axis.
+    # Bisect the mesh based on the provided axis.
+    bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+    bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='VERT')
+    bpy.ops.mesh.select_all(action='SELECT')
     match axis:
         case 'X':
-            mirror_modifier.use_axis[0] = True
-            mirror_modifier.use_bisect_axis[0] = True
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(1.0, 0.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
             
         case 'Y':
-            mirror_modifier.use_axis[1] = True
-            mirror_modifier.use_axis[0] = False
-            mirror_modifier.use_bisect_axis[1] = True
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 1.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
             
         case 'Z':
-            mirror_modifier.use_axis[2] = True
-            mirror_modifier.use_axis[0] = False
-            mirror_modifier.use_bisect_axis[2] = True
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 0.0, 1.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
 
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
     bpy.ops.object.modifier_apply(modifier="Mirror")
@@ -175,7 +160,9 @@ class RyModel_DeleteVerticesPastAxis(Operator):
     def execute(self, context):
         if not internal_utils.verify_active_mesh(self):
             return {'FINISHED'}
-        delete_vertices_past_axis(context.active_object, self.axis)
+        
+        delete_vertices_past_axis(context.active_object, self.axis, bpy.context.scene.rymodel_flip_bidelete)
+        
         return {'FINISHED'}
 
 def add_mirror_modifier(axis):
@@ -227,7 +214,7 @@ def set_object_origin(location, self):
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
 
         internal_utils.set_object_interaction_mode(original_mode)
-        
+
     else:
         self.report({'ERROR'}, "No active object, select an object to reset it's origin.")
 

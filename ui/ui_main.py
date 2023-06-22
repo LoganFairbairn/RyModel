@@ -123,6 +123,7 @@ def draw_mirror_tools(layout):
     op.axis = 'Y'
     op = row.operator("rymodel.delete_vertices_past_axis", text="Z")
     op.axis = 'Z'
+    row.prop(bpy.context.scene, "rymodel_flip_bidelete", text="", icon='MOD_MIRROR')
 
 def draw_boolean_tools(layout):
     if bpy.context.active_object.type != 'MESH':
