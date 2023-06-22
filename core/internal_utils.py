@@ -80,3 +80,15 @@ def add_object_to_collection(collection_name, obj, color_tag='COLOR_01', unlink_
     collection.objects.link(obj)
 
     return collection
+
+def set_object_interaction_mode(interaction_mode):
+    '''Sets the object interaction mode, but allows similar strings.'''
+    match interaction_mode:
+        case 'EDIT_MESH':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
+        case 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
+        case _:
+            bpy.ops.object.mode_set(mode=interaction_mode, toggle=False)

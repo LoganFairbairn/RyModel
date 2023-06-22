@@ -212,7 +212,7 @@ def set_object_origin(location, self):
     active_object = bpy.context.active_object
     if active_object:
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        match self.location:
+        match location:
             case 'WORLD_ORIGIN':
                 bpy.ops.view3d.snap_cursor_to_center()
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
@@ -226,10 +226,8 @@ def set_object_origin(location, self):
                 bpy.context.scene.cursor.location = center
                 bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
 
-        if original_mode == 'EDIT_MESH':
-            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        else:
-            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
+        
     else:
         self.report({'ERROR'}, "No active object, select an object to reset it's origin.")
 
@@ -288,10 +286,7 @@ class RyModel_CenterAxis(Operator):
             case _:
                 rylog.log("Error: Invalid axis provided for center axis operator.")
 
-        if original_mode == 'EDIT_MESH':
-            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        else:
-            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
 class RyModel_AutoSharpen(Operator):
@@ -329,7 +324,7 @@ class RyModel_AutoSharpen(Operator):
         bpy.ops.mesh.mark_sharp()
         bpy.ops.transform.edge_bevelweight(value=1.0, snap=False)
 
-        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
 class RyModel_ExtractFace(Operator):
@@ -463,7 +458,7 @@ class RyModel_CleanMesh(Operator):
         bpy.ops.mesh.remove_doubles(threshold=0.0001)
 
         # Toggle back into the original mode.
-        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
 
         return {'FINISHED'}
 
@@ -483,12 +478,7 @@ class RyModel_FillNonManifold(Operator):
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
         bpy.ops.mesh.select_non_manifold()
         bpy.ops.mesh.edge_face_add()
-
-        if original_mode == 'EDIT_MESH':
-            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        else:
-            bpy.ops.object.mode_set(mode=original_mode, toggle=False)
-
+        internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
 def draw_callback_px(self, context):
@@ -531,7 +521,7 @@ def draw_callback_px(self, context):
     # restore opengl defaults
     gpu.state.blend_set('NONE')
 
-class RyModel_DrawShape(bpy.types.Operator):
+class RyModel_DrawShape(Operator):
     bl_idname = "rymodel.draw_shape"
     bl_label = "Draw Shape"
     bl_description = "Click to create vertices of a shape, which is automatically extruded and filled. If an object is selected, the new shape will be applied as a boolean object"
@@ -643,7 +633,7 @@ class RyModel_MirrorByFace(Operator):
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
 
         # Reset to the original mode.
-        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
 
         align_cursor_to_face()
 
@@ -727,7 +717,7 @@ class RyModel_Unwrap(Operator):
             bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
             
 
-        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
 
         return {'FINISHED'}
 
@@ -746,5 +736,5 @@ class RyModel_AutoSeam(Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.edges_select_sharp()
         bpy.ops.mesh.mark_seam(clear=False)
-        bpy.ops.object.mode_set(mode=original_mode, toggle=False)
+        internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
