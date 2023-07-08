@@ -27,6 +27,7 @@ Features:
 - Extract face
 - Extract curve
 - Auto mesh clean
+- Quick cloth simulation setups
 
     Unwrapping
 - Automatic seam marking
