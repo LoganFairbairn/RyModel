@@ -1,8 +1,18 @@
 import bpy
-from bpy.types import Operator
+from bpy.types import Operator, PropertyGroup
+from bpy.props import EnumProperty
 from ..core import internal_utils
 
 FRAME_END = 50
+
+VERTEX_DENSITY = [
+    ("LOW", "Low", ""),
+    ("MEDIUM", "Medium", ""),
+    ("HIGH", "High", ""),
+]
+
+class ClothSimSettings(PropertyGroup):
+    vertex_density: EnumProperty(items=VERTEX_DENSITY, name="Segments", default='MEDIUM')
 
 class RyModel_ApplyCollision(Operator):
     bl_idname = "rymodel.apply_collision"
@@ -106,3 +116,13 @@ class RyModel_UnPinCloth(Operator):
         pin_cloth(weight=0.0)
 
         return {'FINISHED'}
+    
+class ClothSimMenu(bpy.types.Menu):
+    bl_idname = "OBJECT_MT_cloth_sim_menu"
+    bl_label = "Cloth Sim Menu"
+
+    def draw(self, context):
+        layout = self.layout
+
+        cloth_sim_settings = context.scene.rymodel_cloth_sim_settings
+        layout.props_enum(cloth_sim_settings, "vertex_density")

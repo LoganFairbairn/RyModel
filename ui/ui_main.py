@@ -73,10 +73,11 @@ def draw_contextual_object_menu(layout):
             row.scale_x = 4
             row.scale_y = UI_Y_SCALE
             row.alignment = 'CENTER'
-            row.operator("rymodel.simulate_cloth", text="Cloth Sim", icon='MOD_CLOTH')
+            row.operator("rymodel.simulate_cloth", text="Cloth Sim", icon='PHYSICS')
             row.operator("rymodel.pin_cloth", text="", icon='PINNED')
             row.operator("rymodel.unpin_cloth", text="", icon='UNPINNED')
             row.operator("rymodel.apply_collision", text="", icon='MOD_PHYSICS')
+            row.menu("OBJECT_MT_cloth_sim_menu", text="", icon='MOD_CLOTH')
 
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:

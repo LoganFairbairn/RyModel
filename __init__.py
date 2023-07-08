@@ -58,6 +58,8 @@ classes = (
     RyModel_SimulateCloth,
     RyModel_PinCloth,
     RyModel_UnPinCloth,
+    ClothSimMenu,
+    ClothSimSettings,
 
     # Origin Adjustments / Centering
     RyModel_SetOriginWorld,
@@ -178,6 +180,9 @@ def register():
     ]
 
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
+
+    # Cloth Simulation Settings
+    bpy.types.Scene.rymodel_cloth_sim_settings = bpy.props.PointerProperty(type=ClothSimSettings, name="Cloth Sim Settings")
 
     # Mirror Settings
     bpy.types.Scene.rymodel_update_mirroring = bpy.props.BoolProperty(default=True)
