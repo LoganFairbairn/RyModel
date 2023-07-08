@@ -22,6 +22,7 @@ from bpy.app.handlers import persistent
 from .core.internal_utils import *
 from .core.booleans import *
 from .core.modeling_tools import *
+from .core.simulation_tools import *
 from .core.modifiers import *
 from .core.property_range_overrides import *
 
@@ -42,7 +43,7 @@ bl_info = {
 
 # List of classes to be registered.
 classes = (
-    # Modeling
+    # Modeling Tools
     RyModel_AutoSharpen,
     RyModel_ExtractFace,
     RyModel_ExtractCurve,
@@ -51,6 +52,12 @@ classes = (
     RyModel_SelectNgons,
     RyModel_DrawShape,
     RyModel_FillNonManifold,
+
+    # Simulation Tools
+    RyModel_ApplyCollision,
+    RyModel_SimulateCloth,
+    RyModel_PinCloth,
+    RyModel_UnPinCloth,
 
     # Origin Adjustments / Centering
     RyModel_SetOriginWorld,
@@ -162,16 +169,17 @@ def register():
         #kmi = km.keymap_items.new(RyModel_DrawShape.bl_idname, type='D', value='PRESS', ctrl=True)
         #addon_keymaps.append((km, kmi))
 
-
+    # Boolean Settings
     CUTTER_MODE = [
         ("INTERSECT", "Intersect", "Cutters will cut everything from the object excluding geometry that intersects with the add_boolean_mod", custom_icons["CUTTER_INTERSECT"].icon_id, 1),
         ("UNION", "Union", "Cutters will merge with the original objects geometry", custom_icons["CUTTER_UNION"].icon_id, 2),
         ("DIFFERENCE", "Difference", "Cutters will remove geometry that intersects with the add_boolean_mod", custom_icons["CUTTER_DIFFERENCE"].icon_id, 3),
         ("SLICE", "Slice", "Cutters will slice where the boolean and original geometry intersect", custom_icons["CUTTER_SLICE"].icon_id, 4)
     ]
+
     bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
 
-    # Mirror settings.
+    # Mirror Settings
     bpy.types.Scene.rymodel_update_mirroring = bpy.props.BoolProperty(default=True)
     bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
     bpy.types.Scene.rymodel_mirror_y = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)

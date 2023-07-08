@@ -96,7 +96,7 @@ def update_mirror_bisect(self, context):
             else:
                 mirror_modifier.use_bisect_axis[2] = False
 
-def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
+def delete_vertices_past_axis(mesh_object, axis, flip_axis=False, bisect=True):
     '''Bisects the given object along the given axis, then deletes all vertices past the selected axis.'''
 
     # Bisect the mesh based on the provided axis.
@@ -105,13 +105,13 @@ def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
     bpy.ops.mesh.select_all(action='SELECT')
     match axis:
         case 'X':
-            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(1.0, 0.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(1.0, 0.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.000001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
             
         case 'Y':
-            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 1.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 1.0, 0.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.000001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
             
         case 'Z':
-            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 0.0, 1.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.0001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
+            bpy.ops.mesh.bisect(plane_co=(0.0, 0.0, 0.0), plane_no=(0.0, 0.0, 1.0), use_fill=False, clear_inner=False, clear_outer=False, threshold=0.000001, xstart=0, xend=0, ystart=0, yend=0, flip=False, cursor=5)
 
     bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
     bpy.ops.object.modifier_apply(modifier="Mirror")
@@ -134,13 +134,14 @@ def delete_vertices_past_axis(mesh_object, axis, flip_axis=False):
         case _:
             rylog.log("Error: Invalid axis provided to delete_past_axis.")
 
+    # 0 causes floating point errors occasionally so we'll use 0.0001.
     if flip_axis:
         for vert in bm.verts:
-            if vert.co[axis_index] < 0.0:
+            if vert.co[axis_index] < -0.0001:
                 delete_verts.append(vert)
     else:
         for vert in bm.verts:
-            if vert.co[axis_index] > 0.0:
+            if vert.co[axis_index] > 0.0001:
                 delete_verts.append(vert)
 
     bmesh.ops.delete(bm, geom=delete_verts, context='VERTS') 
@@ -161,7 +162,7 @@ class RyModel_DeleteVerticesPastAxis(Operator):
         if not internal_utils.verify_active_mesh(self):
             return {'FINISHED'}
         
-        delete_vertices_past_axis(context.active_object, self.axis, bpy.context.scene.rymodel_flip_bidelete)
+        delete_vertices_past_axis(context.active_object, self.axis, bpy.context.scene.rymodel_flip_bidelete, bpy.context.scene.rymodel_bidelete_bisect)
         
         return {'FINISHED'}
 
