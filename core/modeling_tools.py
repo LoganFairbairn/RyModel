@@ -315,6 +315,36 @@ class RyModel_AutoSharpen(Operator):
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
+class RyModel_AutoSmooth(Operator):
+    bl_idname = "rymodel.auto_smooth"
+    bl_label = "Auto Smooth"
+    bl_description = "Applies auto smooth and clears all bevel weights and sharpening"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+
+        # Clear all bevel weights.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        if bpy.context.active_object.data.has_bevel_weight_edge:
+            bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+
+        # Apply autosmooth.
+        bpy.ops.object.shade_smooth()
+        bpy.context.object.data.use_auto_smooth = True
+        bpy.context.object.data.auto_smooth_angle = 1.0472
+
+        # Clear all bevel weights and sharpening.
+        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.mark_sharp(clear=True)
+
+        internal_utils.set_object_interaction_mode(original_mode)
+        return {'FINISHED'}
+
 class RyModel_ExtractFace(Operator):
     bl_idname = "rymodel.extract_face"
     bl_label = "Extract Face"

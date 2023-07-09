@@ -44,6 +44,7 @@ bl_info = {
 # List of classes to be registered.
 classes = (
     # Modeling Tools
+    RyModel_AutoSmooth,
     RyModel_AutoSharpen,
     RyModel_ExtractFace,
     RyModel_ExtractCurve,

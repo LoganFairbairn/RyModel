@@ -58,8 +58,9 @@ def draw_contextual_object_menu(layout):
 
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.auto_smooth", text="Smooth")
             row.operator("rymodel.auto_sharpen", text="Sharpen")
-            row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=True)
+            row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
 
 
             split = layout.split(factor=0.3)
