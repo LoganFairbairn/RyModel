@@ -61,13 +61,19 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.auto_sharpen", text="Sharpen")
             row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=True)
 
-            row = layout.row()
+
+            split = layout.split(factor=0.3)
+            first_column = split.column()
+            second_column = split.column()
+
+            row = first_column.row()
+            row.scale_y = UI_Y_SCALE
+            row.label(text="Mesh")
+
+            row = second_column.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.clean_mesh", text="Q Clean")
-
-            row = layout.row()
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.fill_non_manifold", text="Fill Non-Manifold")
+            row.operator("rymodel.fill_non_manifold", text="Fill Holes")
 
             # Curve Array Options
             split = layout.split(factor=0.3)
@@ -83,11 +89,15 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
 
-            row = layout.row(align=True)
+            # Cloth Simulation Operators
+            row = first_column.row(align=True)
+            row.scale_y = UI_Y_SCALE
+            row.label(text="Cloth Sim")
+
+            row = second_column.row(align=True)
             row.scale_x = 4
             row.scale_y = UI_Y_SCALE
-            row.alignment = 'CENTER'
-            row.operator("rymodel.simulate_cloth", text="Cloth Sim", icon='PHYSICS')
+            row.operator("rymodel.simulate_cloth", text="", icon='PHYSICS')
             row.operator("rymodel.pin_cloth", text="", icon='PINNED')
             row.operator("rymodel.unpin_cloth", text="", icon='UNPINNED')
             row.operator("rymodel.apply_collision", text="", icon='MOD_PHYSICS')

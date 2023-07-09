@@ -772,7 +772,7 @@ class RyModel_DeformArrayAlongCurve(Operator):
 
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
-    
+
 class RyModel_ArrayAlongCurve(Operator):
     bl_idname = "rymodel.array_along_curve"
     bl_label = "Array Along Curve"
@@ -834,7 +834,7 @@ class RyModel_ArrayAlongCurve(Operator):
 
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
-    
+
 class RyModel_DeleteCurveArray(Operator):
     bl_idname = "rymodel.delete_curve_array"
     bl_label = "Delete Curve Array"
@@ -893,7 +893,7 @@ class RyModel_DeleteCurveArray(Operator):
         
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
-    
+
 class RyModel_CurveArrayToMesh(Operator):
     bl_idname = "rymodel.curve_array_to_mesh"
     bl_label = "Curve Array to Mesh"
