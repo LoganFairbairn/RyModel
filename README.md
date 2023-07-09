@@ -16,6 +16,10 @@ Features:
 - Copy all modifiers button
 - Workflow friendly quick apply for modifiers (applies all modifiers excluding ones you would not want to apply)
 
+    Additional Modeling Tools
+- Curve mesh which arrays and deforms a mesh along a curve
+- Curve array which arrays a mesh along a curve without deforming the mesh
+
     Cutter Management
 - Cutter shape management and automation
 - Slice boolean modifier mode
