@@ -63,7 +63,7 @@ def draw_contextual_object_menu(layout):
 
             row = layout.row()
             row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.clean_mesh", text="Clean Mesh")
+            row.operator("rymodel.clean_mesh", text="Q Clean")
 
             row = layout.row()
             row.scale_y = UI_Y_SCALE
