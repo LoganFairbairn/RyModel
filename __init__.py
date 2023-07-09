@@ -52,6 +52,8 @@ classes = (
     RyModel_SelectNgons,
     RyModel_DrawShape,
     RyModel_FillNonManifold,
+    RyModel_DeformArrayAlongCurve,
+    RyModel_ArrayAlongCurve,
 
     # Simulation Tools
     RyModel_ApplyCollision,

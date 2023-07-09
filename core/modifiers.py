@@ -80,6 +80,7 @@ def organize_modifier_stack(object_modifiers):
         modifier_index += 1
 
 def add_modifier(modifier_type, self, context):
+    '''Adds a new modifier to the active object, then re-organizes the modifier stack.'''
     if not internal_utils.verify_active_mesh(self):
         return {'FINISHED'}
     

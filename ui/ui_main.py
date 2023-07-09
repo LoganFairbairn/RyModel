@@ -70,6 +70,11 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.fill_non_manifold", text="Fill Non-Manifold")
 
             row = layout.row(align=True)
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.array_along_curve", text="Curve Array")
+            row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
+
+            row = layout.row(align=True)
             row.scale_x = 4
             row.scale_y = UI_Y_SCALE
             row.alignment = 'CENTER'
@@ -338,7 +343,7 @@ def draw_modifier_properties(layout):
                         draw_modifier_title(layout, 'Array', modifier)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(bpy.context.scene.array_modifier_settings, "count", slider=True)
+                        row.prop(bpy.context.scene.array_modifier_settings, "count", slider=False)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.label(text="Relative Offset")

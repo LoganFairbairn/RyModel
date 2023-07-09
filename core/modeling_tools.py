@@ -726,3 +726,111 @@ class RyModel_AutoSeam(Operator):
         bpy.ops.mesh.mark_seam(clear=False)
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
+
+class RyModel_DeformArrayAlongCurve(Operator):
+    bl_idname = "rymodel.deform_array_along_curve"
+    bl_label = "Deform Array Along Curve"
+    bl_description = "Arrays the selected mesh along a curve object, in addition to deforming the object so mesh instances weld together"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        original_object = context.active_object
+
+        # TODO: Verify only 1 object is selected.
+
+        # Apply modifiers.
+        array_mod = modifiers.add_modifier('ARRAY', self, context)
+        array_mod.relative_offset_displace = (0, 0, 1)
+        array_mod.fit_type = 'FIT_CURVE'
+        modifiers.add_modifier('WELD', self, context)
+        curve_mod = modifiers.add_modifier('CURVE', self, context)
+        curve_mod.deform_axis = 'POS_Z'
+
+        # Create a new curve object at the location of the original object.
+        curve_start_location = original_object.location
+        bpy.ops.curve.primitive_bezier_curve_add(enter_editmode=False, align='WORLD', location=curve_start_location, scale=(1, 1, 1))
+        new_curve_object = context.active_object
+        new_curve_object.show_in_front = True
+        curve_mod.object = new_curve_object
+        array_mod.curve = new_curve_object
+
+        # Parent the original object to the curve. Note: I've used ops here because matrix inverting seemed to not work.
+        bpy.ops.object.select_all(action='DESELECT')
+        original_object.select_set(True)
+        new_curve_object.select_set(True)
+        bpy.context.view_layer.objects.active = new_curve_object
+        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
+        # Make the original object not selectable so the users don't accidentally select it while attempting to select the curve.
+        original_object.hide_select = True
+
+        internal_utils.set_object_interaction_mode(original_mode)
+        return {'FINISHED'}
+    
+class RyModel_ArrayAlongCurve(Operator):
+    bl_idname = "rymodel.array_along_curve"
+    bl_label = "Array Along Curve"
+    bl_description = "Arrays the selected mesh along a curve object, without deforming the object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        original_object = context.active_object
+
+        # TODO: Verify only 1 object is selected.
+
+
+        # Create a new curve object at the location of the original object.
+        curve_start_location = original_object.location
+        bpy.ops.curve.primitive_bezier_curve_add(enter_editmode=False, align='WORLD', location=curve_start_location, scale=(1, 1, 1))
+        new_curve_object = context.active_object
+        new_curve_object.show_in_front = True
+
+        # Add a plane object to array along.
+        plane_start_location = original_object.location
+        bpy.ops.mesh.primitive_plane_add(size=0.001, enter_editmode=False, align='WORLD', location=plane_start_location, scale=(1, 1, 1))
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+        new_plane_object = context.active_object
+        array_mod = modifiers.add_modifier('ARRAY', self, context)
+        array_mod.use_relative_offset = False
+        array_mod.use_constant_offset = True
+        array_mod.constant_offset_displace = (0.15, 0, 0)
+        array_mod.fit_type = 'FIT_CURVE'
+        curve_mod = modifiers.add_modifier('CURVE', self, context)
+        curve_mod.deform_axis = 'POS_X'
+        curve_mod.object = new_curve_object
+        array_mod.curve = new_curve_object
+        
+        # Parent the original object to the plane. Note: I've used ops here because matrix inverting seemed to not work.
+        bpy.ops.object.select_all(action='DESELECT')
+        original_object.select_set(True)
+        new_plane_object.select_set(True)
+        bpy.context.view_layer.objects.active = new_plane_object
+        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+        new_plane_object.instance_type = 'FACES'
+
+        # Parent the plane object to the curve.
+        bpy.ops.object.select_all(action='DESELECT')
+        new_plane_object.select_set(True)
+        new_curve_object.select_set(True)
+        bpy.context.view_layer.objects.active = new_curve_object
+        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
+
+        # Make the plane object not selectable so the users don't accidentally select it while attempting to select the curve.
+        new_plane_object.hide_select = True
+
+        original_object.hide_set(True)
+
+        internal_utils.set_object_interaction_mode(original_mode)
+        return {'FINISHED'}
