@@ -73,6 +73,7 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
+            
 
             row = layout.row(align=True)
             row.scale_x = 4
@@ -103,6 +104,9 @@ def draw_contextual_object_menu(layout):
             row = layout.row()
             row.scale_y = UI_Y_SCALE
             row.prop(bpy.context.scene.curve_settings, "resolution_u", slider=True)
+            row = layout.row()
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.delete_curve_array", text="Delete Curve Array")
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''

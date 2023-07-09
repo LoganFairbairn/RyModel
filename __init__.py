@@ -54,6 +54,7 @@ classes = (
     RyModel_FillNonManifold,
     RyModel_DeformArrayAlongCurve,
     RyModel_ArrayAlongCurve,
+    RyModel_DeleteCurveArray,
 
     # Simulation Tools
     RyModel_ApplyCollision,
