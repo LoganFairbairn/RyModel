@@ -55,6 +55,7 @@ classes = (
     RyModel_DeformArrayAlongCurve,
     RyModel_ArrayAlongCurve,
     RyModel_DeleteCurveArray,
+    RyModel_CurveArrayToMesh,
 
     # Simulation Tools
     RyModel_ApplyCollision,

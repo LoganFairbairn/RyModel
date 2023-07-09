@@ -875,7 +875,7 @@ class RyModel_DeleteCurveArray(Operator):
                 obj.select_set(True)
                 bpy.context.view_layer.objects.active = obj
                 bpy.ops.object.delete()
-                
+
             else:
                 original_mesh_obj = obj
 
@@ -891,5 +891,62 @@ class RyModel_DeleteCurveArray(Operator):
         original_mesh_obj.select_set(True)
         bpy.context.view_layer.objects.active = original_mesh_obj  
         
+        internal_utils.set_object_interaction_mode(original_mode)
+        return {'FINISHED'}
+    
+class RyModel_CurveArrayToMesh(Operator):
+    bl_idname = "rymodel.curve_array_to_mesh"
+    bl_label = "Curve Array to Mesh"
+    bl_description = "Converts the selected curve array to a mesh and cleans up objects if they exist"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        original_object = context.active_object
+        if original_object.type != 'CURVE':
+            rylog.log_status("Selected object must be a curve to perform this operation.")
+            return {'FINISHED'}
+
+        # Convert the curve array to a mesh.
+        child_object = original_object.children[0]
+        if len(child_object.children) != 0:
+            original_mesh_obj = child_object.children[0]
+            bpy.ops.object.select_all(action='DESELECT')
+            original_mesh_obj.hide_select = False
+            original_mesh_obj.hide_set(False)
+            original_mesh_obj.select_set(True)
+            bpy.context.view_layer.objects.active = original_mesh_obj
+            bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+            bpy.ops.object.convert(target='MESH')
+
+            # Delete the plane mesh used for the curve array.
+            bpy.ops.object.select_all(action='DESELECT')
+            child_object.select_set(True)
+            bpy.context.view_layer.objects.active = child_object
+            bpy.ops.object.delete()
+
+        else:
+            original_mesh_obj = original_object.children[0]
+            bpy.ops.object.select_all(action='DESELECT')
+            original_mesh_obj.hide_select = False
+            original_mesh_obj.select_set(True)
+            bpy.context.view_layer.objects.active = original_mesh_obj
+            bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+            bpy.ops.object.convert(target='MESH')
+
+        # Delete the curve.
+        bpy.ops.object.select_all(action='DESELECT')
+        original_object.select_set(True)
+        bpy.context.view_layer.objects.active = original_object
+        bpy.ops.object.delete()
+
+        # Select the original mesh object used in the curve array effect.
+        bpy.ops.object.select_all(action='DESELECT')
+        original_mesh_obj.hide_set(False)
+        original_mesh_obj.select_set(True)
+        bpy.context.view_layer.objects.active = original_mesh_obj  
+
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}

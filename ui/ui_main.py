@@ -69,11 +69,19 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.fill_non_manifold", text="Fill Non-Manifold")
 
-            row = layout.row(align=True)
+            # Curve Array Options
+            split = layout.split(factor=0.3)
+            first_column = split.column()
+            second_column = split.column()
+
+            row = first_column.row()
+            row.scale_y = UI_Y_SCALE
+            row.label(text="Curve Array")
+
+            row = second_column.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
-            
 
             row = layout.row(align=True)
             row.scale_x = 4
@@ -92,6 +100,8 @@ def draw_contextual_object_menu(layout):
                 row.operator("rymodel.make_booleans_unique", text="Unique Bools")
 
         case 'CURVE':
+
+            # Settings
             row = layout.row()
             row.scale_y = UI_Y_SCALE
             row.prop(bpy.context.scene.curve_settings, "bevel_depth", slider=True)
@@ -104,9 +114,22 @@ def draw_contextual_object_menu(layout):
             row = layout.row()
             row.scale_y = UI_Y_SCALE
             row.prop(bpy.context.scene.curve_settings, "resolution_u", slider=True)
-            row = layout.row()
+
+            # Curve Array Settings
+            split = layout.split(factor=0.3)
+            first_column = split.column()
+            second_column = split.column()
+
+            row = first_column.row()
             row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.delete_curve_array", text="Delete Curve Array")
+            row.label(text="Curve Array")
+
+            row = second_column.row(align=True)
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.delete_curve_array", text="Remove")
+            row.operator("rymodel.curve_array_to_mesh", text="To Mesh")
+            
+            
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
