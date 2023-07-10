@@ -87,6 +87,9 @@ def set_object_interaction_mode(interaction_mode):
         case 'EDIT_MESH':
             bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
+        case 'EDIT_CURVE':
+            bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+
         case 'EDIT':
             bpy.ops.object.mode_set(mode='EDIT', toggle=False)
 
