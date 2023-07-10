@@ -3,14 +3,14 @@ RyModel adds a contextual panel that is filled with tools that convert multi-ste
 
 This add-on also keeps the vanilla Blender modeling steps and shortcut keys so users won't become reliant on this add-on.
 
-##Features:
+## Features:
 
-    ###Automatic Boolean Object Management
+    ### Automatic Boolean Object Management
 - Cutter shape management and automation
 - Slice boolean modifier mode
 
 
-    ###Fast Modeling Operators
+    ### Fast Modeling Operators
 - Better auto smoothing and sharpening for mesh normal adjustments
 - Fast mirroring
 - One click object origin adjustments
@@ -23,7 +23,7 @@ This add-on also keeps the vanilla Blender modeling steps and shortcut keys so u
 - Object backup button (backs up attached booleans too)
 
 
-    ###Modifier Improvements
+    ### Modifier Improvements
 - Auto modifier stack organization
 - One click circular array modifier setup (arrays objects in a circular fashion)
 - One click circular twist modifier setup (deforms objects and twists them into a circle)
@@ -32,7 +32,7 @@ This add-on also keeps the vanilla Blender modeling steps and shortcut keys so u
 - Workflow friendly quick apply for modifiers (applies all modifiers excluding ones you would not want to apply)
 
 
-    ###Unwrapping
+    ### Unwrapping
 - Automatic seam marking
 - Packing operator that prioritizes using the best packing method among installed add-ons
 
