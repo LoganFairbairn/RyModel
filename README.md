@@ -1,14 +1,29 @@
 # RyModel
-RyModel adds a simple, minimalist quick access panel for batched and commonly used modeling operations that help speed up my personal workflow.
+RyModel adds a contextual panel that is filled with tools that convert multi-step, tedious and complicated modeling operations into one-click solutions. This drastically simplifies and speeds up the modeling process within Blender.
 
-This add-on attempts to keep the vanilla style modeling steps in Blender intact, while extending it just enough to remove common and tedious steps.
+This add-on also keeps the vanilla Blender modeling steps and shortcut keys so users won't become reliant on this add-on.
 
-Features:
+##Features:
 
-- Simple, quick access panel
-- Contextual operators
+    ###Automatic Boolean Object Management
+- Cutter shape management and automation
+- Slice boolean modifier mode
 
-    Modifier Improvements
+
+    ###Fast Modeling Operators
+- Better auto smoothing and sharpening for mesh normal adjustments
+- Fast mirroring
+- One click object origin adjustments
+- Extract face
+- Extract curve
+- Auto mesh clean
+- Quick cloth simulation setups
+- Curve mesh which arrays and deforms a mesh along a curve
+- Curve array which arrays a mesh along a curve without deforming the mesh
+- Object backup button (backs up attached booleans too)
+
+
+    ###Modifier Improvements
 - Auto modifier stack organization
 - One click circular array modifier setup (arrays objects in a circular fashion)
 - One click circular twist modifier setup (deforms objects and twists them into a circle)
@@ -16,24 +31,8 @@ Features:
 - Copy all modifiers button
 - Workflow friendly quick apply for modifiers (applies all modifiers excluding ones you would not want to apply)
 
-    Additional Modeling Tools
-- Curve mesh which arrays and deforms a mesh along a curve
-- Curve array which arrays a mesh along a curve without deforming the mesh
 
-    Cutter Management
-- Cutter shape management and automation
-- Slice boolean modifier mode
-
-    Modeling
-- Auto sharpening / normal correction
-- Fast mirroring
-- One click object origin adjustments
-- Extract face
-- Extract curve
-- Auto mesh clean
-- Quick cloth simulation setups
-
-    Unwrapping
+    ###Unwrapping
 - Automatic seam marking
 - Packing operator that prioritizes using the best packing method among installed add-ons
 
