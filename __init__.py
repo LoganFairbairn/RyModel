@@ -203,7 +203,8 @@ def register():
     bpy.types.Scene.rymodel_mirror_x = BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
     bpy.types.Scene.rymodel_mirror_y = BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
     bpy.types.Scene.rymodel_mirror_z = BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)
-    bpy.types.Scene.rymodel_flip_bidelete = BoolProperty(default=True, description="Flips the axis used for bi-delete.")
+    bpy.types.Scene.rymodel_flip_bidelete = BoolProperty(default=True, description="Flips the axis used for bi-delete")
+    bpy.types.Scene.rymodel_bidelete_bisect = BoolProperty(default=True, description="If true, the model will be bisected along the axis before deleting vertices past it")
 
     # Custom Modifier Settings
     bpy.types.Scene.circular_array_settings = PointerProperty(type=CircularArraySettings)
