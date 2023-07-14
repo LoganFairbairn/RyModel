@@ -26,8 +26,8 @@ class RyModel_ApplyCollision(Operator):
         
         # Apply the cloth modifier and adjust settings.
         active_object = context.active_object
-        collision_modifier = active_object.modifiers.new('RyCollision', "COLLISION")
-        collision_modifier.collision.thickness_outer = 0.001
+        active_object.modifiers.new('RyCollision', "COLLISION")
+        active_object.collision.thickness_outer = 0.001
 
         return {'FINISHED'}
 
