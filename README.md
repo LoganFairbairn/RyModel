@@ -6,8 +6,9 @@ This add-on also keeps the vanilla Blender modeling steps and shortcut keys so u
 ## Features:
 
 ### Automatic Boolean Object Management
-- Cutter shape management and automation
+- Boolean object management
 - Slice boolean modifier mode
+- Boolean multiple objects at once
 
 
 ### Fast Modeling Operators
