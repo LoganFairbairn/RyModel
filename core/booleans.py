@@ -325,7 +325,7 @@ class RyModel_AddConeBoolean(Operator):
 class RyModel_SelectedObjectToBoolean(Operator):
     bl_idname = "rymodel.selected_object_to_boolean"
     bl_label = "Selected Object to Boolean"
-    bl_description = "Converts the selected object into a boolean object and applies a new boolean modifier to the active object"
+    bl_description = "Converts the selected object into a boolean object and applies a new boolean modifier to the active object. Select the object(s) you wish to boolean, then the boolean object"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
