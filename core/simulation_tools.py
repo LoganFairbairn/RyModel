@@ -31,11 +31,10 @@ class RyModel_ApplyCollision(Operator):
 
         return {'FINISHED'}
 
-
 class RyModel_SimulateCloth(Operator):
     bl_idname = "rymodel.simulate_cloth"
     bl_label = "Simulate Cloth"
-    bl_description = "Adds a cloth simulation modifier to the selected object with settings ideal for cloth simulation"
+    bl_description = "Adds a cloth simulation modifier to the selected object with settings ideal for cloth simulation. Cloth simulation will automatically seam cloth together where it's formatted properly"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):

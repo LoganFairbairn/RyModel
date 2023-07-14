@@ -62,7 +62,6 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.auto_sharpen", text="Sharpen")
             row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
 
-
             split = layout.split(factor=0.3)
             first_column = split.column()
             second_column = split.column()
@@ -90,19 +89,6 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
 
-            # Cloth Simulation Operators
-            row = first_column.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.label(text="Cloth Sim")
-
-            row = second_column.row(align=True)
-            row.scale_x = 4
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.simulate_cloth", text="", icon='PHYSICS')
-            row.operator("rymodel.pin_cloth", text="", icon='PINNED')
-            row.operator("rymodel.unpin_cloth", text="", icon='UNPINNED')
-            row.operator("rymodel.apply_collision", text="", icon='MOD_PHYSICS')
-            #row.menu("OBJECT_MT_cloth_sim_menu", text="", icon='MOD_CLOTH')
 
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
@@ -470,6 +456,24 @@ def draw_display_options(layout):
     row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
 
+def draw_cloth_sim_operators(layout):
+    '''Draws cloth simulation operators to the provided layout.'''
+    
+    # Cloth Simulation Operators
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.simulate_cloth", text="Cloth Simulation", icon='MOD_CLOTH')
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.pin_cloth", text="Pin", icon='PINNED')
+    row.operator("rymodel.unpin_cloth", text="Unpin", icon='UNPINNED')
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.apply_collision", text="Apply Collision", icon='MOD_PHYSICS')
+    #row.menu("OBJECT_MT_cloth_sim_menu", text="", icon='MOD_CLOTH')
+
 class RyModel_OT_open_menu(Operator):
     bl_label = "Open RyModel Menu"
     bl_idname = "rymodel.open_menu"
@@ -486,22 +490,41 @@ class RyModel_OT_open_menu(Operator):
     # Draws the properties in the popup.
     def draw(self, context):
         layout = self.layout
-        layout.label(text="RyModel 1.0.0")
 
-        split = layout.split(factor=0.5)
+        row = layout.row()
+        split = row.split(factor=0.2)
         first_column = split.column()
         second_column = split.column()
 
+        row = first_column.row()
+        row.scale_y = UI_Y_SCALE
+        row.label(text="RyModel 1.0.0")
+
+        row = second_column.row(align=True)
+        row.scale_y = UI_Y_SCALE
+        row.prop(context.scene, "rymodel_ui_tabs", text="")
+
+
         if context.active_object:
-            draw_contextual_object_menu(first_column)
-            draw_boolean_tools(first_column)
-            draw_mirror_tools(first_column)
-            draw_origin_tools(first_column)
-            draw_display_options(first_column)
-            draw_unwrapping_tools(first_column)
-            row = first_column.row()
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.make_backup_object", text="Backup Object")
-            draw_modifiers(second_column)
+            match context.scene.rymodel_ui_tabs:
+                case 'MODELLING':
+                    split = layout.split(factor=0.5)
+                    first_column = split.column()
+                    second_column = split.column()
+
+                    draw_contextual_object_menu(first_column)
+                    draw_boolean_tools(first_column)
+                    draw_mirror_tools(first_column)
+                    draw_origin_tools(first_column)
+                    draw_display_options(first_column)
+                    draw_unwrapping_tools(first_column)
+                    row = first_column.row()
+                    row.scale_y = UI_Y_SCALE
+                    row.operator("rymodel.make_backup_object", text="Backup Object")
+                    draw_modifiers(second_column)
+
+                case 'SIMULATION':
+                    draw_cloth_sim_operators(layout)
+
         else:
             layout.label(text="Select an object to edit.")

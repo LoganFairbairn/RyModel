@@ -16,6 +16,7 @@
 # This file imports and registers all required modules for this add-on.
 
 import bpy
+from bpy.props import BoolProperty, IntProperty, FloatProperty, PointerProperty, EnumProperty
 from bpy.app.handlers import persistent
 
 # Import core functionality.
@@ -176,6 +177,14 @@ def register():
         #kmi = km.keymap_items.new(RyModel_DrawShape.bl_idname, type='D', value='PRESS', ctrl=True)
         #addon_keymaps.append((km, kmi))
 
+    # UI Tabs
+    UI_TABS = [
+        ("MODELLING", "Modelling", "Batched modeling operators"),
+        ("SIMULATION", "Simulation", "Batched simulation operators")
+    ]
+
+    bpy.types.Scene.rymodel_ui_tabs = EnumProperty(items=UI_TABS, name="UI Tabs", default='MODELLING')
+
     # Boolean Settings
     CUTTER_MODE = [
         ("INTERSECT", "Intersect", "Cutters will cut everything from the object excluding geometry that intersects with the add_boolean_mod", custom_icons["CUTTER_INTERSECT"].icon_id, 1),
@@ -184,30 +193,30 @@ def register():
         ("SLICE", "Slice", "Cutters will slice where the boolean and original geometry intersect", custom_icons["CUTTER_SLICE"].icon_id, 4)
     ]
 
-    bpy.types.Scene.rymodel_boolean_mode = bpy.props.EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
+    bpy.types.Scene.rymodel_boolean_mode = EnumProperty(items=CUTTER_MODE, name="Cutter Mode", default='DIFFERENCE', update=update_boolean_operation)
 
     # Cloth Simulation Settings
-    bpy.types.Scene.rymodel_cloth_sim_settings = bpy.props.PointerProperty(type=ClothSimSettings, name="Cloth Sim Settings")
+    bpy.types.Scene.rymodel_cloth_sim_settings = PointerProperty(type=ClothSimSettings, name="Cloth Sim Settings")
 
     # Mirror Settings
-    bpy.types.Scene.rymodel_update_mirroring = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.rymodel_mirror_x = bpy.props.BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
-    bpy.types.Scene.rymodel_mirror_y = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
-    bpy.types.Scene.rymodel_mirror_z = bpy.props.BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)
-    bpy.types.Scene.rymodel_flip_bidelete = bpy.props.BoolProperty(default=True, description="Flips the axis used for bi-delete.")
+    bpy.types.Scene.rymodel_update_mirroring = BoolProperty(default=True)
+    bpy.types.Scene.rymodel_mirror_x = BoolProperty(default=True, description="Mirrors the object on the X axis", update=update_mirror_x)
+    bpy.types.Scene.rymodel_mirror_y = BoolProperty(default=True, description="Mirrors the object on the Y axis", update=update_mirror_y)
+    bpy.types.Scene.rymodel_mirror_z = BoolProperty(default=True, description="Mirrors the object on the Z axis", update=update_mirror_z)
+    bpy.types.Scene.rymodel_flip_bidelete = BoolProperty(default=True, description="Flips the axis used for bi-delete.")
 
     # Custom Modifier Settings
-    bpy.types.Scene.circular_array_settings = bpy.props.PointerProperty(type=CircularArraySettings)
-    bpy.types.Scene.circular_twist_count = bpy.props.IntProperty(default=10, min=0, soft_max=30, update=update_circular_twist_count)
+    bpy.types.Scene.circular_array_settings = PointerProperty(type=CircularArraySettings)
+    bpy.types.Scene.circular_twist_count = IntProperty(default=10, min=0, soft_max=30, update=update_circular_twist_count)
 
     # Property Range Overrides
-    bpy.types.Scene.bevel_modifier_settings = bpy.props.PointerProperty(type=BevelModifierSettings)
-    bpy.types.Scene.solidify_modifier_settings = bpy.props.PointerProperty(type=SolidifyModifierSettings)
-    bpy.types.Scene.array_modifier_settings = bpy.props.PointerProperty(type=ArrayModifierSettings)
-    bpy.types.Scene.curve_settings = bpy.props.PointerProperty(type=CurveSettings)
+    bpy.types.Scene.bevel_modifier_settings = PointerProperty(type=BevelModifierSettings)
+    bpy.types.Scene.solidify_modifier_settings = PointerProperty(type=SolidifyModifierSettings)
+    bpy.types.Scene.array_modifier_settings = PointerProperty(type=ArrayModifierSettings)
+    bpy.types.Scene.curve_settings = PointerProperty(type=CurveSettings)
 
     # General Settings
-    bpy.types.Scene.auto_sharpen_angle = bpy.props.FloatProperty(name="Auto Sharpen Angle", description="Angle in which to apply auto sharpening. Default = 30 degrees", default=0.523599, min=0, max=3.14159, unit='ROTATION')
+    bpy.types.Scene.auto_sharpen_angle = FloatProperty(name="Auto Sharpen Angle", description="Angle in which to apply auto sharpening. Default = 30 degrees", default=0.523599, min=0, max=3.14159, unit='ROTATION')
 
 def unregister():
     # Remove custom icons.
