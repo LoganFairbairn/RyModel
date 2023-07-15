@@ -62,29 +62,13 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.auto_sharpen", text="Sharpen")
             row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
 
-            split = layout.split(factor=0.3)
-            first_column = split.column()
-            second_column = split.column()
-
-            row = first_column.row()
-            row.scale_y = UI_Y_SCALE
-            row.label(text="Mesh")
-
-            row = second_column.row(align=True)
+            row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.clean_mesh", text="Q Clean")
             row.operator("rymodel.fill_non_manifold", text="Fill Holes")
 
             # Curve Array Options
-            split = layout.split(factor=0.3)
-            first_column = split.column()
-            second_column = split.column()
-
-            row = first_column.row()
-            row.scale_y = UI_Y_SCALE
-            row.label(text="Curve Array")
-
-            row = second_column.row(align=True)
+            row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
@@ -113,15 +97,7 @@ def draw_contextual_object_menu(layout):
             row.prop(bpy.context.scene.curve_settings, "resolution_u", slider=True)
 
             # Curve Array Settings
-            split = layout.split(factor=0.3)
-            first_column = split.column()
-            second_column = split.column()
-
-            row = first_column.row()
-            row.scale_y = UI_Y_SCALE
-            row.label(text="Curve Array")
-
-            row = second_column.row(align=True)
+            row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.delete_curve_array", text="Remove")
             row.operator("rymodel.curve_array_to_mesh", text="To Mesh")
