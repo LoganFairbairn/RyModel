@@ -712,7 +712,7 @@ class RyModel_Cheshire(Operator):
 class RyModel_Unwrap(Operator):
     bl_idname = "rymodel.unwrap"
     bl_label = "Unwrap"
-    bl_description = "Unwraps and packs the selected model using the best unwrapping method available amongst all packing / unwrapping add-ons you have installed in Blender, defaults to vanilla unwrapping and packing if you have no packing / unwrapping add-ons"
+    bl_description = "Unwraps and packs UV islands for the selected model"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -722,19 +722,7 @@ class RyModel_Unwrap(Operator):
         original_mode = bpy.context.mode
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
         bpy.ops.mesh.select_all(action='SELECT')
-
-        addons = context.preferences.addons
-
-        # Use UV Packer if it's installed.
-        uv_packer = addons.get("UV-Packer")
-        if uv_packer:
-            bpy.ops.uvpackeroperator.packbtn()
-
-        # User has no enabled add-ons, using vanilla packing method.
-        else:
-            bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
-            
-
+        bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
         internal_utils.set_object_interaction_mode(original_mode)
 
         return {'FINISHED'}
