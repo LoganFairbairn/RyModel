@@ -73,7 +73,6 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
 
-
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
                 row = layout.row()
@@ -101,8 +100,6 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.delete_curve_array", text="Remove")
             row.operator("rymodel.curve_array_to_mesh", text="To Mesh")
-            
-            
 
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
@@ -358,7 +355,7 @@ def draw_modifier_properties(layout):
                         row.operator("object.multires_higher_levels_delete")
 
                     case 'SUBSURF':
-                        draw_modifier_title(layout, 'Subsurface', modifier)
+                        draw_modifier_title(layout, 'Subdivision', modifier)
                         row = layout.row(align=True)
                         row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "levels")
