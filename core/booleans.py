@@ -5,6 +5,7 @@ import bmesh
 from ..core import internal_utils
 from ..core import modifiers
 from ..core import rylog
+import numpy as np
 import math
 import mathutils
 
@@ -125,7 +126,7 @@ def create_new_boolean_shape(shape):
             bpy.ops.mesh.primitive_plane_add(size=2, enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
 
         case 'CUBE':
-            bpy.ops.mesh.primitive_cube_add(enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
+            bpy.ops.mesh.primitive_cube_add(enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(0.5, 0.5, 0.5))
 
         case 'CYLINDER':
             bpy.ops.mesh.primitive_cylinder_add(radius=1, depth=2, enter_editmode=False, align='WORLD', location=(0.0, 0.0, 0.0), scale=(1, 1, 1))
@@ -139,16 +140,13 @@ def create_new_boolean_shape(shape):
         case _:
             rylog.log("Error: Invalid shape value provided to the add boolean operator.")
 
-    new_boolean_object = bpy.context.active_object       # The active object is the new boolean object.
+    new_boolean_object = bpy.context.active_object                                  # The active object is the new boolean object.
     new_boolean_object.name = new_boolean_name
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)       # Ensure scale is applied by default.
     return new_boolean_object
 
 def setup_new_boolean(new_boolean_object, active_object, boolean_modifiers, set_location=True):
     '''Adjust boolean settings, and sets location so a newly created boolean object is setup in an ideal fashion for adjustment.'''
-
-    # Parent the boolean to the active object so the booleans will move with the object they are assigned to.
-    if new_boolean_object.parent != active_object:
-        new_boolean_object.parent = active_object
 
     # Add the boolean object to the boolean modifier and apply boolean settings.
     for boolean_modifier in boolean_modifiers:
@@ -168,28 +166,33 @@ def setup_new_boolean(new_boolean_object, active_object, boolean_modifiers, set_
         solidify_modifier.use_even_offset = True
         solidify_modifier.thickness = 0.075
 
-    # Move the new boolean to the center of the active object, while also accounting for mirror modifiers.
+    # Move the new boolean to the center of the active object (while also accounting for mirror modifiers).
     if set_location:
         new_boolean_object.location = internal_utils.get_object_true_center(active_object)
+
+    # Parent the boolean to the active object so the booleans will move with the object they are assigned to.
+    if new_boolean_object.parent != active_object:
+        new_boolean_object.parent = active_object
+        new_boolean_object.matrix_parent_inverse = active_object.matrix_world.inverted()
 
     # All new booleans should go in their own scene collection.
     internal_utils.add_object_to_collection('Booleans', new_boolean_object, color_tag='COLOR_01', unlink_from_other_collections=True)
 
-def optimize_new_boolean_dimensions(shape, active_object, new_boolean_object):
+def optimize_new_boolean_dimensions(shape, new_boolean_object, original_object_dimensions):
     '''Attempts to create new boolean objects with optimal dimensions so booleans cut through all the way through objects by default.'''
     match shape:
         case 'PLANE':
-            new_boolean_object.dimensions = active_object.dimensions * 1.25
+            new_boolean_object.dimensions = np.array(original_object_dimensions) * 1.25
 
         case 'CUBE':
-            new_boolean_object.dimensions = active_object.dimensions * 1.25
+            new_boolean_object.dimensions = np.array(original_object_dimensions) * 1.25
 
         case _:
             if shape != 'SELECTED_OBJECT':
-                largest_dimension = active_object.dimensions[0]
-                for i in range(1, len(active_object.dimensions)):
-                    if active_object.dimensions[i] > largest_dimension:
-                        largest_dimension = active_object.dimensions[i]
+                largest_dimension = original_object_dimensions[0]
+                for i in range(1, len(original_object_dimensions)):
+                    if original_object_dimensions[i] > largest_dimension:
+                        largest_dimension = original_object_dimensions[i]
                 new_boolean_object.dimensions = (largest_dimension, largest_dimension, largest_dimension)
 
 def rotate_plane_boolean_to_view(plane_boolean):
@@ -260,12 +263,16 @@ def add_new_boolean_shape(self, shape):
     if not internal_utils.verify_active_mesh(self):
         return {'FINISHED'}
     
+    # Apply scale before adding a new boolean object (otherwise booleans will be created with incorrect sizes).
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
     active_object = bpy.context.active_object
+    original_object_dimensions = [active_object.dimensions[0], active_object.dimensions[1], active_object.dimensions[2]]
     hide_booleans()
     boolean_modifiers = add_boolean_mods_to_selected()
     new_boolean_object = create_new_boolean_shape(shape)
     setup_new_boolean(new_boolean_object, active_object, boolean_modifiers)
-    optimize_new_boolean_dimensions(shape, active_object, new_boolean_object)
+    optimize_new_boolean_dimensions(shape, new_boolean_object, original_object_dimensions)
 
     if shape == 'PLANE':
         setup_plane_boolean(new_boolean_object)
