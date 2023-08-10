@@ -335,7 +335,7 @@ class RyModel_AutoSmooth(Operator):
         # Apply autosmooth.
         bpy.ops.object.shade_smooth()
         bpy.context.object.data.use_auto_smooth = True
-        bpy.context.object.data.auto_smooth_angle = 1.0472
+        bpy.context.object.data.auto_smooth_angle = 3.14159
 
         # Clear all bevel weights and sharpening.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
