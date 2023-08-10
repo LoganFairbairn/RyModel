@@ -142,7 +142,7 @@ def create_new_boolean_shape(shape):
 
     new_boolean_object = bpy.context.active_object                                  # The active object is the new boolean object.
     new_boolean_object.name = new_boolean_name
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)       # Ensure scale is applied by default.
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)       # Ensure scale is applied by default.
     return new_boolean_object
 
 def setup_new_boolean(new_boolean_object, active_object, boolean_modifiers, set_location=True):
@@ -264,7 +264,7 @@ def add_new_boolean_shape(self, shape):
         return {'FINISHED'}
     
     # Apply scale before adding a new boolean object (otherwise booleans will be created with incorrect sizes).
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
     active_object = bpy.context.active_object
     original_object_dimensions = [active_object.dimensions[0], active_object.dimensions[1], active_object.dimensions[2]]
