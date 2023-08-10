@@ -477,6 +477,7 @@ class RyModel_OT_open_menu(Operator):
         row.scale_y = UI_Y_SCALE
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'MODELLING', text="Modeling")
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'SIMULATION', text="Simulation")
+        row.prop_enum(context.scene, "rymodel_ui_tabs", 'SETTINGS', text="")
 
         if context.active_object:
             match context.scene.rymodel_ui_tabs:

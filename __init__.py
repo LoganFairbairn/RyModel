@@ -179,8 +179,9 @@ def register():
 
     # UI Tabs
     UI_TABS = [
-        ("MODELLING", "Modelling", "Batched modeling operators"),
-        ("SIMULATION", "Simulation", "Batched simulation operators")
+        ("MODELLING", "Modelling", "Batched modeling operators", '', 0),
+        ("SIMULATION", "Simulation", "Batched simulation operators", '', 1),
+        ("SETTINGS", "Settings", "Add-on settings", 'SETTINGS', 2)
     ]
 
     bpy.types.Scene.rymodel_ui_tabs = EnumProperty(items=UI_TABS, name="UI Tabs", default='MODELLING')
