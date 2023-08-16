@@ -19,6 +19,9 @@ import bpy
 from bpy.props import BoolProperty, IntProperty, FloatProperty, PointerProperty, EnumProperty
 from bpy.app.handlers import persistent
 
+# Preferences
+from . preferences import AddonPreferences
+
 # Import core functionality.
 from .core.internal_utils import *
 from .core.booleans import *
@@ -26,6 +29,7 @@ from .core.modeling_tools import *
 from .core.simulation_tools import *
 from .core.modifiers import *
 from .core.property_range_overrides import *
+from .core.exporting_tools import RyModel_Export
 
 # Import user interface.
 from .ui.ui_main import *
@@ -44,6 +48,9 @@ bl_info = {
 
 # List of classes to be registered.
 classes = (
+    # Preferences
+    AddonPreferences,
+
     # Modeling Tools
     RyModel_AutoSmooth,
     RyModel_AutoSharpen,
@@ -119,6 +126,9 @@ classes = (
     ArrayModifierSettings,
     CurveSettings,
 
+    # Exporting Tools
+    RyModel_Export,
+
     # User Interface
     RyModel_OT_open_menu
 )
@@ -172,10 +182,6 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
         kmi = km.keymap_items.new(RyModel_OT_open_menu.bl_idname, type='D', value='PRESS', ctrl=False)
         addon_keymaps.append((km, kmi))
-
-        #km = wm.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        #kmi = km.keymap_items.new(RyModel_DrawShape.bl_idname, type='D', value='PRESS', ctrl=True)
-        #addon_keymaps.append((km, kmi))
 
     # UI Tabs
     UI_TABS = [

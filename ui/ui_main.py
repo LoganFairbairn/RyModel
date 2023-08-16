@@ -27,6 +27,7 @@ def load_custom_icons():
     custom_icons.load('2XSUBD', os.path.join(icons_dir, "2xsubd.png"), 'IMAGE')
     custom_icons.load('CIRCULAR_ARRAY', os.path.join(icons_dir, "circular_array.png"), 'IMAGE')
     custom_icons.load('CIRCULAR_TWIST', os.path.join(icons_dir, "circular_twist.png"), 'IMAGE')
+    custom_icons.load('INDIVIDUAL_OBJECTS', os.path.join(icons_dir, "individual_objects.png"), 'IMAGE')
     return custom_icons
 
 def remove_custom_icons():
@@ -429,6 +430,16 @@ def draw_display_options(layout):
     row.scale_y = UI_Y_SCALE
     row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
 
+def draw_exporting_options(layout):
+    addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.export", text="Export", icon='EXPORT')
+
+    row.prop(addon_preferences, "export_template", text="")
+    row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
+
 def draw_cloth_sim_operators(layout):
     '''Draws cloth simulation operators to the provided layout.'''
     
@@ -490,6 +501,7 @@ class RyModel_OT_open_menu(Operator):
                     draw_boolean_tools(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
+                    draw_exporting_options(first_column)
                     draw_display_options(first_column)
                     draw_unwrapping_tools(first_column)
                     row = first_column.row()
