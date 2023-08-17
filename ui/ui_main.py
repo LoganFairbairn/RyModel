@@ -79,6 +79,15 @@ def draw_contextual_object_menu(layout):
     active_object = bpy.context.active_object
     match active_object.type:
         case 'MESH':
+            draw_mesh_fix_tools(layout)
+            draw_boolean_tools(layout)
+
+            boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
+            if boolean_mod:
+                row = layout.row()
+                row.scale_y = UI_Y_SCALE
+                row.operator("rymodel.make_booleans_unique", text="Unique Bools")
+
             if bpy.context.mode == 'EDIT_MESH':
                 if bpy.context.scene.tool_settings.mesh_select_mode[1]:
                     row = layout.row()
@@ -94,15 +103,9 @@ def draw_contextual_object_menu(layout):
                     #row.scale_y = UI_Y_SCALE
                     #row.operator("rymodel.3d_cursor_to_face", text="3D Cursor To Face")
 
-                    row = layout.row()
-                    row.scale_y = UI_Y_SCALE
-                    row.operator("rymodel.mirror_by_face", text="Mirror By Face")
-
-            boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
-            if boolean_mod:
-                row = layout.row()
-                row.scale_y = UI_Y_SCALE
-                row.operator("rymodel.make_booleans_unique", text="Unique Bools")
+                    #row = layout.row()
+                    #row.scale_y = UI_Y_SCALE
+                    #row.operator("rymodel.mirror_by_face", text="Mirror By Face")
 
         case 'CURVE':
 
@@ -524,14 +527,12 @@ class RyModel_OT_open_menu(Operator):
                     second_column = split.column()
 
                     # First Column
-                    draw_mesh_fix_tools(first_column)
-                    draw_boolean_tools(first_column)
+                    draw_contextual_object_menu(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
                     draw_unwrapping_tools(first_column)
                     draw_backup_options(first_column)
                     draw_exporting_options(first_column)
-                    draw_contextual_object_menu(first_column)
 
                     # Second Column
                     draw_modifiers(second_column)
