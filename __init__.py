@@ -94,6 +94,9 @@ classes = (
     RyModel_AddShrinkWrapModifier,
     RyModel_AddTriangulateModifier,
     RyModel_ApplyModifier,
+    RyModel_DuplicateModifier,
+    RyModel_MoveModifierUp,
+    RyModel_MoveModifierDown,
     RyModel_DeleteModifier,
     RyModel_CopyModifiers,
     CircularArraySettings,
@@ -130,6 +133,7 @@ classes = (
     RyModel_Export,
 
     # User Interface
+    ModifierSubMenu,
     RyModel_OT_open_menu
 )
 

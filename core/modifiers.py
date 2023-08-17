@@ -199,6 +199,72 @@ class RyModel_ApplyModifier(Operator):
         modeling_tools.update_mirror_properties()   # Update mirror properties in case a mirror modifier was applied.
         return {'FINISHED'}
 
+class RyModel_DuplicateModifier(Operator):
+    bl_idname = "rymodel.duplicate_modifier"
+    bl_label = "Duplicate Modifier"
+    bl_description = "Duplicates the modifier"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+
+        bpy.ops.object.modifier_copy(modifier=self.modifier_name)
+
+        booleans.remove_unused_booleans()
+
+        return {'FINISHED'}
+
+class RyModel_MoveModifierUp(Operator):
+    bl_idname = "rymodel.move_modifier_up"
+    bl_label = "Move Modifier Up"
+    bl_description = "Moves the modifier up on the modifier stack"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+
+        active_object = bpy.context.active_object
+
+        mod_index = 0
+        for mod in active_object.modifiers:
+            if mod.name == self.modifier_name:
+                break
+            mod_index += 1
+
+        bpy.ops.object.modifier_move_to_index(modifier=self.modifier_name, index=mod_index - 1)
+
+        return {'FINISHED'}
+
+class RyModel_MoveModifierDown(Operator):
+    bl_idname = "rymodel.move_modifier_down"
+    bl_label = "Move Modifier Down"
+    bl_description = "Moves the modifier down on the modifier stack"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+
+        active_object = bpy.context.active_object
+
+        mod_index = 0
+        for mod in active_object.modifiers:
+            if mod.name == self.modifier_name:
+                break
+            mod_index += 1
+
+        bpy.ops.object.modifier_move_to_index(modifier=self.modifier_name, index=mod_index + 1)
+
+        return {'FINISHED'}
+
 def remove_circular_array_setup(context):
     circular_array_displacement_modifier = bpy.context.active_object.modifiers.get("CircularArrayDisplacement")
     if circular_array_displacement_modifier:

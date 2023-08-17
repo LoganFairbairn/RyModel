@@ -3,7 +3,8 @@
 import bpy
 import bpy.utils.previews                   # Imported for custom icons.
 from bpy.utils import resource_path
-from bpy.types import Operator
+from bpy.types import Operator, Menu
+from bpy.props import StringProperty
 from ..core import modifiers
 from .. import preferences
 from pathlib import Path
@@ -12,6 +13,21 @@ import os
 UI_Y_SCALE = 1.4
 
 custom_icons = None
+
+class ModifierSubMenu(bpy.types.Menu):
+    bl_idname = "RYMODEL_MT_modifier_submenu"
+    bl_label = "Modifier Submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        op = layout.operator("rymodel.apply_modifier", text="Apply", icon='ADD')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_up", text="Move Up", icon='TRIA_UP')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_down", text="Move Down", icon='TRIA_DOWN')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.duplicate_modifier", text="Duplicate", icon='DUPLICATE')
+        op.modifier_name = context.modifier.name
 
 def load_custom_icons():
     global custom_icons
@@ -252,7 +268,7 @@ def draw_specials(layout):
     row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
 
 def draw_modifier_title(layout, name, modifier):
-    split = layout.split(factor=0.6)
+    split = layout.split(factor=0.35)
     first_column = split.column()
     second_column = split.column()
 
@@ -269,10 +285,14 @@ def draw_modifier_title(layout, name, modifier):
         op = row.operator("rymodel.select_boolean", text="", icon='SELECT_SET')
         op.boolean_modifier_name = modifier.name
 
+    op = row.prop(modifier, "show_in_editmode", text="", icon='EDITMODE_HLT')
     op = row.prop(modifier, "show_viewport", text="", icon='RESTRICT_VIEW_ON')
-    op = row.operator("rymodel.apply_modifier", text="", icon='ADD')
-    op.modifier_name = modifier.name
-    op = row.operator("rymodel.delete_modifier", text="", icon='TRASH')
+    op = row.prop(modifier, "show_render", text="", icon='RESTRICT_RENDER_ON')
+
+    row.context_pointer_set("modifier", modifier)
+    row.menu("RYMODEL_MT_modifier_submenu", text="", icon='DOWNARROW_HLT')
+
+    op = row.operator("rymodel.delete_modifier", text="", icon='X')
     op.modifier_name = modifier.name
 
 def draw_circular_array_properties(layout):
@@ -298,28 +318,12 @@ def draw_circular_twist_array(layout):
         row = layout.row(align=True)
         row.prop(displace_modifier1, "strength", text="Inner Offset", slider=True)
 
-def draw_boolean_properties(layout, active_object):
-    '''Draws boolean proprerties.'''
-    row = layout.row()
-    row.separator()
-
-    row = layout.row()
-    row.scale_y = UI_Y_SCALE
-    row.alignment = 'CENTER'
-    row.label(text="Booleans")
-
-    for modifier in active_object.modifiers:
-        if modifier.type == 'BOOLEAN':
-            draw_modifier_title(layout, modifier.name, modifier)
-            #row = layout.row(align=True)
-            #row.scale_y = UI_Y_SCALE
-            #row.label(text="Solver ")
-            #row.prop_enum(modifier, "solver", 'FAST')
-            #row.prop_enum(modifier, "solver", 'EXACT')
-
 def draw_modifier_properties(layout):
     '''Draws commonly edited modifier properties based on the selected modifier in the active object.'''
     active_object = bpy.context.active_object
+    row = layout.row()
+    row.template_modifiers()
+
     for modifier in active_object.modifiers:
         match modifier.name:
             # Draw properties for custom modifiers.
@@ -345,7 +349,7 @@ def draw_modifier_properties(layout):
                         row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
                         row = layout.row()
                         row.scale_y = UI_Y_SCALE
-                        row.prop(modifier, "limit_method", slider=True)
+                        row.prop(modifier, "limit_method", slider=True, text="")
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, 'Weighted Normal', modifier)
@@ -400,12 +404,15 @@ def draw_modifier_properties(layout):
                         row.scale_y = UI_Y_SCALE
 
                     case 'BOOLEAN':
+                        addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
+                        if not addon_preferences.hide_booleans:
+                            draw_modifier_title(layout, 'Boolean', modifier)
+                            row = layout.row(align=True)
+                            row.scale_y = UI_Y_SCALE          
                         continue
 
                     case 'MIRROR':
                         draw_modifier_title(layout, 'Mirror', modifier)
-
-    draw_boolean_properties(layout, active_object)
 
 def draw_modifiers(layout):
     row = layout.row(align=True)
@@ -427,16 +434,14 @@ def draw_modifiers(layout):
     row.operator("rymodel.add_shrinkwrap_modifier", icon='MOD_SHRINKWRAP', text="")
     row.operator("rymodel.add_triangulate_modifier", icon='MOD_TRIANGULATE', text="")
 
+    addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
     row = layout.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="Copy")
-    row.operator("rymodel.hswf_mod_apply", icon='MODIFIER', text="Apply")
-
-    row = layout.row()
-    row.alignment = 'CENTER'
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Modifiers")
+    row.prop(addon_preferences, "organize_modifiers", icon='DOCUMENTS', text="")
+    row.prop(addon_preferences, "hide_booleans", icon='MOD_BOOLEAN', text="")
+    row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="")
+    row.operator("rymodel.hswf_mod_apply", icon='ADD', text="")
 
     draw_modifier_properties(layout)
 

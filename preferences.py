@@ -18,7 +18,19 @@ class AddonPreferences(AddonPreferences):
     save_imported_textures: BoolProperty(
         name="Save Imported Textures", 
         default=True,
-        description="Saves all imported textures to the 'Layers' folder. This helps provided a constant external folder for saving images used in layers which helps keep your files consistent."
+        description="Saves all imported textures to the 'Layers' folder. This helps provided a constant external folder for saving images used in layers which helps keep your files consistent"
+    )
+
+    organize_modifiers: BoolProperty(
+        name="Organize Modifiers",
+        default=True,
+        description="When true, editing the modifier stack in any way triggers organization of the modifier stack"
+    )
+
+    hide_booleans: BoolProperty(
+        name="Hide Booleans",
+        default=True,
+        description="Hides booleans in the modifier stack"
     )
 
     export_template: EnumProperty(

@@ -728,7 +728,6 @@ class RyModel_AutoSeam(Operator):
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
-
 class RyModel_ColorGrid(Operator):
     bl_idname = "rymodel.color_grid"
     bl_label = "Color Grid"
