@@ -93,6 +93,7 @@ classes = (
     RyModel_AddSubdivisionModifier,
     RyModel_AddShrinkWrapModifier,
     RyModel_AddTriangulateModifier,
+    RyModel_AddSmoothModifier,
     RyModel_ApplyModifier,
     RyModel_DuplicateModifier,
     RyModel_MoveModifierUp,

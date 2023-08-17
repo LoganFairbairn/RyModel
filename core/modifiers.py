@@ -183,6 +183,17 @@ class RyModel_AddTriangulateModifier(Operator):
         property_range_overrides.update_property_range_overrides()
         return {'FINISHED'}
 
+class RyModel_AddSmoothModifier(Operator):
+    bl_idname = "rymodel.add_smooth_modifier"
+    bl_label = "Add Smooth Modifier"
+    bl_description = "Adds a smooth modifier to the selected object"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        add_modifier('SMOOTH', self, context)
+        property_range_overrides.update_property_range_overrides()
+        return {'FINISHED'}
+
 class RyModel_ApplyModifier(Operator):
     bl_idname = "rymodel.apply_modifier"
     bl_label = "Apply Modifier"

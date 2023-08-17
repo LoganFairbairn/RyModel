@@ -273,12 +273,10 @@ def draw_modifier_title(layout, name, modifier):
     second_column = split.column()
 
     row = first_column.row()
-    row.scale_y = UI_Y_SCALE
     row.alignment = 'LEFT'
     row.label(text="• {0}".format(name))
 
     row = second_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
     row.alignment = 'RIGHT'
 
     if modifier.type == 'BOOLEAN':
@@ -390,7 +388,11 @@ def draw_modifier_properties(layout):
 
                     case 'TRIANGULATE':
                         draw_modifier_title(layout, 'Triangulate', modifier)
+
+                    case 'SMOOTH':
+                        draw_modifier_title(layout, 'Smooth', modifier)
                         row = layout.row(align=True)
+                        row.prop(modifier, "iterations")
 
                     case 'BOOLEAN':
                         addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
@@ -419,6 +421,7 @@ def draw_modifiers(layout):
     row.operator("rymodel.add_multires_modifier", icon='MOD_MULTIRES', text="")
     row.operator("rymodel.add_subdivision_modifier", icon='MOD_SUBSURF', text="")
     row.operator("rymodel.two_x_subdivision", text="", icon_value=custom_icons["2XSUBD"].icon_id)
+    row.operator("rymodel.add_smooth_modifier", icon='MOD_SMOOTH', text="")
     row.operator("rymodel.add_shrinkwrap_modifier", icon='MOD_SHRINKWRAP', text="")
     row.operator("rymodel.add_triangulate_modifier", icon='MOD_TRIANGULATE', text="")
 
