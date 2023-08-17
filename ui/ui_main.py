@@ -218,6 +218,10 @@ def draw_retopology_tools(layout):
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.prepare_manual_retopology", text="Manual Retopology")
 
+    active_object = bpy.context.active_object
+    if active_object:
+        row.prop(active_object, "show_wire", text="", icon='SHADING_WIRE', toggle=True)
+
 def draw_exporting_options(layout):
     addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
 
