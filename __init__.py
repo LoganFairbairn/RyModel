@@ -106,8 +106,6 @@ classes = (
     RyModel_CircularArray,
     RyModel_CircularTwist,
     RyModel_2xSubDivision,
-    RyModel_CurveToRope, 
-    RyModel_Cheshire,
     RyModel_HSWFModApply,
 
     # Booleans

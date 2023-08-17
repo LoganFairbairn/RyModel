@@ -250,19 +250,6 @@ def draw_backup_options(layout):
 
 def draw_specials(layout):
     '''Draws extra tool operations to the user interface.'''
-    layout.label(text="Extras:")
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.curve_to_rope")
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.cheshire")
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.delete_curve_array", text="Remove")
-
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.array_along_curve", text="Curve Array")
@@ -343,12 +330,10 @@ def draw_modifier_properties(layout):
                 match modifier.type:
                     case 'BEVEL':
                         draw_modifier_title(layout, 'Bevel', modifier)
-                        row = layout.row()
+                        row = layout.row(align=True)
                         row.prop(bpy.context.scene.bevel_modifier_settings, "segments")
-                        row = layout.row()
                         row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
-                        row = layout.row()
-                        row.prop(modifier, "limit_method", slider=True, text="")
+                        row.prop(modifier, "angle_limit", slider=True, text="")
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, 'Weighted Normal', modifier)
@@ -363,17 +348,15 @@ def draw_modifier_properties(layout):
 
                     case 'ARRAY':
                         draw_modifier_title(layout, 'Array', modifier)
-                        row = layout.row()
-                        row.prop(bpy.context.scene.array_modifier_settings, "count", slider=False)
                         row = layout.row(align=True)
-                        row.label(text="Relative Offset")
+                        row.prop(bpy.context.scene.array_modifier_settings, "count", slider=False)
                         row.prop(modifier, "relative_offset_displace", index=0, text="")
                         row.prop(modifier, "relative_offset_displace", index=1, text="")
                         row.prop(modifier, "relative_offset_displace", index=2, text="")
 
                     case 'MULTIRES':
                         draw_modifier_title(layout, 'Multi-resolution', modifier)
-                        row = layout.row()
+                        row = layout.row(align=True)
                         row.operator("object.multires_subdivide")
                         row.operator("object.multires_higher_levels_delete")
 
@@ -382,8 +365,7 @@ def draw_modifier_properties(layout):
                         row = layout.row(align=True)
                         row.prop(modifier, "levels")
                         row = layout.row(align=True)
-                        row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
-                        row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
+                        row.prop(modifier, "subdivision_type")
 
                     case 'SHRINKWRAP':
                         draw_modifier_title(layout, 'Shrinkwrap', modifier)

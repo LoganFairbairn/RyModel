@@ -686,29 +686,6 @@ class RyModel_3DCursorToFace(Operator):
         align_cursor_to_face()
         return {'FINISHED'}
 
-class RyModel_CurveToRope(Operator):
-    bl_idname = "rymodel.curve_to_rope"
-    bl_label = "Curve To Rope"
-    bl_description = "Converts the selected curve to a rope"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    type: StringProperty(default='BEVEL')
-
-    def execute(self, context):
-
-        return {'FINISHED'}
-
-class RyModel_Cheshire(Operator):
-    bl_idname = "rymodel.cheshire"
-    bl_label = "Cheshire"
-    bl_description = "Cheshire"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        if not internal_utils.verify_active_mesh(self):
-            return {'FINISHED'}
-        return {'FINISHED'}
-
 class RyModel_AutoSeam(Operator):
     bl_idname = "rymodel.auto_seam"
     bl_label = "Auto Seam"
