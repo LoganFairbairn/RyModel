@@ -28,6 +28,7 @@ def load_custom_icons():
     custom_icons.load('CIRCULAR_ARRAY', os.path.join(icons_dir, "circular_array.png"), 'IMAGE')
     custom_icons.load('CIRCULAR_TWIST', os.path.join(icons_dir, "circular_twist.png"), 'IMAGE')
     custom_icons.load('INDIVIDUAL_OBJECTS', os.path.join(icons_dir, "individual_objects.png"), 'IMAGE')
+    custom_icons.load('BACKUP', os.path.join(icons_dir, "backup.png"), 'IMAGE')
     return custom_icons
 
 def remove_custom_icons():
@@ -185,22 +186,9 @@ def draw_origin_tools(layout):
     row = second_column.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.set_origin_world_center", text="", icon='WORLD')
-    op = row.operator("rymodel.set_origin_selected", text="", icon='SELECT_INTERSECT')
-    op = row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
-
-    row = first_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Center")
-
-    row = second_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    op = row.operator("rymodel.center_axis", text="X")
-    op.axis = 'X'
-    op = row.operator("rymodel.center_axis", text="Y")
-    op.axis = 'Y'
-    op = row.operator("rymodel.center_axis", text="Z")
-    op.axis = 'Z'
+    row.operator("rymodel.set_origin_world_center", text="", icon='WORLD')
+    row.operator("rymodel.set_origin_selected", text="", icon='SELECT_INTERSECT')
+    row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
 
 def draw_unwrapping_tools(layout):
     '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
@@ -439,6 +427,7 @@ def draw_exporting_options(layout):
 
     row.prop(addon_preferences, "export_template", text="")
     row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
+    row.operator("rymodel.make_backup_object", text="", icon_value=custom_icons["BACKUP"].icon_id)
 
 def draw_cloth_sim_operators(layout):
     '''Draws cloth simulation operators to the provided layout.'''
@@ -501,13 +490,10 @@ class RyModel_OT_open_menu(Operator):
                     draw_boolean_tools(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
-                    draw_exporting_options(first_column)
                     draw_display_options(first_column)
                     draw_unwrapping_tools(first_column)
-                    row = first_column.row()
-                    row.scale_y = UI_Y_SCALE
-                    row.operator("rymodel.make_backup_object", text="Backup Object")
                     draw_modifiers(second_column)
+                    draw_exporting_options(first_column)
 
                 case 'SIMULATION':
                     draw_cloth_sim_operators(layout)
