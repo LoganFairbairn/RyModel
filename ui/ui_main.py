@@ -68,7 +68,6 @@ def draw_contextual_object_menu(layout):
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.clean_mesh", text="Q Clean", icon_value=custom_icons["CLEAN"].icon_id)
-            row.operator("rymodel.fill_non_manifold", text="Fill Holes")
 
             # Curve Array Options
             row = layout.row(align=True)
