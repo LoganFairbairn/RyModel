@@ -48,9 +48,11 @@ def show_boolean_objects():
     if not internal_utils.verify_active_mesh():
         return
 
-    for obj in bpy.data.objects:
-        if obj.name.startswith("Boolean_"):
-                obj.hide_viewport = False
+    for obj in bpy.context.selected_objects:   
+        for modifier in obj.modifiers:
+            if modifier.type == 'BOOLEAN':
+                boolean_obj = modifier.object
+                boolean_obj.hide_viewport = False
 
 def remove_unused_booleans():
     '''Removes all unused boolean objects and all boolean modifiers on all objects that have no object assigned.'''
