@@ -22,6 +22,7 @@ This add-on also attempts to keep the vanilla Blender modeling steps and shortcu
 - Curve mesh which arrays and deforms a mesh along a curve
 - Curve array which arrays a mesh along a curve without deforming the mesh
 - Object backup button (backs up attached booleans too)
+- Quick setup for manual retopology
 
 
 ### Simulation 
