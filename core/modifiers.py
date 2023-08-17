@@ -84,11 +84,8 @@ def add_modifier(modifier_type, self, context):
     if not internal_utils.verify_active_mesh(self):
         return {'FINISHED'}
     
-    modifier_name = modifier_type.replace('_', ' ')
-    new_modifier = context.active_object.modifiers.get(modifier_name)
-    if not new_modifier:
-        new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
-        new_modifier.show_expanded = False
+    new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
+    new_modifier.show_expanded = False
 
     organize_modifier_stack(context.active_object.modifiers)
     return new_modifier
