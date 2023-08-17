@@ -738,12 +738,17 @@ class RyModel_ColorGrid(Operator):
         image_node.image = color_grid_image
         image_node.location = (-300, 300)
         color_grid_material.node_tree.links.new(image_node.outputs[0], principled_bsdf.inputs[0])
-        
-        # Assign the new color grid material to all selected objects.
+
         for obj in bpy.context.selected_objects:
-            obj.active_material_index = 0
-            for i in range(len(obj.material_slots)):
-                obj.material_slots[i].material = color_grid_material
+            # If there is no material slots on the selected object, add one.
+            if len(obj.material_slots) <= 0:
+                obj.data.materials.append(color_grid_material)
+
+            # If the object has material slots, assign the new color grid material to all material slots for all selected objects.
+            else:
+                obj.active_material_index = 0
+                for i in range(len(obj.material_slots)):
+                    obj.material_slots[i].material = color_grid_material
 
         # Switch the color space to shading so users can see the applied color grid.
         bpy.context.space_data.shading.type = 'MATERIAL'
@@ -972,4 +977,68 @@ class RyModel_CurveArrayToMesh(Operator):
         bpy.context.view_layer.objects.active = original_mesh_obj  
 
         internal_utils.set_object_interaction_mode(original_mode)
+        return {'FINISHED'}
+
+class RyModel_PrepareManualRetopology(Operator):
+    bl_idname = "rymodel.prepare_manual_retopology"
+    bl_label = "Prepare Manual Retopology"
+    bl_description = "Adds plane mesh to the active (selected) object and applies settings ideal modifiers, visibility, and snapping to prepare for a common manual retopology process within Blender"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        active_object = bpy.context.active_object
+
+        # Create a new retopology plane.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+        bpy.ops.mesh.primitive_plane_add(size=0.2, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        bpy.ops.transform.rotate(value=1.5708, orient_axis='X', orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, False, False), mirror=False, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=0.0430567, use_proportional_connected=False, use_proportional_projected=False, snap=False, snap_elements={'INCREMENT'}, use_snap_project=False, snap_target='CLOSEST', use_snap_self=True, use_snap_edit=True, use_snap_nonedit=True, use_snap_selectable=False)
+        retopology_plane = bpy.context.active_object
+        retopology_plane.name = "{0}_{1}".format(active_object.name, "Retopo")
+        retopology_plane.show_wire = True
+
+        # Apply autosmooth.
+        bpy.ops.object.shade_smooth()
+        bpy.context.object.data.use_auto_smooth = True
+        bpy.context.object.data.auto_smooth_angle = 3.14159
+
+        # Subsurface modifier allows users to retopologize in a lower polycount, and have their retopology automatically smoothed out.
+        subsurface_modifier = modifiers.add_modifier('SUBSURF', self, context)
+        subsurface_modifier.subdivision_type = 'SIMPLE'
+
+        # Shrinkwrap modifier wraps the retopology mesh to the original object so the polygons are closely matched.
+        shrinkwrap_modifier = modifiers.add_modifier('SHRINKWRAP', self, context)
+        shrinkwrap_modifier.target = active_object
+        shrinkwrap_modifier.offset = 0.0001
+        shrinkwrap_modifier.show_on_cage = True
+
+        # Show in front allows retopology planes to be significantly more visiable through higher poly surface detail.
+        retopology_plane.show_in_front = True
+
+        # Backface culling allows the user to avoid seeing backfaces through the object being manually retopologized as 'show in front' is applied to the retopology object.
+        bpy.context.space_data.shading.show_backface_culling = True
+
+        # Create and add a new retopology material that improves visibility of the underlying model while retopologizing.
+        retopology_material = bpy.data.materials.get('Retopology')
+        if not retopology_material:
+            retopology_material = bpy.data.materials.new(name='Retopology')
+            retopology_material.use_nodes = True
+            retopology_material.diffuse_color = (0.0, 0.1, 1.0, 0.5)
+        retopology_plane.data.materials.append(retopology_material)
+
+        # Set viewport shading mode to solid, material so users can see the retopology materials.
+        bpy.context.space_data.shading.type = 'SOLID'
+        bpy.context.space_data.shading.color_type = 'MATERIAL'
+
+        # Turn on best snapping settings.
+        bpy.context.scene.tool_settings.use_snap = True
+        bpy.context.scene.tool_settings.snap_elements = {'FACE'}
+        bpy.context.scene.tool_settings.use_snap_project = True
+
+        # End in edit mode.
+        internal_utils.set_object_interaction_mode('EDIT')
+
+        # Automerge is turned on with a higher double threshold so users can quickly snap vertices while retopologizing.
+        bpy.context.scene.tool_settings.use_mesh_automerge = True
+        bpy.context.scene.tool_settings.double_threshold = 0.01
+
         return {'FINISHED'}

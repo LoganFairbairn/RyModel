@@ -87,7 +87,7 @@ def add_modifier(modifier_type, self, context):
     new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
     new_modifier.show_expanded = False
 
-    organize_modifier_stack(context.active_object.modifiers)
+    #organize_modifier_stack(context.active_object.modifiers)
     return new_modifier
 
 class RyModel_AddBevelModifier(Operator):

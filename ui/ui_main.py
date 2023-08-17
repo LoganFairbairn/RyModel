@@ -204,6 +204,20 @@ def draw_origin_tools(layout):
     row.operator("rymodel.set_origin_selected", text="", icon='SELECT_INTERSECT')
     row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
 
+def draw_retopology_tools(layout):
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Topology")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.prepare_manual_retopology", text="Manual Retopology")
+
 def draw_exporting_options(layout):
     addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
 
@@ -530,6 +544,7 @@ class RyModel_OT_open_menu(Operator):
                     draw_contextual_object_menu(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
+                    draw_retopology_tools(first_column)
                     draw_unwrapping_tools(first_column)
                     draw_backup_options(first_column)
                     draw_exporting_options(first_column)

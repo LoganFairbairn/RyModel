@@ -490,5 +490,3 @@ class RyModel_ShowBooleanObjects(Operator):
     def execute(self, context):
         show_boolean_objects()
         return {'FINISHED'}
-
-

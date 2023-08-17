@@ -65,6 +65,7 @@ classes = (
     RyModel_ArrayAlongCurve,
     RyModel_DeleteCurveArray,
     RyModel_CurveArrayToMesh,
+    RyModel_PrepareManualRetopology,
 
     # Simulation Tools
     RyModel_ApplyCollision,
