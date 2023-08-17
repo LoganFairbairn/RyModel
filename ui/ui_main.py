@@ -338,8 +338,8 @@ def draw_modifier_properties(layout):
 
                         row = first_column.row(align=True)
                         row.scale_y = MODIFIER_UI_Y_SCALE
-                        row.prop(modifier, "segments", text="Segments")
-                        row.prop(modifier, "width", slider=True)
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "segments", text="Edges")
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
 
                         row = second_column.row(align=True)
                         row.scale_y = MODIFIER_UI_Y_SCALE
@@ -360,7 +360,7 @@ def draw_modifier_properties(layout):
 
                         row = first_column.row(align=True)
                         row.scale_y = MODIFIER_UI_Y_SCALE
-                        row.prop(modifier, "thickness", slider=True)
+                        row.prop(bpy.context.scene.solidify_modifier_settings, "thickness", slider=True)
                         row.prop(modifier, "offset", slider=True)
 
                         row = second_column.row()
