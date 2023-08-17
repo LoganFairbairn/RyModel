@@ -744,6 +744,9 @@ class RyModel_ColorGrid(Operator):
             for i in range(len(obj.material_slots)):
                 obj.material_slots[i].material = color_grid_material
 
+        # Switch the color space to shading so users can see the applied color grid.
+        bpy.context.space_data.shading.type = 'MATERIAL'
+
         return {'FINISHED'}
 
 class RyModel_DeformArrayAlongCurve(Operator):
