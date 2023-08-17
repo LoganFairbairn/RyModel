@@ -11,6 +11,7 @@ from pathlib import Path
 import os
 
 UI_Y_SCALE = 1.4
+MODIFIER_UI_Y_SCALE = 1.2
 
 custom_icons = None
 
@@ -58,20 +59,20 @@ def remove_custom_icons():
 
 def draw_mesh_fix_tools(layout):
     '''Draws mesh fix tool operator buttons to the user interface.'''
-    split = layout.split(factor=0.85)
+    split = layout.split(factor=0.2)
     first_column = split.column()
     second_column = split.column()
 
     row = first_column.row(align=True)
+    row.scale_x = 6
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.clean_mesh", text="", icon_value=custom_icons["CLEAN"].icon_id)
+
+    row = second_column.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.auto_smooth", text="Smooth")
     row.operator("rymodel.auto_sharpen", text="Sharpen")
     row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
-
-    row = second_column.row(align=True)
-    row.scale_x = 6
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.clean_mesh", text="", icon_value=custom_icons["CLEAN"].icon_id)
 
 def draw_contextual_object_menu(layout):
     '''Draws frequently used settings based on context.'''
@@ -330,26 +331,55 @@ def draw_modifier_properties(layout):
                 match modifier.type:
                     case 'BEVEL':
                         draw_modifier_title(layout, 'Bevel', modifier)
-                        row = layout.row(align=True)
-                        row.prop(bpy.context.scene.bevel_modifier_settings, "segments")
-                        row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
+
+                        split = layout.split(factor=0.8)
+                        first_column = split.column()
+                        second_column = split.column()
+
+                        row = first_column.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
+                        row.prop(modifier, "segments", text="Segments")
+                        row.prop(modifier, "width", slider=True)
+
+                        row = second_column.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.prop(modifier, "angle_limit", slider=True, text="")
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, 'Weighted Normal', modifier)
-                        row = layout.row()
-                        row.prop(modifier, "weight", slider=True)
+                        #row = layout.row()
+                        #row.prop(modifier, "weight", slider=True)
 
                     case 'SOLIDIFY':
                         draw_modifier_title(layout, 'Solidify', modifier)
                         row = layout.row(align=True)
-                        row.prop(bpy.context.scene.solidify_modifier_settings, "thickness", slider=True)
-                        row.prop(modifier, "use_even_offset", toggle=True)
+
+                        split = layout.split(factor=0.8)
+                        first_column = split.column()
+                        second_column = split.column()
+
+                        row = first_column.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
+                        row.prop(modifier, "thickness", slider=True)
+                        row.prop(modifier, "offset", slider=True)
+
+                        row = second_column.row()
+                        row.scale_y = MODIFIER_UI_Y_SCALE
+                        row.prop(modifier, "use_even_offset", toggle=True, text="Even")
 
                     case 'ARRAY':
                         draw_modifier_title(layout, 'Array', modifier)
-                        row = layout.row(align=True)
+
+                        split = layout.split(factor=0.6)
+                        first_column = split.column()
+                        second_column = split.column()
+
+                        row = first_column.row()
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.prop(bpy.context.scene.array_modifier_settings, "count", slider=False)
+
+                        row = second_column.row()
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.prop(modifier, "relative_offset_displace", index=0, text="")
                         row.prop(modifier, "relative_offset_displace", index=1, text="")
                         row.prop(modifier, "relative_offset_displace", index=2, text="")
@@ -357,19 +387,21 @@ def draw_modifier_properties(layout):
                     case 'MULTIRES':
                         draw_modifier_title(layout, 'Multi-resolution', modifier)
                         row = layout.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.operator("object.multires_subdivide")
                         row.operator("object.multires_higher_levels_delete")
 
                     case 'SUBSURF':
                         draw_modifier_title(layout, 'Subdivision', modifier)
                         row = layout.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.prop(modifier, "levels")
-                        row = layout.row(align=True)
-                        row.prop(modifier, "subdivision_type")
+                        row.prop(modifier, "subdivision_type", text="")
 
                     case 'SHRINKWRAP':
                         draw_modifier_title(layout, 'Shrinkwrap', modifier)
                         row = layout.row(align=True)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row.prop(modifier, "target")
 
                     case 'TRIANGULATE':
@@ -377,6 +409,7 @@ def draw_modifier_properties(layout):
 
                     case 'SMOOTH':
                         draw_modifier_title(layout, 'Smooth', modifier)
+                        row.scale_y = MODIFIER_UI_Y_SCALE
                         row = layout.row(align=True)
                         row.prop(modifier, "iterations")
 
@@ -385,6 +418,7 @@ def draw_modifier_properties(layout):
                         if not addon_preferences.hide_booleans:
                             draw_modifier_title(layout, 'Boolean', modifier)
                             row = layout.row(align=True)
+                            row.scale_y = MODIFIER_UI_Y_SCALE
                         continue
 
                     case 'MIRROR':
