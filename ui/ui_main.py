@@ -29,6 +29,7 @@ def load_custom_icons():
     custom_icons.load('CIRCULAR_TWIST', os.path.join(icons_dir, "circular_twist.png"), 'IMAGE')
     custom_icons.load('INDIVIDUAL_OBJECTS', os.path.join(icons_dir, "individual_objects.png"), 'IMAGE')
     custom_icons.load('BACKUP', os.path.join(icons_dir, "backup.png"), 'IMAGE')
+    custom_icons.load('CLEAN', os.path.join(icons_dir, "clean.png"), 'IMAGE')
     return custom_icons
 
 def remove_custom_icons():
@@ -66,7 +67,7 @@ def draw_contextual_object_menu(layout):
 
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.clean_mesh", text="Q Clean")
+            row.operator("rymodel.clean_mesh", text="Q Clean", icon_value=custom_icons["CLEAN"].icon_id)
             row.operator("rymodel.fill_non_manifold", text="Fill Holes")
 
             # Curve Array Options
@@ -74,6 +75,11 @@ def draw_contextual_object_menu(layout):
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.array_along_curve", text="Curve Array")
             row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
+
+            row = layout.row(align=True)
+            row.scale_y = UI_Y_SCALE
+            row.operator("rymodel.auto_seam")
+            row.operator("rymodel.unwrap")
 
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
@@ -190,23 +196,24 @@ def draw_origin_tools(layout):
     row.operator("rymodel.set_origin_selected", text="", icon='SELECT_INTERSECT')
     row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
 
-def draw_unwrapping_tools(layout):
-    '''Draws operations for quickly adjusting elements for the active (selected) mesh.'''
-    if bpy.context.active_object.type != 'MESH':
-        return
+def draw_exporting_options(layout):
+    addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
 
     split = layout.split(factor=0.25)
     first_column = split.column()
     second_column = split.column()
 
-    row = first_column.row(align=True)
+    row = first_column.row()
     row.scale_y = UI_Y_SCALE
-    row.label(text="UVs")
+    row.label(text="Export")
 
     row = second_column.row(align=True)
+    row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.auto_seam")
-    row.operator("rymodel.unwrap")
+    row.operator("rymodel.export", text="", icon='EXPORT')
+    row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
+    row.prop(addon_preferences, "export_template", text="")
+    #row.operator("rymodel.make_backup_object", text="", icon_value=custom_icons["BACKUP"].icon_id)
 
 def draw_extras(layout):
     '''Draws extra tool operations to the user interface.'''
@@ -405,30 +412,6 @@ def draw_modifiers(layout):
 
     draw_modifier_properties(layout)
 
-def draw_display_options(layout):
-    split = layout.split(factor=0.25)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Display")
-
-    row = second_column.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.prop(bpy.context.space_data.overlay, "show_wireframes", toggle=True)
-
-def draw_exporting_options(layout):
-    addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.export", text="Export", icon='EXPORT')
-
-    row.prop(addon_preferences, "export_template", text="")
-    row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
-    row.operator("rymodel.make_backup_object", text="", icon_value=custom_icons["BACKUP"].icon_id)
-
 def draw_cloth_sim_operators(layout):
     '''Draws cloth simulation operators to the provided layout.'''
     
@@ -469,11 +452,20 @@ class RyModel_OT_open_menu(Operator):
         first_column = split.column()
         second_column = split.column()
 
-        row = first_column.row()
+        row = first_column.row(align=True)
         row.scale_y = UI_Y_SCALE
         row.label(text="RyModel 1.0.0")
 
-        row = second_column.row(align=True)
+        split = second_column.split(factor=0.1)
+        display_settings_column = split.column()
+        tabs_column = split.column()
+
+        row = display_settings_column.row(align=True)
+        row.scale_x = UI_Y_SCALE
+        row.scale_y = UI_Y_SCALE
+        row.prop(bpy.context.space_data.overlay, "show_wireframes", icon='MOD_WIREFRAME', toggle=True, text="")
+
+        row = tabs_column.row(align=True)
         row.scale_y = UI_Y_SCALE
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'MODELLING', text="Modeling")
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'SIMULATION', text="Simulation")
@@ -490,8 +482,6 @@ class RyModel_OT_open_menu(Operator):
                     draw_boolean_tools(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
-                    draw_display_options(first_column)
-                    draw_unwrapping_tools(first_column)
                     draw_modifiers(second_column)
                     draw_exporting_options(first_column)
 
