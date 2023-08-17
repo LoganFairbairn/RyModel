@@ -738,8 +738,37 @@ class RyModel_ColorGrid(Operator):
     def execute(self, context):
         if not internal_utils.verify_active_mesh(self):
             return {'FINISHED'}
-        
-        print("Placeholder...")
+
+        # Must be in object mode.
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+        # Create a new material.
+        color_grid_material = bpy.data.materials.get('ColorGrid')
+        if not color_grid_material:
+            color_grid_material = bpy.data.materials.new(name='ColorGrid')
+            color_grid_material.use_nodes = True
+
+        # Create a new color grid texture.
+        color_grid_image = bpy.data.images.get('ColorGrid')
+        if color_grid_image:
+            bpy.data.images.remove(color_grid_image)
+        bpy.ops.image.new(name='ColorGrid', width=2048, height=2048, color=(0.0, 0.0, 0.0, 1.0), alpha=False, generated_type='COLOR_GRID', float=False, use_stereo_3d=False, tiled=False)
+        color_grid_image = bpy.data.images.get('ColorGrid')
+
+        # Assign the color grid texture to the image shader node and connect it to the principled bsdf.
+        principled_bsdf = color_grid_material.node_tree.nodes.get("Principled BSDF")
+        image_node = color_grid_material.node_tree.nodes.new('ShaderNodeTexImage')
+        image_node.image = color_grid_image
+        image_node.location = (-300, 300)
+        color_grid_material.node_tree.links.new(image_node.outputs[0], principled_bsdf.inputs[0])
+
+        # Remove all material slots from all selected objects and assign the new color grid material to all selected objects.
+        for obj in bpy.context.selected_objects:
+            obj.active_material_index = 0
+            for i in range(len(obj.material_slots)):
+                bpy.ops.object.material_slot_remove({'object': obj})
+            obj.data.materials.append(color_grid_material)
+
         return {'FINISHED'}
 
 class RyModel_DeformArrayAlongCurve(Operator):
