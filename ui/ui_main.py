@@ -432,7 +432,7 @@ def draw_modifiers(layout):
     row.prop(addon_preferences, "organize_modifiers", icon='DOCUMENTS', text="")
     row.prop(addon_preferences, "hide_booleans", icon='MOD_BOOLEAN', text="")
     row.operator("rymodel.copy_modifiers", icon='COPYDOWN', text="")
-    row.operator("rymodel.hswf_mod_apply", icon='ADD', text="")
+    row.operator("rymodel.hswf_mod_apply", text="Apply All")
 
     draw_modifier_properties(layout)
 
