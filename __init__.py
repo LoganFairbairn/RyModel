@@ -118,6 +118,7 @@ classes = (
 
     # Unwrapping
     RyModel_AutoSeam,
+    RyModel_ColorGrid,
 
     # Property Range Overrides
     BevelModifierSettings,

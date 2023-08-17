@@ -728,6 +728,20 @@ class RyModel_AutoSeam(Operator):
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 
+
+class RyModel_ColorGrid(Operator):
+    bl_idname = "rymodel.color_grid"
+    bl_label = "Color Grid"
+    bl_description = "Removes all materials from the selected objects and applies a material with a color grid ideal for viewing UV unwrapping quality"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        print("Placeholder...")
+        return {'FINISHED'}
+
 class RyModel_DeformArrayAlongCurve(Operator):
     bl_idname = "rymodel.deform_array_along_curve"
     bl_label = "Deform Array Along Curve"

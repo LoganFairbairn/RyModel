@@ -77,12 +77,6 @@ def draw_contextual_object_menu(layout):
                     row.scale_y = UI_Y_SCALE
                     row.operator("rymodel.mirror_by_face", text="Mirror By Face")
 
-            
-
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.auto_seam")
-
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
                 row = layout.row()
@@ -203,6 +197,21 @@ def draw_exporting_options(layout):
     row.operator("rymodel.export", text="", icon='EXPORT')
     row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
     row.prop(addon_preferences, "export_template", text="")
+
+def draw_unwrapping_tools(layout):
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Unwrap")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.auto_seam", text="Auto Seam")
+    row.operator("rymodel.color_grid", text="Color Grid")
 
 def draw_backup_options(layout):
     '''Draws operators for backing up asset data.'''
@@ -503,8 +512,9 @@ class RyModel_OT_open_menu(Operator):
                     draw_boolean_tools(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
-                    draw_exporting_options(first_column)
+                    draw_unwrapping_tools(first_column)
                     draw_backup_options(first_column)
+                    draw_exporting_options(first_column)
                     draw_contextual_object_menu(first_column)
 
                     # Second Column
