@@ -6,6 +6,7 @@ from . import booleans
 from ..core import modeling_tools
 from ..core import internal_utils
 from ..core import rylog
+from .. import preferences
 import math
 
 def get_modifier_of_type(modifiers, modifier_type):
@@ -25,6 +26,11 @@ def get_modifiers_of_type(modifiers, modifier_type):
 
 def organize_modifier_stack(object_modifiers):
     '''Organizes the modifier stack order.'''
+
+    # Don't organize the modifier stack ever if modifier stack organization is toggled off.
+    addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
+    if not addon_preferences.organize_modifiers:
+        return
 
     bevel_modifiers = get_modifiers_of_type(object_modifiers, 'BEVEL')
     weighted_normal_modifiers = get_modifiers_of_type(object_modifiers, 'WEIGHTED_NORMAL')
@@ -78,6 +84,8 @@ def organize_modifier_stack(object_modifiers):
     for triangulate_modifier in triangulate_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=triangulate_modifier.name, index=modifier_index)
         modifier_index += 1
+
+    rylog.log("Organized modifier stack.")
 
 def add_modifier(modifier_type, self, context):
     '''Adds a new modifier to the active object, then re-organizes the modifier stack.'''
