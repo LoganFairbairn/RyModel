@@ -117,7 +117,6 @@ classes = (
     RyModel_ShowBooleanObjects,
 
     # Unwrapping
-    RyModel_Unwrap,
     RyModel_AutoSeam,
 
     # Property Range Overrides
@@ -185,9 +184,10 @@ def register():
 
     # UI Tabs
     UI_TABS = [
-        ("MODELLING", "Modelling", "Batched modeling operators", '', 0),
-        ("SIMULATION", "Simulation", "Batched simulation operators", '', 1),
-        ("SETTINGS", "Settings", "Add-on settings", 'SETTINGS', 2)
+        ("MODELLING", "Modelling", "Modeling operators that speed up, automate the modeling workflow within Blender.", '', 0),
+        ("SIMULATION", "Simulation", "Operators that preparing and run simulations that can speed up, automate or improve the quality of modeling (cloth simulation).", '', 1),
+        ("SPECIAL", "Special", "Special batched operations for achieving specific modeling effects.", '', 2),
+        ("SETTINGS", "Settings", "Add-on settings", 'SETTINGS', 3)
     ]
 
     bpy.types.Scene.rymodel_ui_tabs = EnumProperty(items=UI_TABS, name="UI Tabs", default='MODELLING')

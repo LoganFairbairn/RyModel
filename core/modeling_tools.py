@@ -709,24 +709,6 @@ class RyModel_Cheshire(Operator):
             return {'FINISHED'}
         return {'FINISHED'}
 
-class RyModel_Unwrap(Operator):
-    bl_idname = "rymodel.unwrap"
-    bl_label = "Unwrap"
-    bl_description = "Unwraps and packs UV islands for the selected model"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        if not internal_utils.verify_active_mesh(self):
-            return {'FINISHED'}
-        
-        original_mode = bpy.context.mode
-        bpy.ops.object.mode_set(mode='EDIT', toggle=False)
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
-        internal_utils.set_object_interaction_mode(original_mode)
-
-        return {'FINISHED'}
-
 class RyModel_AutoSeam(Operator):
     bl_idname = "rymodel.auto_seam"
     bl_label = "Auto Seam"
@@ -742,6 +724,7 @@ class RyModel_AutoSeam(Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.edges_select_sharp()
         bpy.ops.mesh.mark_seam(clear=False)
+
         internal_utils.set_object_interaction_mode(original_mode)
         return {'FINISHED'}
 

@@ -36,7 +36,25 @@ def remove_custom_icons():
     global custom_icons
     bpy.utils.previews.remove(custom_icons)
 
+def draw_mesh_fix_tools(layout):
+    '''Draws mesh fix tool operator buttons to the user interface.'''
+    split = layout.split(factor=0.85)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.auto_smooth", text="Smooth")
+    row.operator("rymodel.auto_sharpen", text="Sharpen")
+    row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
+
+    row = second_column.row(align=True)
+    row.scale_x = 6
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.clean_mesh", text="", icon_value=custom_icons["CLEAN"].icon_id)
+
 def draw_contextual_object_menu(layout):
+    '''Draws frequently used settings based on context.'''
     active_object = bpy.context.active_object
     match active_object.type:
         case 'MESH':
@@ -59,26 +77,11 @@ def draw_contextual_object_menu(layout):
                     row.scale_y = UI_Y_SCALE
                     row.operator("rymodel.mirror_by_face", text="Mirror By Face")
 
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.auto_smooth", text="Smooth")
-            row.operator("rymodel.auto_sharpen", text="Sharpen")
-            row.prop(bpy.context.scene, "auto_sharpen_angle", text="", slider=False)
-
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.clean_mesh", text="Q Clean", icon_value=custom_icons["CLEAN"].icon_id)
-
-            # Curve Array Options
-            row = layout.row(align=True)
-            row.scale_y = UI_Y_SCALE
-            row.operator("rymodel.array_along_curve", text="Curve Array")
-            row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
+            
 
             row = layout.row(align=True)
             row.scale_y = UI_Y_SCALE
             row.operator("rymodel.auto_seam")
-            row.operator("rymodel.unwrap")
 
             boolean_mod = modifiers.get_modifier_of_type(active_object.modifiers, 'BOOLEAN')
             if boolean_mod:
@@ -147,37 +150,25 @@ def draw_mirror_tools(layout):
 def draw_boolean_tools(layout):
     if bpy.context.active_object.type != 'MESH':
         return
+    
+    split = layout.split(factor=0.2)
+    visibility_column = split.column()
+    boolean_column = split.column()
 
-    row = layout.row()
-    row.scale_y = UI_Y_SCALE
-    row.label(text="Booleans")
+    row = visibility_column.row()
+    row.scale_x = 10
+    row.scale_y = 2
+    row.operator("rymodel.show_boolean_objects", icon='HIDE_OFF', text="")
 
-    row = layout.row(align=True)
-    row.scale_x = 4
+    row = boolean_column.row(align=True)
+    row.scale_x = 10
     row.scale_y = 2
     row.operator("rymodel.add_plane_boolean", text="/")
     row.operator("rymodel.add_cube_boolean", icon='MESH_CUBE', text="")
     row.operator("rymodel.add_cylinder_boolean", icon='MESH_CYLINDER', text="")
-    row.operator("rymodel.add_sphere_boolean", icon='SPHERE', text="")
-    row.operator("rymodel.add_cone_boolean", icon='MESH_CONE', text="")
     row.operator("rymodel.selected_object_to_boolean", icon='SELECT_SET', text="")
-
-    split = layout.split(factor=0.2)
-    first_column = split.column()
-    second_column = split.column()
-
-    row = first_column.row(align=True)
-    row.scale_x = 2
-    row.scale_y = 2
-    row.operator("rymodel.show_boolean_objects", icon='HIDE_OFF', text="")
-
-    row = second_column.row(align=True)
-    row.scale_x = 10
-    row.scale_y = 2
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'INTERSECT', text="")
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'UNION', text="")
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'DIFFERENCE', text="")
-    row.prop_enum(bpy.context.scene, "rymodel_boolean_mode", 'SLICE', text="")
+    
+    row.prop_menu_enum(bpy.context.scene, "rymodel_boolean_mode", text='')
 
 def draw_origin_tools(layout):
     split = layout.split(factor=0.25)
@@ -212,15 +203,44 @@ def draw_exporting_options(layout):
     row.operator("rymodel.export", text="", icon='EXPORT')
     row.prop(addon_preferences, "export_selected_objects_individually", text="", icon_value=custom_icons["INDIVIDUAL_OBJECTS"].icon_id)
     row.prop(addon_preferences, "export_template", text="")
-    #row.operator("rymodel.make_backup_object", text="", icon_value=custom_icons["BACKUP"].icon_id)
 
-def draw_extras(layout):
+def draw_backup_options(layout):
+    '''Draws operators for backing up asset data.'''
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Backup")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.make_backup_object", text="Backup Object", icon_value=custom_icons["BACKUP"].icon_id)
+
+def draw_specials(layout):
     '''Draws extra tool operations to the user interface.'''
     layout.label(text="Extras:")
     row = layout.row(align=True)
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.curve_to_rope")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
     row.operator("rymodel.cheshire")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.delete_curve_array", text="Remove")
+
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.array_along_curve", text="Curve Array")
+    
+    row = layout.row(align=True)
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
 
 def draw_modifier_title(layout, name, modifier):
     split = layout.split(factor=0.6)
@@ -468,6 +488,7 @@ class RyModel_OT_open_menu(Operator):
         row.scale_y = UI_Y_SCALE
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'MODELLING', text="Modeling")
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'SIMULATION', text="Simulation")
+        row.prop_enum(context.scene, "rymodel_ui_tabs", 'SPECIAL', text="Special")
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'SETTINGS', text="")
 
         if context.active_object:
@@ -477,15 +498,23 @@ class RyModel_OT_open_menu(Operator):
                     first_column = split.column()
                     second_column = split.column()
 
-                    draw_contextual_object_menu(first_column)
+                    # First Column
+                    draw_mesh_fix_tools(first_column)
                     draw_boolean_tools(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
-                    draw_modifiers(second_column)
                     draw_exporting_options(first_column)
+                    draw_backup_options(first_column)
+                    draw_contextual_object_menu(first_column)
+
+                    # Second Column
+                    draw_modifiers(second_column)
 
                 case 'SIMULATION':
                     draw_cloth_sim_operators(layout)
+
+                case 'SPECIAL':
+                    draw_specials(layout)
 
         else:
             layout.label(text="Select an object to edit.")

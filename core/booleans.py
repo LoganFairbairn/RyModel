@@ -7,7 +7,6 @@ from ..core import modifiers
 from ..core import rylog
 import numpy as np
 import math
-import mathutils
 
 def update_boolean_operation(self, context):
     '''Updates the boolean operation for all objects using the selected boolean.'''
@@ -414,7 +413,7 @@ def make_booleans_unique(obj, new_parent=None):
 class RyModel_MakeBooleansUnique(Operator):
     bl_idname = "rymodel.make_booleans_unique"
     bl_label = "Make Booleans Unique"
-    bl_description = "Makes the boolean objects unique for the selected objects."
+    bl_description = "Makes duplicate versions of boolean objects for the selected objects"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
