@@ -26,16 +26,16 @@ def get_modifiers_of_type(modifiers, modifier_type):
 def organize_modifier_stack(object_modifiers):
     '''Organizes the modifier stack order.'''
 
-    bevel_modifier = get_modifier_of_type(object_modifiers, 'BEVEL')
-    weighted_normal_modifier = get_modifier_of_type(object_modifiers, 'WEIGHTED_NORMAL')
-    mirror_modifier = get_modifier_of_type(object_modifiers, 'MIRROR')
+    bevel_modifiers = get_modifiers_of_type(object_modifiers, 'BEVEL')
+    weighted_normal_modifiers = get_modifiers_of_type(object_modifiers, 'WEIGHTED_NORMAL')
+    mirror_modifiers = get_modifiers_of_type(object_modifiers, 'MIRROR')
     array_modifiers = get_modifiers_of_type(object_modifiers, 'ARRAY')
-    solidify_modifier = get_modifier_of_type(object_modifiers, 'SOLIDIFY')
+    solidify_modifiers = get_modifiers_of_type(object_modifiers, 'SOLIDIFY')
     boolean_modifiers = get_modifiers_of_type(object_modifiers, 'BOOLEAN')
-    multires_modifier = get_modifier_of_type(object_modifiers, 'MULTIRES')
+    multires_modifiers = get_modifiers_of_type(object_modifiers, 'MULTIRES')
     subdivision_modifiers = get_modifiers_of_type(object_modifiers, 'SUBSURF')
-    shrinkwrap_modifier = get_modifier_of_type(object_modifiers, 'SHRINKWRAP')
-    triangulate_modifier = get_modifier_of_type(object_modifiers, 'TRIANGULATE')
+    shrinkwrap_modifiers = get_modifiers_of_type(object_modifiers, 'SHRINKWRAP')
+    triangulate_modifiers = get_modifiers_of_type(object_modifiers, 'TRIANGULATE')
 
     modifier_index = 0
 
@@ -43,39 +43,39 @@ def organize_modifier_stack(object_modifiers):
         bpy.ops.object.modifier_move_to_index(modifier=boolean_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if mirror_modifier:
-        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
+    for subdivision_modifier in subdivision_modifiers:
+        bpy.ops.object.modifier_move_to_index(modifier=subdivision_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if shrinkwrap_modifier:
+    for shrinkwrap_modifier in shrinkwrap_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=shrinkwrap_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if solidify_modifier:
+    for mirror_modifier in mirror_modifiers:
+        bpy.ops.object.modifier_move_to_index(modifier=mirror_modifier.name, index=modifier_index)
+        modifier_index += 1
+
+    for solidify_modifier in solidify_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=solidify_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if multires_modifier:
+    for multires_modifier in multires_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=multires_modifier.name, index=modifier_index)
-        modifier_index += 1
-
-    for subdivision_modifier in subdivision_modifiers:
-        bpy.ops.object.modifier_move_to_index(modifier=subdivision_modifier.name, index=modifier_index)
         modifier_index += 1
 
     for array_modifier in array_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=array_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if bevel_modifier:
+    for bevel_modifier in bevel_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=bevel_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if weighted_normal_modifier:
+    for weighted_normal_modifier in weighted_normal_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=weighted_normal_modifier.name, index=modifier_index)
         modifier_index += 1
 
-    if triangulate_modifier:
+    for triangulate_modifier in triangulate_modifiers:
         bpy.ops.object.modifier_move_to_index(modifier=triangulate_modifier.name, index=modifier_index)
         modifier_index += 1
 
@@ -87,7 +87,7 @@ def add_modifier(modifier_type, self, context):
     new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
     new_modifier.show_expanded = False
 
-    #organize_modifier_stack(context.active_object.modifiers)
+    organize_modifier_stack(context.active_object.modifiers)
     return new_modifier
 
 class RyModel_AddBevelModifier(Operator):
