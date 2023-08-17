@@ -760,13 +760,12 @@ class RyModel_ColorGrid(Operator):
         image_node.image = color_grid_image
         image_node.location = (-300, 300)
         color_grid_material.node_tree.links.new(image_node.outputs[0], principled_bsdf.inputs[0])
-
-        # Remove all material slots from all selected objects and assign the new color grid material to all selected objects.
+        
+        # Assign the new color grid material to all selected objects.
         for obj in bpy.context.selected_objects:
             obj.active_material_index = 0
             for i in range(len(obj.material_slots)):
-                bpy.ops.object.material_slot_remove({'object': obj})
-            obj.data.materials.append(color_grid_material)
+                obj.material_slots[i].material = color_grid_material
 
         return {'FINISHED'}
 
