@@ -96,6 +96,8 @@ classes = (
     RyModel_AddSmoothModifier,
     RyModel_ApplyModifier,
     RyModel_DuplicateModifier,
+    RyModel_MoveModifierToFirst,
+    RyModel_MoveModifierToLast,
     RyModel_MoveModifierUp,
     RyModel_MoveModifierDown,
     RyModel_DeleteModifier,

@@ -228,6 +228,40 @@ class RyModel_DuplicateModifier(Operator):
 
         return {'FINISHED'}
 
+class RyModel_MoveModifierToFirst(Operator):
+    bl_idname = "rymodel.move_modifier_to_first"
+    bl_label = "Move to First"
+    bl_description = "Moves the modifier to be the first modifier applied"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+
+        bpy.ops.object.modifier_move_to_index(modifier=self.modifier_name, index=0)
+
+        return {'FINISHED'}
+
+class RyModel_MoveModifierToLast(Operator):
+    bl_idname = "rymodel.move_modifier_to_last"
+    bl_label = "Move to Last"
+    bl_description = "Moves the modifier to be the last modifier applied"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    modifier_name: StringProperty(default="")
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+
+        active_object = bpy.context.active_object
+        last_modifier_index = len(active_object.modifiers) - 1
+        bpy.ops.object.modifier_move_to_index(modifier=self.modifier_name, index=last_modifier_index)
+
+        return {'FINISHED'}
+
 class RyModel_MoveModifierUp(Operator):
     bl_idname = "rymodel.move_modifier_up"
     bl_label = "Move Modifier Up"

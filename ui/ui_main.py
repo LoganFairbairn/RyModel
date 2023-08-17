@@ -20,6 +20,10 @@ class ModifierSubMenu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        op = layout.operator("rymodel.move_modifier_to_first", text="Move to First")
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_to_last", text="Move to Last")
+        op.modifier_name = context.modifier.name
         op = layout.operator("rymodel.apply_modifier", text="Apply", icon='ADD')
         op.modifier_name = context.modifier.name
         op = layout.operator("rymodel.move_modifier_up", text="Move Up", icon='TRIA_UP')
