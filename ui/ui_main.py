@@ -342,35 +342,28 @@ def draw_modifier_properties(layout):
                     case 'BEVEL':
                         draw_modifier_title(layout, 'Bevel', modifier)
                         row = layout.row()
-                        row.scale_y = UI_Y_SCALE
-                        row.prop(bpy.context.scene.bevel_modifier_settings, "segments", slider=True)
+                        row.prop(bpy.context.scene.bevel_modifier_settings, "segments")
                         row = layout.row()
-                        row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.bevel_modifier_settings, "width", slider=True)
                         row = layout.row()
-                        row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "limit_method", slider=True, text="")
 
                     case 'WEIGHTED_NORMAL':
                         draw_modifier_title(layout, 'Weighted Normal', modifier)
                         row = layout.row()
-                        row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "weight", slider=True)
 
                     case 'SOLIDIFY':
                         draw_modifier_title(layout, 'Solidify', modifier)
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.solidify_modifier_settings, "thickness", slider=True)
                         row.prop(modifier, "use_even_offset", toggle=True)
 
                     case 'ARRAY':
                         draw_modifier_title(layout, 'Array', modifier)
                         row = layout.row()
-                        row.scale_y = UI_Y_SCALE
                         row.prop(bpy.context.scene.array_modifier_settings, "count", slider=False)
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
                         row.label(text="Relative Offset")
                         row.prop(modifier, "relative_offset_displace", index=0, text="")
                         row.prop(modifier, "relative_offset_displace", index=1, text="")
@@ -385,30 +378,25 @@ def draw_modifier_properties(layout):
                     case 'SUBSURF':
                         draw_modifier_title(layout, 'Subdivision', modifier)
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "levels")
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
                         row.prop_enum(modifier, "subdivision_type", 'CATMULL_CLARK')
                         row.prop_enum(modifier, "subdivision_type", 'SIMPLE')
 
                     case 'SHRINKWRAP':
                         draw_modifier_title(layout, 'Shrinkwrap', modifier)
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
                         row.prop(modifier, "target")
 
                     case 'TRIANGULATE':
                         draw_modifier_title(layout, 'Triangulate', modifier)
                         row = layout.row(align=True)
-                        row.scale_y = UI_Y_SCALE
 
                     case 'BOOLEAN':
                         addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
                         if not addon_preferences.hide_booleans:
                             draw_modifier_title(layout, 'Boolean', modifier)
                             row = layout.row(align=True)
-                            row.scale_y = UI_Y_SCALE          
                         continue
 
                     case 'MIRROR':
