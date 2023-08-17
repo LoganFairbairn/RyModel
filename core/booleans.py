@@ -262,6 +262,9 @@ def add_new_boolean_shape(self, shape):
     if not internal_utils.verify_active_mesh(self):
         return {'FINISHED'}
     
+    # Must be in object mode to add booleans.
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+    
     # Apply scale before adding a new boolean object (otherwise booleans will be created with incorrect sizes).
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
@@ -273,6 +276,7 @@ def add_new_boolean_shape(self, shape):
     setup_new_boolean(new_boolean_object, active_object, boolean_modifiers)
     optimize_new_boolean_dimensions(shape, new_boolean_object, original_object_dimensions)
 
+    # Plane booleans leave the user in edit mode, with a special setup to allow them to quickly extrude edges of the plane to cut through the object.
     if shape == 'PLANE':
         setup_plane_boolean(new_boolean_object)
     else:

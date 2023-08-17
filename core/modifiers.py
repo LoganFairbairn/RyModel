@@ -83,7 +83,7 @@ def add_modifier(modifier_type, self, context):
     '''Adds a new modifier to the active object, then re-organizes the modifier stack.'''
     if not internal_utils.verify_active_mesh(self):
         return {'FINISHED'}
-    
+
     new_modifier = context.active_object.modifiers.new(modifier_type, modifier_type)
     new_modifier.show_expanded = False
 
