@@ -132,7 +132,7 @@ def export_by_template(template_name, export_path, self):
 class RyModel_Export(Operator):
     bl_idname = "rymodel.export"
     bl_label = "Export"
-    bl_description = "Automatically exports selected objects to a path next to the open blend file"
+    bl_description = "Automatically exports selected objects to a path next to the open blend file. This operator requries the blend file to be saved"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
