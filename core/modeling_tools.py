@@ -709,7 +709,7 @@ class RyModel_AutoSeam(Operator):
 class RyModel_ColorGrid(Operator):
     bl_idname = "rymodel.color_grid"
     bl_label = "Color Grid"
-    bl_description = "Removes all materials from the selected objects and applies a material with a color grid ideal for viewing UV unwrapping quality"
+    bl_description = "Applies a color grid material ideal for viewing UV unwrapping quality to all material slots on all selected objects. A new material slot is created if one does not exist"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):

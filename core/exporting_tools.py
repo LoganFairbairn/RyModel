@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Operator
 import os
 from .. import preferences
+from ..core import modifiers
 from ..core import internal_utils
 from ..core import rylog
 
@@ -147,6 +148,10 @@ class RyModel_Export(Operator):
             rylog.log_status("The blend file must be saved to export models relative to the blend files path.", self, 'ERROR')
             return {'FINISHED'}
         directory = os.path.dirname(open_blend_path)
+
+        # Apply a triangulate modifier to the object being exported, if one does not exist already.
+        for obj in selected_objects:
+            modifiers.get_modifier_of_type(obj.modifiers, '')
 
         # Export all selected objects as individual files (use the name of each object as the filename).
         addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
