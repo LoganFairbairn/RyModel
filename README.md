@@ -1,11 +1,9 @@
 # RyModel
-RyModel adds a minimalistic, compact panel that is filled with tools that convert multi-step, tedious and complicated modeling operations into one-click solutions. This drastically simplifies and speeds up the modeling process within Blender.
-
-This add-on also attempts to keep the vanilla Blender modeling steps and shortcut keys so users who may be new to Blender can still gain an understanding of what different operators are achieving.
+RyModel adds a compact, minimalistic, and easy to use panel that is filled with tools that convert multi-step, tedious and complicated modeling operations into one-click solutions. This add-on simplifies and speeds up the modeling process within Blender while not straying too far from the vanilla modelling process or shortcut keys in Blender.
 
 ## Features:
 
-### Automatic Boolean Object Management
+### Automatic Boolean Management
 - Boolean object management (outliner organization, repairing, cleaning up unused booleans)
 - Slice boolean modifier mode
 - Boolean multiple objects at once
