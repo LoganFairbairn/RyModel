@@ -98,6 +98,16 @@ def add_modifier(modifier_type, self, context):
     organize_modifier_stack(context.active_object.modifiers)
     return new_modifier
 
+def get_modifier_index(modifier_name, modifiers):
+    '''Returns the modifier stack index for the modifier with the given name.'''
+    mod_index = 0
+    for mod in modifiers:
+        if mod.name == modifier_name:
+            return mod_index
+            break
+        mod_index += 1
+    return -1
+
 class RyModel_AddBevelModifier(Operator):
     bl_idname = "rymodel.add_bevel_modifier"
     bl_label = "Add Bevel Modifier"

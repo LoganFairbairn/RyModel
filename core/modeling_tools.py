@@ -1017,6 +1017,11 @@ class RyModel_PrepareManualRetopology(Operator):
         # Backface culling allows the user to avoid seeing backfaces through the object being manually retopologized as 'show in front' is applied to the retopology object.
         bpy.context.space_data.shading.show_backface_culling = True
 
+        # Turn on retopology overlay mode in the viewport (must be in edit mode and requires Blender version 3.6+).
+        bpy.context.space_data.overlay.show_retopology = True
+
+        # Deprecated method (as of Blender version 3.6) of improving visibility of the underlying mesh when retopologizing.
+        '''
         # Create and add a new retopology material that improves visibility of the underlying model while retopologizing.
         retopology_material = bpy.data.materials.get('Retopology')
         if not retopology_material:
@@ -1024,10 +1029,11 @@ class RyModel_PrepareManualRetopology(Operator):
             retopology_material.use_nodes = True
             retopology_material.diffuse_color = (0.0, 0.1, 1.0, 0.5)
         retopology_plane.data.materials.append(retopology_material)
+        bpy.context.space_data.shading.color_type = 'MATERIAL'
+        '''
 
         # Set viewport shading mode to solid, material so users can see the retopology materials.
         bpy.context.space_data.shading.type = 'SOLID'
-        bpy.context.space_data.shading.color_type = 'MATERIAL'
 
         # Turn on best snapping settings.
         bpy.context.scene.tool_settings.use_snap = True
@@ -1039,6 +1045,43 @@ class RyModel_PrepareManualRetopology(Operator):
 
         # Automerge is turned on with a higher double threshold so users can quickly snap vertices while retopologizing.
         bpy.context.scene.tool_settings.use_mesh_automerge = True
-        bpy.context.scene.tool_settings.double_threshold = 0.01
+        bpy.context.scene.tool_settings.double_threshold = 0.001
 
+        return {'FINISHED'}
+
+def reapply_shrinkwrap(self, context):
+    original_mode = bpy.context.mode
+    bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+
+    # Apply the existing shrinkwrap modifier.
+    shrinkwrap_modifier = modifiers.get_modifier_of_type(bpy.context.active_object.modifiers, 'SHRINKWRAP')
+    original_index = modifiers.get_modifier_index(shrinkwrap_modifier.name, bpy.context.active_object.modifiers)
+    original_shrinkwrap_target = shrinkwrap_modifier.target
+    original_wrap_mode = shrinkwrap_modifier.wrap_mode
+    original_offset = shrinkwrap_modifier.offset
+    original_show_on_cage = shrinkwrap_modifier.show_on_cage
+    bpy.ops.object.modifier_apply(modifier=shrinkwrap_modifier.name)
+
+    # Reapply the shrinkwrap modifier with original settings, and the original modifier stack index.
+    new_shrinkwrap_modifier = modifiers.add_modifier('SHRINKWRAP', self, context)
+    new_shrinkwrap_modifier.target = original_shrinkwrap_target
+    new_shrinkwrap_modifier.wrap_mode = original_wrap_mode
+    new_shrinkwrap_modifier.offset = original_offset
+    new_shrinkwrap_modifier.show_on_cage = original_show_on_cage
+    bpy.ops.object.modifier_move_to_index(modifier=new_shrinkwrap_modifier.name, index=original_index)
+
+    internal_utils.set_object_interaction_mode(original_mode)
+    rylog.log_status("Reapplied shrinkwrap modifier.", self, 'INFO')
+
+class RyModel_ReApplyShrinkwrap(Operator):
+    bl_idname = "rymodel.reapply_shrinkwrap"
+    bl_label = "Reapply Shrinkwrap"
+    bl_description = "Applies the shrinkwrap modifier, then adds a new shrinkwrap modifier with the settings of the original shrinkwrap modifier. This effectively resets the vertex placement on the mesh"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        reapply_shrinkwrap(self, context)
         return {'FINISHED'}

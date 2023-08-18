@@ -66,6 +66,7 @@ classes = (
     RyModel_DeleteCurveArray,
     RyModel_CurveArrayToMesh,
     RyModel_PrepareManualRetopology,
+    RyModel_ReApplyShrinkwrap,
 
     # Simulation Tools
     RyModel_ApplyCollision,
@@ -192,9 +193,10 @@ def register():
     # UI Tabs
     UI_TABS = [
         ("MODELLING", "Modelling", "Modeling operators that speed up, automate the modeling workflow within Blender.", '', 0),
-        ("SIMULATION", "Simulation", "Operators that preparing and run simulations that can speed up, automate or improve the quality of modeling (cloth simulation).", '', 1),
-        ("SPECIAL", "Special", "Special batched operations for achieving specific modeling effects.", '', 2),
-        ("SETTINGS", "Settings", "Add-on settings", 'SETTINGS', 3)
+        ("RETOPOLOGY", "Retopology", "Contains operators that automate adjusting topology of models, and commonly used operators involed in the retopology process", '', 1),
+        ("SIMULATION", "Simulation", "Operators that preparing and run simulations that can speed up, automate or improve the quality of modeling (cloth simulation).", '', 2),
+        ("SPECIAL", "Special", "Special batched operations for achieving specific modeling effects.", '', 3),
+        ("SETTINGS", "Settings", "Add-on settings", 'SETTINGS', 4)
     ]
 
     bpy.types.Scene.rymodel_ui_tabs = EnumProperty(items=UI_TABS, name="UI Tabs", default='MODELLING')
