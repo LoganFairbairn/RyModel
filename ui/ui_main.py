@@ -15,24 +15,8 @@ MODIFIER_UI_Y_SCALE = 1.2
 
 custom_icons = None
 
-class ModifierSubMenu(bpy.types.Menu):
-    bl_idname = "RYMODEL_MT_modifier_submenu"
-    bl_label = "Modifier Submenu"
 
-    def draw(self, context):
-        layout = self.layout
-        op = layout.operator("rymodel.move_modifier_to_first", text="Move to First")
-        op.modifier_name = context.modifier.name
-        op = layout.operator("rymodel.move_modifier_to_last", text="Move to Last")
-        op.modifier_name = context.modifier.name
-        op = layout.operator("rymodel.apply_modifier", text="Apply", icon='ADD')
-        op.modifier_name = context.modifier.name
-        op = layout.operator("rymodel.move_modifier_up", text="Move Up", icon='TRIA_UP')
-        op.modifier_name = context.modifier.name
-        op = layout.operator("rymodel.move_modifier_down", text="Move Down", icon='TRIA_DOWN')
-        op.modifier_name = context.modifier.name
-        op = layout.operator("rymodel.duplicate_modifier", text="Duplicate", icon='DUPLICATE')
-        op.modifier_name = context.modifier.name
+#----------------------------- MODELING TOOL UI -----------------------------#
 
 def load_custom_icons():
     global custom_icons
@@ -51,6 +35,7 @@ def load_custom_icons():
     custom_icons.load('INDIVIDUAL_OBJECTS', os.path.join(icons_dir, "individual_objects.png"), 'IMAGE')
     custom_icons.load('BACKUP', os.path.join(icons_dir, "backup.png"), 'IMAGE')
     custom_icons.load('CLEAN', os.path.join(icons_dir, "clean.png"), 'IMAGE')
+    custom_icons.load('REAPPLY_SHRINKWRAP', os.path.join(icons_dir, "reapply_shrinkwrap.png"), 'IMAGE')
     return custom_icons
 
 def remove_custom_icons():
@@ -205,15 +190,19 @@ def draw_origin_tools(layout):
     row.operator("rymodel.set_origin_center", text="", icon='ANCHOR_CENTER')
 
 def draw_retopology_tools(layout):
-    row = layout.row(align=True)
-    row.scale_x = 4
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.prepare_manual_retopology", text="Manual Retopology")
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
 
-    row = layout.row(align=True)
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Retopo")
+
+    row = second_column.row(align=True)
     row.scale_x = 4
     row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.reapply_shrinkwrap", text="Reapply Shrinkwrap")
+    row.operator("rymodel.prepare_manual_retopology", text="Manual Retopo")
+    row.operator("rymodel.reapply_shrinkwrap", text="", icon_value=custom_icons["REAPPLY_SHRINKWRAP"].icon_id)
 
 def draw_exporting_options(layout):
     addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
@@ -223,6 +212,7 @@ def draw_exporting_options(layout):
     second_column = split.column()
 
     row = first_column.row()
+    row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     row.label(text="Export")
 
@@ -263,15 +253,62 @@ def draw_backup_options(layout):
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.make_backup_object", text="Backup Object", icon_value=custom_icons["BACKUP"].icon_id)
 
-def draw_specials(layout):
+def draw_curve_array_settings(layout):
     '''Draws extra tool operations to the user interface.'''
-    row = layout.row(align=True)
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Curve")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.array_along_curve", text="Curve Array")
-    
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
     row.operator("rymodel.deform_array_along_curve", text="Curve Mesh")
+
+def draw_cloth_sim_operators(layout):
+    '''Draws cloth simulation operators to the provided layout.'''
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Cloth")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.simulate_cloth", text="", icon='MOD_CLOTH')
+    row.operator("rymodel.pin_cloth", text="", icon='PINNED')
+    row.operator("rymodel.unpin_cloth", text="", icon='UNPINNED')
+    row.operator("rymodel.apply_collision", text="", icon='MOD_PHYSICS')
+    #row.menu("OBJECT_MT_cloth_sim_menu", text="", icon='MOD_CLOTH')
+
+
+#----------------------------- MODIFIER UI -----------------------------#
+
+class ModifierSubMenu(bpy.types.Menu):
+    bl_idname = "RYMODEL_MT_modifier_submenu"
+    bl_label = "Modifier Submenu"
+
+    def draw(self, context):
+        layout = self.layout
+        op = layout.operator("rymodel.move_modifier_to_first", text="Move to First")
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_to_last", text="Move to Last")
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.apply_modifier", text="Apply", icon='ADD')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_up", text="Move Up", icon='TRIA_UP')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.move_modifier_down", text="Move Down", icon='TRIA_DOWN')
+        op.modifier_name = context.modifier.name
+        op = layout.operator("rymodel.duplicate_modifier", text="Duplicate", icon='DUPLICATE')
+        op.modifier_name = context.modifier.name
 
 def draw_modifier_title(layout, name, modifier):
     split = layout.split(factor=0.35)
@@ -470,24 +507,6 @@ def draw_modifiers(layout):
 
     draw_modifier_properties(layout)
 
-def draw_cloth_sim_operators(layout):
-    '''Draws cloth simulation operators to the provided layout.'''
-    
-    # Cloth Simulation Operators
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.simulate_cloth", text="Cloth Simulation", icon='MOD_CLOTH')
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.pin_cloth", text="Pin", icon='PINNED')
-    row.operator("rymodel.unpin_cloth", text="Unpin", icon='UNPINNED')
-
-    row = layout.row(align=True)
-    row.scale_y = UI_Y_SCALE
-    row.operator("rymodel.apply_collision", text="Apply Collision", icon='MOD_PHYSICS')
-    #row.menu("OBJECT_MT_cloth_sim_menu", text="", icon='MOD_CLOTH')
-
 class RyModel_OT_open_menu(Operator):
     bl_label = "Open RyModel Menu"
     bl_idname = "rymodel.open_menu"
@@ -526,9 +545,6 @@ class RyModel_OT_open_menu(Operator):
         row = tabs_column.row(align=True)
         row.scale_y = UI_Y_SCALE
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'MODELLING', text="Modeling")
-        row.prop_enum(context.scene, "rymodel_ui_tabs", 'RETOPOLOGY', text="Retopology")
-        row.prop_enum(context.scene, "rymodel_ui_tabs", 'SIMULATION', text="Simulation")
-        row.prop_enum(context.scene, "rymodel_ui_tabs", 'SPECIAL', text="Special")
         row.prop_enum(context.scene, "rymodel_ui_tabs", 'SETTINGS', text="")
 
         if context.active_object:
@@ -542,21 +558,15 @@ class RyModel_OT_open_menu(Operator):
                     draw_contextual_object_menu(first_column)
                     draw_mirror_tools(first_column)
                     draw_origin_tools(first_column)
+                    draw_retopology_tools(first_column)
+                    draw_cloth_sim_operators(first_column)
+                    draw_curve_array_settings(first_column)
                     draw_unwrapping_tools(first_column)
                     draw_backup_options(first_column)
                     draw_exporting_options(first_column)
 
                     # Second Column
                     draw_modifiers(second_column)
-
-                case 'RETOPOLOGY':
-                    draw_retopology_tools(layout)
-
-                case 'SIMULATION':
-                    draw_cloth_sim_operators(layout)
-
-                case 'SPECIAL':
-                    draw_specials(layout)
 
         else:
             layout.label(text="Select an object to edit.")
