@@ -18,6 +18,26 @@ custom_icons = None
 
 #----------------------------- MODELING TOOL UI -----------------------------#
 
+class MirrorSubMenu(Menu):
+    bl_idname = "RYMODEL_MT_mirror_submenu"
+    bl_label = "Mirror Submenu"
+
+    def draw(self, context):
+        layout = self.layout
+
+        active_object = bpy.context.active_object
+        if active_object:
+            mirror_modifier = modifiers.get_modifier_of_type(bpy.context.active_object.modifiers, modifier_type='MIRROR')
+            if mirror_modifier:
+                layout.prop(mirror_modifier, "use_bisect_axis", text="X", index=0, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_axis", text="Y", index=1, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_axis", text="Z", index=2, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="X", index=0, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Y", index=1, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Z", index=2, toggle=True)
+            else:
+                layout.label(text="No mirror modifier applied.")
+
 def load_custom_icons():
     global custom_icons
     custom_icons = bpy.utils.previews.new()
@@ -130,6 +150,7 @@ def draw_mirror_tools(layout):
         row.prop(bpy.context.scene, "rymodel_mirror_x", text="X", toggle=True)
         row.prop(bpy.context.scene, "rymodel_mirror_y", text="Y", toggle=True)
         row.prop(bpy.context.scene, "rymodel_mirror_z", text="Z", toggle=True)
+        row.menu("RYMODEL_MT_mirror_submenu", text="", icon='DOWNARROW_HLT')
 
     # Bi-Delete
     split = layout.split(factor=0.25)
@@ -171,7 +192,7 @@ def draw_boolean_tools(layout):
     row.operator("rymodel.add_cylinder_boolean", icon='MESH_CYLINDER', text="")
     row.operator("rymodel.selected_object_to_boolean", icon='SELECT_SET', text="")
     
-    row.prop_menu_enum(bpy.context.scene, "rymodel_boolean_mode", text='')
+    #row.prop_menu_enum(bpy.context.scene, "rymodel_boolean_mode", text='')
 
 def draw_origin_tools(layout):
     split = layout.split(factor=0.25)
@@ -291,7 +312,7 @@ def draw_cloth_sim_operators(layout):
 
 #----------------------------- MODIFIER UI -----------------------------#
 
-class ModifierSubMenu(bpy.types.Menu):
+class ModifierSubMenu(Menu):
     bl_idname = "RYMODEL_MT_modifier_submenu"
     bl_label = "Modifier Submenu"
 

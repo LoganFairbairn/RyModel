@@ -137,6 +137,7 @@ classes = (
 
     # User Interface
     ModifierSubMenu,
+    MirrorSubMenu,
     RyModel_OT_open_menu
 )
 
