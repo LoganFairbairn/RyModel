@@ -134,6 +134,14 @@ def draw_contextual_object_menu(layout):
             row.operator("rymodel.delete_curve_array", text="Remove")
             row.operator("rymodel.curve_array_to_mesh", text="To Mesh")
 
+        case 'ARMATURE':
+            selected_rig = bpy.context.active_object
+            if selected_rig:
+                if selected_rig.pose.bones.get('MCH-WGT-chest'):
+                    row = layout.row(align=True)
+                    row.scale_y = UI_Y_SCALE
+                    row.operator("rymodel.prepare_rigify_for_vrchat")
+
 def draw_mirror_tools(layout):
     '''Draws mirror options for this add-on to the user interface.'''
     if bpy.context.active_object:

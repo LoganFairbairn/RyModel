@@ -29,6 +29,7 @@ from .core.modeling_tools import *
 from .core.simulation_tools import *
 from .core.modifiers import *
 from .core.property_range_overrides import *
+from .core.rigging_tools import RyModel_PrepareRigifyForVRChat
 from .core.exporting_tools import RyModel_Export
 
 # Import user interface.
@@ -131,6 +132,9 @@ classes = (
     SolidifyModifierSettings,
     ArrayModifierSettings,
     CurveSettings,
+
+    # Rigging Tools
+    RyModel_PrepareRigifyForVRChat,
 
     # Exporting Tools
     RyModel_Export,
