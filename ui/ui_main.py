@@ -232,6 +232,10 @@ def draw_retopology_tools(layout):
     row.scale_y = UI_Y_SCALE
     row.operator("rymodel.prepare_manual_retopology", text="Manual Retopo")
     row.operator("rymodel.reapply_shrinkwrap", text="", icon_value=custom_icons["REAPPLY_SHRINKWRAP"].icon_id)
+    if bpy.context.scene.retopology_snapping_toggle:
+        row.prop(bpy.context.scene, "retopology_snapping_toggle", text="", icon='SNAP_ON')
+    else:
+        row.prop(bpy.context.scene, "retopology_snapping_toggle", text="", icon='SNAP_OFF')
 
 def draw_exporting_options(layout):
     addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences

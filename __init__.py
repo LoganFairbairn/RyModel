@@ -234,6 +234,9 @@ def register():
     bpy.types.Scene.array_modifier_settings = PointerProperty(type=ArrayModifierSettings)
     bpy.types.Scene.curve_settings = PointerProperty(type=CurveSettings)
 
+    # Retopology snapping toggle.
+    bpy.types.Scene.retopology_snapping_toggle = BoolProperty(default=False, description="Toggles between ideal snapping settings for manual retopology in Blender and commonly used snapping settings for modeling. Toggles snapping, project individual elements, face snapping, and automerge", update=toggle_retopology_snapping)
+
     # General Settings
     bpy.types.Scene.auto_sharpen_angle = FloatProperty(name="Auto Sharpen Angle", description="Angle in which to apply auto sharpening. Default = 30 degrees", default=0.523599, min=0, max=3.14159, unit='ROTATION')
 

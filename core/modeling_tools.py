@@ -9,6 +9,18 @@ from ..core import modifiers
 from ..core import internal_utils
 from ..core import rylog
 
+def toggle_retopology_snapping(self, context):
+    if context.scene.retopology_snapping_toggle:
+        bpy.context.scene.tool_settings.use_snap_project = True
+        bpy.context.scene.tool_settings.use_snap = True
+        bpy.context.scene.tool_settings.snap_elements = {'FACE'}
+        bpy.context.scene.tool_settings.use_mesh_automerge = True
+    else:
+        bpy.context.scene.tool_settings.use_snap_project = False
+        bpy.context.scene.tool_settings.use_snap = False
+        bpy.context.scene.tool_settings.snap_elements = {'VERTEX'}
+        bpy.context.scene.tool_settings.use_mesh_automerge = False
+
 def update_mirror_x(self, context):
     if bpy.context.scene.rymodel_update_mirroring:
         mirror_modifier = modifiers.get_modifier_of_type(context.active_object.modifiers, 'MIRROR')
