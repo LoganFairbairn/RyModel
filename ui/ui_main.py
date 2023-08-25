@@ -137,7 +137,7 @@ def draw_contextual_object_menu(layout):
         case 'ARMATURE':
             selected_rig = bpy.context.active_object
             if selected_rig:
-                if selected_rig.pose.bones.get('MCH-WGT-chest'):
+                if selected_rig.pose.bones.get('MCH-WGT-chest') and len(selected_rig.pose.bones) > 394:
                     row = layout.row(align=True)
                     row.scale_y = UI_Y_SCALE
                     row.operator("rymodel.prepare_rigify_for_vrchat")

@@ -4,7 +4,7 @@ from ..core import rylog
 
 class RyModel_PrepareRigifyForVRChat(Operator):
     bl_idname = "rymodel.prepare_rigify_for_vrchat"
-    bl_label = "Rigify To Unity"
+    bl_label = "Rigify To VRChat"
     bl_description = "Converts a standard Rigify rig (already generated) to be imported into Unity as a humanoid model and is compatible with VRChat. This is done by automatically removing, and re-parenting bones so they rig matches the Unity humanoid skeleton. Bone constraints are also applied to shoulder bones so their control bones work in Blender"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -15,6 +15,11 @@ class RyModel_PrepareRigifyForVRChat(Operator):
         # Check that the selected rig is a rigify rig (we'll check by looking for an existing 'MCH-WGT-chest' bone).
         if not rigify_rig_object.pose.bones.get('MCH-WGT-chest'):
             rylog.log_status("The selected rig is not a standard Rigify rig. This operator should only be used on standard un-edited Rigify rigs.", self)
+            return {'FINISHED'}
+        
+        # Check that the number of bones is greater than the number of bones after a standard Rigify rig is converted to be compatible with Unity / VRChat.
+        if len(rigify_rig_object.pose.bones) <= 394:
+            rylog.log_status("The selected rig is not a standard Rigify rig, or has already been converted to a Unity / VRChat compatible rig.", self)
             return {'FINISHED'}
 
         # Breast and pelvis bones aren't part of the Unity humanoid skeleton, make sure they are not marked as deform bones. They can still be imported and used as dynamic bones in Unity.
