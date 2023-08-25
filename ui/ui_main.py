@@ -29,12 +29,12 @@ class MirrorSubMenu(Menu):
         if active_object:
             mirror_modifier = modifiers.get_modifier_of_type(bpy.context.active_object.modifiers, modifier_type='MIRROR')
             if mirror_modifier:
-                layout.prop(mirror_modifier, "use_bisect_axis", text="X", index=0, toggle=True)
-                layout.prop(mirror_modifier, "use_bisect_axis", text="Y", index=1, toggle=True)
-                layout.prop(mirror_modifier, "use_bisect_axis", text="Z", index=2, toggle=True)
-                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="X", index=0, toggle=True)
-                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Y", index=1, toggle=True)
-                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Z", index=2, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_axis", text="Bisect X", index=0, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_axis", text="Bisect Y", index=1, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_axis", text="Bisect Z", index=2, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Flip Bisect X", index=0, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Flip Bisect Y", index=1, toggle=True)
+                layout.prop(mirror_modifier, "use_bisect_flip_axis", text="Flip Bisect Z", index=2, toggle=True)
             else:
                 layout.label(text="No mirror modifier applied.")
 
