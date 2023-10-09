@@ -1097,3 +1097,38 @@ class RyModel_ReApplyShrinkwrap(Operator):
         
         reapply_shrinkwrap(self, context)
         return {'FINISHED'}
+    
+class RyModel_AutoGenerateLODs(Operator):
+    bl_idname = "rymodel.auto_generate_lods"
+    bl_label = "Auto Generate LODs"
+    bl_description = "Automatically generates LOD (level of detail) meshes for all selected meshes"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        if not internal_utils.verify_active_mesh(self):
+            return {'FINISHED'}
+        
+        selected_objects = context.selected_objects
+        for obj in selected_objects:
+
+            number_of_lods = 5
+            decimate_reduction_per_lod = 1 / (number_of_lods + 1)
+            decimate_ratio = 1 - decimate_reduction_per_lod
+
+            for i in range(0, number_of_lods):
+
+                # Duplicate the selected object.
+                lod_object = obj.copy()
+                lod_object.data = obj.data.copy()
+                bpy.context.collection.objects.link(lod_object)
+                lod_object.name = "{0}_LOD{1}".format(obj.name, i + 1)
+        
+                # Add a decimate modifier.
+                decimate_modifier = lod_object.modifiers.new('AUTO_DECIMATE', 'DECIMATE')
+                decimate_modifier.ratio = decimate_ratio
+                decimate_ratio -= decimate_reduction_per_lod
+
+                # Apply the decimate modifier.
+                #lod_object.modifier_apply(modifier=decimate_modifier.modifier_name, report=False)
+
+        return {'FINISHED'}

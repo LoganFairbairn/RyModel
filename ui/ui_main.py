@@ -237,6 +237,22 @@ def draw_retopology_tools(layout):
     else:
         row.prop(bpy.context.scene, "retopology_snapping_toggle", text="", icon='SNAP_OFF')
 
+def draw_lod_options(layout):
+    '''Draws level of detail (LOD) operator buttons.'''
+    split = layout.split(factor=0.25)
+    first_column = split.column()
+    second_column = split.column()
+
+    row = first_column.row()
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.label(text="Auto LOD")
+
+    row = second_column.row(align=True)
+    row.scale_x = 4
+    row.scale_y = UI_Y_SCALE
+    row.operator("rymodel.auto_generate_lods", text="Auto Generate LOD")
+
 def draw_exporting_options(layout):
     addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
 
@@ -596,6 +612,7 @@ class RyModel_OT_open_menu(Operator):
                     draw_curve_array_settings(first_column)
                     draw_unwrapping_tools(first_column)
                     draw_backup_options(first_column)
+                    draw_lod_options(first_column)
                     draw_exporting_options(first_column)
 
                     # Second Column

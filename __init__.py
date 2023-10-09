@@ -68,6 +68,7 @@ classes = (
     RyModel_CurveArrayToMesh,
     RyModel_PrepareManualRetopology,
     RyModel_ReApplyShrinkwrap,
+    RyModel_AutoGenerateLODs,
 
     # Simulation Tools
     RyModel_ApplyCollision,
