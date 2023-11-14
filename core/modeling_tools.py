@@ -300,24 +300,26 @@ class RyModel_AutoSharpen(Operator):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode
-
-        # Clear all bevel weights.
         bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 
-        if bpy.context.active_object.data.has_bevel_weight_edge:
-            bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+        # Clear all bevel weight attributes.
+        mesh_data = bpy.context.active_object.data
+        attributes = mesh_data.attributes
+        for attribute in attributes:
+            if attribute.domain == 'EDGE' and attribute.is_required == False:
+                attributes.remove(attribute)
 
         # Apply autosmooth.
         bpy.ops.object.shade_smooth()
         bpy.context.object.data.use_auto_smooth = True
         bpy.context.object.data.auto_smooth_angle = 1.0472
 
-        # Clear all bevel weights and sharpening.
+        # Clear all sharpening.
         bpy.ops.object.mode_set(mode='EDIT', toggle=False)
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.mark_sharp(clear=True)
 
-        # Mark bevel weights and sharpening for sharp angles.
+        # Mark bevel weights and sharpening for detected sharp angles.
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='EDGE')
         bpy.ops.mesh.edges_select_sharp(sharpness=context.scene.auto_sharpen_angle)
@@ -338,11 +340,14 @@ class RyModel_AutoSmooth(Operator):
             return {'FINISHED'}
         
         original_mode = bpy.context.mode
+        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 
         # Clear all bevel weights.
-        bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-        if bpy.context.active_object.data.has_bevel_weight_edge:
-            bpy.ops.mesh.customdata_bevel_weight_edge_clear()
+        mesh_data = bpy.context.active_object.data
+        attributes = mesh_data.attributes
+        for attribute in attributes:
+            if attribute.domain == 'EDGE' and attribute.is_required == False:
+                attributes.remove(attribute)
 
         # Apply autosmooth.
         bpy.ops.object.shade_smooth()
