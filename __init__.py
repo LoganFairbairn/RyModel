@@ -39,7 +39,7 @@ bl_info = {
     "name": "RyModel",
     "author": "Logan Fairbairn (Ryver)",
     "version": (1, 0, 0),
-    "blender": (3, 5, 1),
+    "blender": (4, 0, 0),
     "location": "View3D > Sidebar > RyModel",
     "description": "Adds a quick access menu with a collection of batched and commonly used modeling operations.",
     "warning": "",
