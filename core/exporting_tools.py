@@ -150,13 +150,13 @@ class RyModel_Export(Operator):
         directory = os.path.dirname(open_blend_path)
 
         # Apply a triangulate modifier to the object being exported, if one does not exist already.
+        selected_objects = bpy.context.selected_objects
         for obj in selected_objects:
             modifiers.get_modifier_of_type(obj.modifiers, '')
 
         # Export all selected objects as individual files (use the name of each object as the filename).
         addon_preferences = bpy.context.preferences.addons[preferences.ADDON_NAME].preferences
         if addon_preferences.export_selected_objects_individually:
-            selected_objects = bpy.context.selected_objects
             
             # Select 1 object at a time for export as individual files.
             for obj in selected_objects:
