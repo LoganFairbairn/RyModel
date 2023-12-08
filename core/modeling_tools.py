@@ -1037,25 +1037,12 @@ class RyModel_PrepareManualRetopology(Operator):
         # Turn on retopology overlay mode in the viewport (must be in edit mode and requires Blender version 3.6+).
         bpy.context.space_data.overlay.show_retopology = True
 
-        # Deprecated method (as of Blender version 3.6) of improving visibility of the underlying mesh when retopologizing.
-        '''
-        # Create and add a new retopology material that improves visibility of the underlying model while retopologizing.
-        retopology_material = bpy.data.materials.get('Retopology')
-        if not retopology_material:
-            retopology_material = bpy.data.materials.new(name='Retopology')
-            retopology_material.use_nodes = True
-            retopology_material.diffuse_color = (0.0, 0.1, 1.0, 0.5)
-        retopology_plane.data.materials.append(retopology_material)
-        bpy.context.space_data.shading.color_type = 'MATERIAL'
-        '''
-
         # Set viewport shading mode to solid, material so users can see the retopology materials.
         bpy.context.space_data.shading.type = 'SOLID'
 
         # Turn on best snapping settings.
         bpy.context.scene.tool_settings.use_snap = True
-        bpy.context.scene.tool_settings.snap_elements = {'FACE'}
-        bpy.context.scene.tool_settings.use_snap_project = True
+        bpy.context.scene.tool_settings.snap_elements_individual = {'FACE_PROJECT'}
 
         # End in edit mode.
         internal_utils.set_object_interaction_mode('EDIT')
